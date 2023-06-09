@@ -1,5 +1,3 @@
-# aligo_oligo_backend
-
 # aligo_oligo
 알리고 올리고 공유 기반 목표 달성 웹 서비스
 
