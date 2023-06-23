@@ -1,6 +1,5 @@
 package com.intouch.aligooligo.User;
 
-import com.intouch.aligooligo.Exception.UserIdPwNotFoundException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
@@ -14,13 +13,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @AllArgsConstructor
-@RequestMapping("/users")
+@RequestMapping(value="/users")
 @RestController
 public class UserController {
 
     private final UserService userService;
     @PostMapping("/signin")
-    public ResponseEntity<String> SignInUser(@RequestBody UserDTO req){
+    public ResponseEntity<String> SignInUser(@RequestBody User req){
         try {
             String token = userService.SignIn(req);
             if(token==null)
@@ -28,7 +27,7 @@ public class UserController {
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", "Bearer " + token);
             return ResponseEntity.ok().headers(headers).body(token);
-        }catch(UserIdPwNotFoundException e){//db에 없을 때
+        }catch(IllegalArgumentException e){//db에 없을 때
             return ResponseEntity.status(401).build();
         }catch(UnsupportedJwtException e){//jwt가 예상하는 형식과 다른 형식이거나 구성
             return ResponseEntity.badRequest().build();
@@ -43,7 +42,7 @@ public class UserController {
         }
     }
     @PostMapping("/signup")
-    public ResponseEntity<String> SignUpUser(@RequestBody UserDTO req){
+    public ResponseEntity<String> SignUpUser(@RequestBody User req){
         try {
             int res = userService.SignUp(req);
             System.out.println(req);
