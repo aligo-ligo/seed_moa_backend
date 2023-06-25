@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 @Table(name = "user")
 @Builder
 public class User implements UserDetails {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -28,7 +27,7 @@ public class User implements UserDetails {
     @Column(name = "user_email", length = 50, nullable = false, unique = true)
     private String email;
 
-    @Column(name = "user_password", length = 20, nullable = false)
+    @Column(name = "user_password", length = 20)
     private String password;
 
     @Column(name = "nickname", length = 10, nullable = false)
