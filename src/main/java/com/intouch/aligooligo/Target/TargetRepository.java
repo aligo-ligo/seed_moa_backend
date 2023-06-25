@@ -1,7 +1,9 @@
-/*package com.intouch.aligooligo.Target;
+package com.intouch.aligooligo.Target;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface TargetRepository extends JpaRepository<TargetDTO, Long> {
+import java.util.List;
+
+public interface TargetRepository extends JpaRepository<Target, Long> {
+    List<Target> findAllById(Integer id);
 }
-*/

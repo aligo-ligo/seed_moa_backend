@@ -1,12 +1,11 @@
 package com.intouch.aligooligo.Target;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import com.intouch.aligooligo.User.User;
+import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -15,12 +14,16 @@ import java.util.Date;
 @Table(name = "target")
 @Builder
 public class Target {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
 
     @Column(name = "start_date", nullable = false)
-    Date startDate;
+    LocalDate startDate;
 
     @Column(name = "end_date", nullable = false)
-    Date endDate;
+    LocalDate endDate;
 
     @Column(name = "goal", nullable = false)
     String goal;
@@ -42,4 +45,8 @@ public class Target {
 
     @Column(name = "penalty", nullable = false)
     String penalty;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 }
