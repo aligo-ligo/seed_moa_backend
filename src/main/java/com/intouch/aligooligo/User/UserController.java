@@ -46,6 +46,7 @@ public class UserController {
         ObjectNode mainNode = objectMapper.createObjectNode();
         ObjectNode userNode = objectMapper.createObjectNode();
 
+        userNode.put("id",user.getId());
         userNode.put("email", user.getEmail());
         userNode.put("nickName",user.getNickName());
         mainNode.put("accessToken",token);
@@ -57,6 +58,7 @@ public class UserController {
     @PostMapping("/signin")
     public ResponseEntity<String> SignInUser(@RequestBody User req){
         String token = getToken(req);
+        User user = userService.findByUserEmail(req.getEmail()).get();
 
         if(token==null)
             return ResponseEntity.internalServerError().build();
@@ -66,7 +68,7 @@ public class UserController {
             return ResponseEntity.badRequest().build();
         else if(token.equals("500"))
             return ResponseEntity.internalServerError().build();
-        return ResponseEntity.ok().body(getResponse(token, req));
+        return ResponseEntity.ok().body(getResponse(token, user));
 
     }
     @PostMapping("/signup")
@@ -77,6 +79,7 @@ public class UserController {
             System.out.println(res);
             if (res == 0){
                 String token = getToken(req);
+                User user = userService.findByUserEmail(req.getEmail()).get();
                 System.out.println(token);
                 if(token==null)
                     return ResponseEntity.internalServerError().build();
@@ -86,7 +89,7 @@ public class UserController {
                     return ResponseEntity.badRequest().build();
                 else if(token.equals("500"))
                     return ResponseEntity.internalServerError().build();
-                return ResponseEntity.ok().body(getResponse(token, req));
+                return ResponseEntity.ok().body(getResponse(token, user));
             }
             else if(res==1)
                 return ResponseEntity.badRequest().body("Email format is invalid");
@@ -111,9 +114,8 @@ public class UserController {
     public ResponseEntity<String> SignUpKakao(@RequestParam String code){
         String access_Token = userService.getKakaoAcessToken(code);
         Map<String, String> kakaoUser = userService.createKakaoUser(access_Token);
-
         if(kakaoUser!=null)
-            return ResponseEntity.ok().body(getResponse(kakaoUser.get("accessToken"),new User(kakaoUser.get("email"),kakaoUser.get("nickName"))));
+            return ResponseEntity.ok().body(getResponse(kakaoUser.get("accessToken"),new User(Long.parseLong(kakaoUser.get("id")), kakaoUser.get("email"),kakaoUser.get("nickName"))));
         return ResponseEntity.internalServerError().build();
 
     }

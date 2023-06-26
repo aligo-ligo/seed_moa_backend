@@ -194,6 +194,7 @@ public class UserService {
             List<String> list = user.getRoles();
             String localAccessToken = SignIn(new User(email,list), true);
             Map<String, String> returnValue = new HashMap<>();
+            returnValue.put("id",user.getId().toString());
             returnValue.put("email",user.getEmail());
             returnValue.put("nickName",user.getNickName());
             returnValue.put("accessToken", localAccessToken);

@@ -56,7 +56,8 @@ public class User implements UserDetails {
         this.roles = list;
     }
 
-    User(String email, String nickName){
+    User(Long id, String email, String nickName){
+        this.id = id;
         this.email = email;
         this.nickName = nickName;
     }
