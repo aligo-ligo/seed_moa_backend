@@ -51,15 +51,13 @@ public class User implements UserDetails {
                 .collect(Collectors.toList());
     }
 
-    User(String email, String password, String nickName, List<String> list){
+    User(String email, List<String> list){
         this.email = email;
-        this.password = password;
-        this.nickName = nickName;
         this.roles = list;
     }
-    User(String email, String password, String nickName){
+
+    User(String email, String nickName){
         this.email = email;
-        this.password = password;
         this.nickName = nickName;
     }
 

@@ -1,5 +1,7 @@
 package com.intouch.aligooligo.User;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -13,6 +15,8 @@ import org.springframework.stereotype.Service;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.http.HttpClient;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Service
@@ -37,10 +41,12 @@ public class UserService {
     private String kakaoUserInfo;
 
 
-    public String SignIn(User req) throws UnsupportedJwtException, MalformedJwtException, ExpiredJwtException, SignatureException{
+    public String SignIn(User req, boolean kakaoChecked) throws UnsupportedJwtException, MalformedJwtException, ExpiredJwtException, SignatureException{
 
         User user = findByUserEmail(req.getEmail()).orElseThrow(()->new IllegalArgumentException("가입되지 않은 E-MAIL 입니다."));
-        if(passwordEncoder.matches(req.getPassword(),user.getPassword())){//email, password 모두 같을 경우
+        if(kakaoChecked)
+            return jwtTokenProvider.createToken(user.getEmail(),user.getRoles());
+        else if(passwordEncoder.matches(req.getPassword(),user.getPassword())){//email, password 모두 같을 경우
             return jwtTokenProvider.createToken(user.getEmail(),user.getRoles());
         }
         return null;
@@ -68,9 +74,7 @@ public class UserService {
         String email = req.getEmail();
         String pw = req.getPassword();
         String name = req.getNickName();
-        System.out.println("hihihiihi");
         boolean checkedId = existByUserEmail(email);
-        System.out.println("hihihiihi222");
 
         try{
             for(char i : pw.toCharArray()){
@@ -82,14 +86,10 @@ public class UserService {
             if(email.contains("@") && NumberCheck && AlphabetCheck &&
             pw.length()>=8 && email.length()<=50 && pw.length()<=20 &&
             name.length()<=10 && !checkedId){
-                System.out.println("hihihiihisfasfdfs");
-                System.out.println(passwordEncoder.encode(pw).length());
-                //userRepository.save(new User(email,pw,name));
                 userRepository.save(User.builder().email(email).password(passwordEncoder.encode(pw))
                         .nickName(name).roles(Collections.singletonList("ROLE_USER")).build());
                 return 0;//ok
             }
-
             if(!email.contains("@")||email.length()>50)
                 return 1;//이메일 형식 올바르지 않은 경우
             if(!NumberCheck || !AlphabetCheck || pw.length()>20 || pw.length()<8)
@@ -128,12 +128,10 @@ public class UserService {
             sb.append("&code=" + code);
             sb.append("&client_secret=" + clientSecret);
             bw.write(sb.toString());
-            System.out.println(sb.toString());
             bw.flush();
 
             //결과 코드가 200이라면 성공
             int responseCode = conn.getResponseCode();
-            System.out.println("responseCode : " + responseCode);
 
             //요청을 통해 얻은 JSON타입의 Response 메세지 읽어오기
             BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
@@ -143,16 +141,11 @@ public class UserService {
             while ((line = br.readLine()) != null) {
                 result += line;
             }
-            System.out.println("response body : " + result);
-
             //Gson 라이브러리에 포함된 클래스로 JSON파싱 객체 생성
             JsonElement element = JsonParser.parseString(result);
 
             access_Token = element.getAsJsonObject().get("access_token").getAsString();
             refresh_Token = element.getAsJsonObject().get("refresh_token").getAsString();
-
-            System.out.println("access_token : " + access_Token);
-            System.out.println("refresh_token : " + refresh_Token);
 
             br.close();
             bw.close();
@@ -163,57 +156,53 @@ public class UserService {
         return access_Token;
     }
 
-    public boolean createKakaoUser(String accessToken) {
+    public Map<String, String> createKakaoUser(String accessToken) {
         try{
             URL url = new URL(kakaoUserInfo);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-
             conn.setRequestMethod("POST");
             conn.setDoOutput(true);
             conn.setRequestProperty("Authorization", "Bearer "+accessToken);
 
-            int responseCode = conn.getResponseCode();
-            System.out.println("responseCode : " + responseCode);
-
             //요청을 통해 얻은 JSON타입의 Response 메세지 읽어오기
-            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(),"UTF-8"));
             String line = "";
             String result = "";
 
             while ((line = br.readLine()) != null) {
                 result += line;
             }
-            System.out.println("response body : " + result);
 
             //Gson 라이브러리로 JSON파싱
             JsonElement element = JsonParser.parseString(result);
-
             int id = element.getAsJsonObject().get("id").getAsInt();
             boolean hasEmail = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("has_email").getAsBoolean();
             String email = "";
             String name = "";
+
             if(hasEmail){
                 email = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("email").getAsString();
             }
-
             name = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("profile").getAsJsonObject().get("nickname").getAsString();
-
-            System.out.println("id : " + id);
-            System.out.println("email : " + email);
-            System.out.println("name : "+name);
-
             br.close();
 
-            userRepository.save(User.builder().email(email)
-                    .nickName(name).roles(Collections.singletonList("ROLE_USER")).build());
-            return true;
-
-
+            if(!existByUserEmail(email)) {
+                userRepository.save(User.builder().email(email)
+                        .nickName(name).roles(Collections.singletonList("ROLE_USER")).build());
+            }
+            User user = findByUserEmail(email).get();
+            List<String> list = user.getRoles();
+            String localAccessToken = SignIn(new User(email,list), true);
+            Map<String, String> returnValue = new HashMap<>();
+            returnValue.put("email",user.getEmail());
+            returnValue.put("nickName",user.getNickName());
+            returnValue.put("accessToken", localAccessToken);
+            return returnValue;
 
 
         }catch(Exception e){
             e.printStackTrace();
-            return false;
+            return null;
         }
     }
 }

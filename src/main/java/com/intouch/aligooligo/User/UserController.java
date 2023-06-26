@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @AllArgsConstructor
 @RequestMapping(value="/users")
 @RestController
@@ -20,7 +22,7 @@ public class UserController {
     private final UserService userService;
     public String getToken(User req){
         try {
-            String token = userService.SignIn(req);
+            String token = userService.SignIn(req, false);
             if(token==null)
                 return "400";
             return token;
@@ -106,13 +108,12 @@ public class UserController {
     }
 
     @GetMapping("/kakao")
-    public ResponseEntity<HttpStatus> SignUpKakao(@RequestParam String code){
+    public ResponseEntity<String> SignUpKakao(@RequestParam String code){
         String access_Token = userService.getKakaoAcessToken(code);
-        System.out.println("controller access_token: "+access_Token);
-        boolean createKakaoUser = userService.createKakaoUser(access_Token);
+        Map<String, String> kakaoUser = userService.createKakaoUser(access_Token);
 
-        if(createKakaoUser)
-            return ResponseEntity.ok().build();
+        if(kakaoUser!=null)
+            return ResponseEntity.ok().body(getResponse(kakaoUser.get("accessToken"),new User(kakaoUser.get("email"),kakaoUser.get("nickName"))));
         return ResponseEntity.internalServerError().build();
 
     }
