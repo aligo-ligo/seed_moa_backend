@@ -1,16 +1,19 @@
 package com.intouch.aligooligo.Target;
 
 
+import com.intouch.aligooligo.Routine.Routine;
+import com.intouch.aligooligo.Subgoal.Subgoal;
 import com.intouch.aligooligo.User.User;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @Table(name = "target")
 @Builder
 public class Target {
@@ -25,7 +28,7 @@ public class Target {
     @Column(name = "end_date", nullable = false)
     LocalDate endDate;
 
-    @Column(name = "goal", nullable = false)
+    @Column(name = "goal", nullable = false, length = 100)
     String goal;
 
     @Column(name = "subgoal_total")
@@ -43,10 +46,16 @@ public class Target {
     @Column(name = "vote_total")
     Integer voteTotal;
 
-    @Column(name = "penalty", nullable = false)
+    @Column(name = "penalty", nullable = false, length = 50)
     String penalty;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToMany(mappedBy = "target")
+    private List<Subgoal> subgoals;
+
+    @OneToMany(mappedBy = "target")
+    private List<Routine> routines;
 }

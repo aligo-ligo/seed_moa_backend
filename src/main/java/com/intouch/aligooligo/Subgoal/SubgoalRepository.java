@@ -1,4 +1,6 @@
 package com.intouch.aligooligo.Subgoal;
 
-public interface SubgoalRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface SubgoalRepository extends JpaRepository<Subgoal, Long> {
 }

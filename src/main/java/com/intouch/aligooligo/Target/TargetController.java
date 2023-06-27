@@ -25,10 +25,10 @@ public class TargetController {
         }
     }
 
-    @PostMapping("/write")
-    public ResponseEntity<HttpStatus> writeTarget(@RequestBody Target req){
+    @PostMapping("/create")
+    public ResponseEntity<HttpStatus> createTarget(@RequestBody Target req){
         try{
-            targetService.writeTargetList(req);
+            String createRes = targetService.createTarget(req);
             return ResponseEntity.ok().build();
         }catch(Exception e){
             return ResponseEntity.internalServerError().build();
