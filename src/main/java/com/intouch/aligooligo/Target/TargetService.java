@@ -27,14 +27,14 @@ public class TargetService {
     }
 
     @Transactional
-    public String createTarget(Target req){
+    public String createTarget(String email, Target req){
         System.out.println("req : " +req.getGoal());
         System.out.println("req : " +req.getEndDate());
         System.out.println("req : " +req.getPenalty());
         System.out.println("req : " +req.getSubGoal());
         System.out.println("req : " +req.getRoutine());
 
-        User user = userRepository.findById(54L).get();
+        User user = userRepository.findByEmail(email).get();
         System.out.println(user);
         Target saved = targetRepository.save(Target.builder().startDate(LocalDate.now()).endDate(req.getEndDate()).goal(req.getGoal()).subGoalTotal(0.0)
                 .successCount(0).failureVote(0).successVote(0).voteTotal(0).penalty("테스트입니다").user(user).subGoal(req.getSubGoal()).routine(req.getRoutine()).build());
