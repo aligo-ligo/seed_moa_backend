@@ -37,6 +37,7 @@ public class TargetService {
 
     public TargetDTO getTargetDTO(Target target){
         TargetDTO dto = new TargetDTO();
+        dto.setId(target.getId());
         dto.setUserId(target.getUser().getId());
         dto.setGoal(target.getGoal());
         dto.setPenalty(target.getPenalty());
@@ -53,18 +54,45 @@ public class TargetService {
     }
 
     @Transactional
-    public String createTarget(String email, Target req){
+    public boolean createTarget(String email, Target req){
+        try {
+            User user = userRepository.findByEmail(email).get();
+            Target saved = targetRepository.save(Target.builder().startDate(LocalDate.now()).endDate(req.getEndDate()).goal(req.getGoal()).subGoalTotal(0.0)
+                    .successCount(0).failureVote(0).successVote(0).voteTotal(0).penalty(req.getPenalty()).user(user).subGoal(req.getSubGoal()).routine(req.getRoutine()).build());
 
-        User user = userRepository.findByEmail(email).get();
-        Target saved = targetRepository.save(Target.builder().startDate(LocalDate.now()).endDate(req.getEndDate()).goal(req.getGoal()).subGoalTotal(0.0)
-                .successCount(0).failureVote(0).successVote(0).voteTotal(0).penalty(req.getPenalty()).user(user).subGoal(req.getSubGoal()).routine(req.getRoutine()).build());
+            for (Subgoal subgoal : req.getSubGoal()) {
+                subgoalRepository.save(Subgoal.builder().target(saved).value(subgoal.getValue()).success(false).build());
+            }
+            for (Routine routine : req.getRoutine()) {
+                routineRepository.save(Routine.builder().target(saved).value(routine.getValue()).build());
+            }
+            return true;
+        }catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+    }
 
-        for(Subgoal subgoal : req.getSubGoal()){
-            subgoalRepository.save(Subgoal.builder().target(saved).value(subgoal.getValue()).success(false).build());
+//    public String updateTarget(TargetUpdateReq req){
+//
+//    }
+
+    public boolean voteTarget(Long id, boolean success){
+        try{
+            Target target = targetRepository.findById(id).orElseThrow(()->new IllegalArgumentException("타겟을 찾을 수 없습니다."));
+            if(success){
+                targetRepository.save(Target.builder().startDate(target.getStartDate()).endDate(target.getEndDate()).goal(target.getGoal()).subGoalTotal(target.getSubGoalTotal())
+                        .successCount(target.getSuccessCount()).failureVote(target.getFailureVote()).successVote(target.getSuccessVote()+1).voteTotal(target.getVoteTotal()+1)
+                        .penalty(target.getPenalty()).user(target.getUser()).subGoal(target.getSubGoal()).routine(target.getRoutine()).build());
+            }
+            else {
+                targetRepository.save(Target.builder().startDate(target.getStartDate()).endDate(target.getEndDate()).goal(target.getGoal()).subGoalTotal(target.getSubGoalTotal())
+                        .successCount(target.getSuccessCount()).failureVote(target.getFailureVote() + 1).successVote(target.getSuccessVote()).voteTotal(target.getVoteTotal() + 1)
+                        .penalty(target.getPenalty()).user(target.getUser()).subGoal(target.getSubGoal()).routine(target.getRoutine()).build());
+            }
+            return true;
+        }catch (Exception e){
+            return false;
         }
-        for(Routine routine : req.getRoutine()){
-            routineRepository.save(Routine.builder().target(saved).value(routine.getValue()).build());
-        }
-        return null;
     }
 }

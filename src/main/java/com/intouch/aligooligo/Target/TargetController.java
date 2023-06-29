@@ -35,8 +35,10 @@ public class TargetController {
         try {
             String email = checkJwtValidation(request);
             if (email != null) {
-                targetService.createTarget(email, req);
-                return ResponseEntity.ok().build();//ok
+                boolean created = targetService.createTarget(email, req);
+                if(created)
+                    return ResponseEntity.ok().build();//ok
+                return ResponseEntity.internalServerError().build();//server error
             }
             return ResponseEntity.status(403).build();//not auth
         } catch (Exception e) {
@@ -54,6 +56,34 @@ public class TargetController {
         }catch (Exception e){
             e.printStackTrace();
             return null;
+        }
+    }
+
+//    @PostMapping("/update")
+//    public ResponseEntity<HttpStatus> updateTarget(@RequestBody TargetUpdateReq req){
+//        try{
+//            targetService.updateTarget(req);
+//        }catch(Exception e){
+//
+//        }
+//    }
+
+//    @GetMapping("/share")
+//    public ResponseEntity<HttpStatus> shareTarget(@RequestParam String req){
+//
+//
+//    }
+
+    @GetMapping("/vote")
+    public ResponseEntity<HttpStatus> voteTarget(@RequestParam(value = "targetId") Long id, @RequestParam(value = "success") boolean success){
+        try{
+            boolean voted = targetService.voteTarget(id, success);
+            if(voted)
+                return ResponseEntity.ok().build();//ok
+            return ResponseEntity.internalServerError().build();//server error
+        }catch(Exception e){
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();//server error
         }
     }
 }

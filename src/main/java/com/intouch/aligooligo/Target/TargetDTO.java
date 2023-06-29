@@ -16,6 +16,7 @@ import java.util.List;
 @Getter
 @Setter
 public class TargetDTO {
+    private Long id;
     private Long userId;
     private LocalDate startDate;
     private LocalDate endDate;

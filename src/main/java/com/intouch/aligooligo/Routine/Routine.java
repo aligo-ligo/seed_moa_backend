@@ -26,7 +26,7 @@ public class Routine {
 
     @ManyToOne
     @JsonIgnore
-    @JoinColumn(name = "target_idid")
+    @JoinColumn(name = "target_id")
     private Target target;
 
 
