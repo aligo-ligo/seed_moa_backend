@@ -25,4 +25,5 @@ public class Subgoal {
     @ManyToOne
     @JoinColumn(name = "target_id")
     private Target target;
+
 }

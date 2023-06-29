@@ -57,6 +57,8 @@ public class UserController {
 
     @PostMapping("/signin")
     public ResponseEntity<String> SignInUser(@RequestBody User req){
+        System.out.println("hsafasdifadj");
+
         String token = getToken(req);
         User user = userService.findByUserEmail(req.getEmail()).get();
 
@@ -73,6 +75,7 @@ public class UserController {
     }
     @PostMapping("/signup")
     public ResponseEntity<String> SignUpUser(@RequestBody User req){
+        System.out.println("hsafasdifadj");
         try {
             int res = userService.SignUp(req);
             System.out.println(req);

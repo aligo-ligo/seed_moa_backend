@@ -1,4 +1,6 @@
 package com.intouch.aligooligo.Routine;
 
-public interface RoutineRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface RoutineRepository extends JpaRepository<Routine, Long> {
 }

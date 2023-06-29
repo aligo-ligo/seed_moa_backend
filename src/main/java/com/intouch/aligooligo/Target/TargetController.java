@@ -16,7 +16,7 @@ public class TargetController {
 
     private final TargetService targetService;
     @GetMapping("/list")
-    public ResponseEntity<List<Target>> getTargetList(@RequestParam Integer id){
+    public ResponseEntity<List<Target>> getTargetList(@RequestParam Long id){
         try{
             return ResponseEntity.ok().body(targetService.getTargetList(id));
         }catch(Exception e){

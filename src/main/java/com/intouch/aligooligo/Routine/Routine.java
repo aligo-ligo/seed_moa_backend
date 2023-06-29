@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "subgoal")
+@Table(name = "routine")
 @Builder
 public class Routine {
     @Id
@@ -26,5 +26,6 @@ public class Routine {
     @ManyToOne
     @JoinColumn(name = "target_id")
     private Target target;
+
 
 }

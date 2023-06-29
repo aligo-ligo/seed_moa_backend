@@ -6,6 +6,7 @@ import com.intouch.aligooligo.Subgoal.Subgoal;
 import com.intouch.aligooligo.User.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.checkerframework.checker.units.qual.C;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -54,8 +55,10 @@ public class Target {
     private User user;
 
     @OneToMany(mappedBy = "target")
-    private List<Subgoal> subgoals;
+    @Column(name = "subgoals")
+    private List<Subgoal> subGoal;
 
     @OneToMany(mappedBy = "target")
-    private List<Routine> routines;
+    @Column(name = "routines")
+    private List<Routine> routine;
 }
