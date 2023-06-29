@@ -1,5 +1,6 @@
 package com.intouch.aligooligo.Routine;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.intouch.aligooligo.Target.Target;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -24,7 +25,8 @@ public class Routine {
 
 
     @ManyToOne
-    @JoinColumn(name = "target_id")
+    @JsonIgnore
+    @JoinColumn(name = "target_idid")
     private Target target;
 
 

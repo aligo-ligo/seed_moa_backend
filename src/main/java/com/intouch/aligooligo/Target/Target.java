@@ -6,7 +6,6 @@ import com.intouch.aligooligo.Subgoal.Subgoal;
 import com.intouch.aligooligo.User.User;
 import jakarta.persistence.*;
 import lombok.*;
-import org.checkerframework.checker.units.qual.C;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -24,31 +23,31 @@ public class Target {
     private Long id;
 
     @Column(name = "start_date", nullable = false)
-    LocalDate startDate;
+    private LocalDate startDate;
 
     @Column(name = "end_date", nullable = false)
-    LocalDate endDate;
+    private LocalDate endDate;
 
     @Column(name = "goal", nullable = false, length = 100)
-    String goal;
+    private String goal;
 
     @Column(name = "subgoal_total")
-    Double subGoalTotal;
+    private Double subGoalTotal;
 
     @Column(name = "success_count")
-    Integer successCount;
+    private Integer successCount;
 
     @Column(name = "failure_vote")
-    Integer failureVote;
+    private Integer failureVote;
 
     @Column(name = "success_vote")
-    Integer successVote;
+    private Integer successVote;
 
     @Column(name = "vote_total")
-    Integer voteTotal;
+    private Integer voteTotal;
 
     @Column(name = "penalty", nullable = false, length = 50)
-    String penalty;
+    private String penalty;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
