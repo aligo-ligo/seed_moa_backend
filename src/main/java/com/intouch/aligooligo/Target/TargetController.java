@@ -34,19 +34,17 @@ public class TargetController {
     @PostMapping("/create")
     public ResponseEntity<HttpStatus> createTarget(HttpServletRequest request, @RequestBody Target req) {
         try {
-            System.out.println(req);
-            System.out.println(request);
-            String email = null;
             String token = request.getHeader("Authorization");
-            System.out.println(token);
+
             if (token != null && jwtTokenProvider.validateToken(token)) {
                 Authentication authentication = jwtTokenProvider.getAuthentication(token);
-                email = authentication.getName();
+                String email = authentication.getName();
+                targetService.createTarget(email, req);
+                return ResponseEntity.ok().build();//ok
             }
-            targetService.createTarget(email, req);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.status(403).build();//not auth
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.internalServerError().build();//server error
         }
     }
 }
