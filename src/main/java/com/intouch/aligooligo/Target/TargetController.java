@@ -60,12 +60,25 @@ public class TargetController {
         }
     }
 
+    @GetMapping("/detail")
+    public ResponseEntity<TargetDTO> detailTarget(@RequestParam Long targetId){
+        try{
+            TargetDTO targetDTO = targetService.getDetailTarget(targetId);
+            if(targetDTO==null)
+                return ResponseEntity.internalServerError().build();
+            return ResponseEntity.ok().body(targetDTO);
+        }catch (Exception e){
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
 //    @PostMapping("/update")
 //    public ResponseEntity<HttpStatus> updateTarget(@RequestBody TargetUpdateReq req){
 //        try{
 //            targetService.updateTarget(req);
 //        }catch(Exception e){
-//
+
 //        }
 //    }
 

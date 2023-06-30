@@ -94,6 +94,17 @@ public class TargetService {
         }
     }
 
+    public TargetDTO getDetailTarget(Long targetId){
+        try {
+            Target target = targetRepository.findById(targetId).orElseThrow(() -> new IllegalArgumentException("타겟을 찾을 수 없습니다."));
+            TargetDTO targetDTO = getTargetDTO(target);
+            return targetDTO;
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 /*    public String updateTarget(TargetUpdateReq req){
 
     }*/
