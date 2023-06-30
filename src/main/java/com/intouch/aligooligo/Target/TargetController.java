@@ -18,6 +18,7 @@ public class TargetController {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final TargetService targetService;
+
     @GetMapping("/list")
     public ResponseEntity<List<TargetDTO>> getTargetList(HttpServletRequest request){
         try{
@@ -68,11 +69,29 @@ public class TargetController {
 //        }
 //    }
 
-//    @GetMapping("/share")
-//    public ResponseEntity<HttpStatus> shareTarget(@RequestParam String req){
-//
-//
-//    }
+    @GetMapping("/share")
+    public ResponseEntity<String> ShareUrl(@RequestParam Long targetId){
+        try {
+            String shortUrl = targetService.shareUrl(targetId);
+            System.out.println(shortUrl);
+            return ResponseEntity.ok().body(shortUrl);
+        }catch (Exception e){
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+    @GetMapping("/result")
+    public ResponseEntity<TargetDTO> resultTargetPage(@RequestParam String shortUrl){
+        try{
+            TargetDTO targetDTO = targetService.resultTargetPage(shortUrl);
+            if(targetDTO ==null)
+                return ResponseEntity.internalServerError().build();
+            return ResponseEntity.ok().body(targetDTO);
+        }catch(Exception e){
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 
     @GetMapping("/vote")
     public ResponseEntity<HttpStatus> voteTarget(@RequestParam(value = "targetId") Long id, @RequestParam(value = "success") boolean success){

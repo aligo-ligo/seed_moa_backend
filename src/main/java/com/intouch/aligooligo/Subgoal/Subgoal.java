@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.intouch.aligooligo.Target.Target;
 import jakarta.persistence.*;
 import lombok.*;
+import org.checkerframework.common.aliasing.qual.Unique;
 
 @Entity
 @Getter
@@ -17,10 +18,10 @@ public class Subgoal {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "value", nullable = false, length = 100)
+    @Column(name = "value", nullable = false, length = 100, unique = true)
     String value;
 
-    @Column(name = "success")
+    @Column(name = "success", unique = true)
     boolean success;
 
     @ManyToOne
