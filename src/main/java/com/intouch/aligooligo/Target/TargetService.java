@@ -19,6 +19,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -104,9 +105,24 @@ public class TargetService {
         }
     }
 
-    //public String updateTarget(TargetUpdateReq req){
-    //
-   // }
+    public boolean updateTarget(TargetUpdateReq req){
+        try{
+            Target target = targetRepository.findById(req.targetId()).orElseThrow(()->new IllegalArgumentException("사용자가 없습니다."));
+            for(Subgoal subgoal:target.getSubGoal()){
+                if(Objects.equals(subgoal.getValue(), req.subGoal())){
+                    if(req.completeDate()==null)
+                        subgoalRepository.save(Subgoal.builder().id(subgoal.getId()).target(target).success(false).completedDate(null).value(subgoal.getValue()).build());
+                    else
+                        subgoalRepository.save(Subgoal.builder().id(subgoal.getId()).target(target).success(true).completedDate(req.completeDate()).value(subgoal.getValue()).build());
+                    return true;
+                }
+            }
+            return false;
+        }catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+    }
 
     public boolean voteTarget(Long id, boolean success){
         try{

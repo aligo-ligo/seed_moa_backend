@@ -73,15 +73,18 @@ public class TargetController {
         }
     }
 
-    //@PostMapping("/update")
-    //public ResponseEntity<HttpStatus> updateTarget(@RequestBody TargetUpdateReq req){
-    //    try{
-    //        targetService.updateTarget(req);
-    //    }catch(Exception e){
-    //        e.printStackTrace();
-    //        return ResponseEntity.internalServerError().build();
-    //    }
-   // }
+    @PostMapping("/update")
+    public ResponseEntity<String> updateTarget(@RequestBody TargetUpdateReq req){
+        try{
+            boolean updated = targetService.updateTarget(req);
+            if(updated)
+                return ResponseEntity.ok().body("수정이 완료되었습니다.");
+            return ResponseEntity.internalServerError().build();
+        }catch(Exception e){
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 
     @GetMapping("/share")
     public ResponseEntity<String> ShareUrl(@RequestParam Long targetId){
