@@ -2,13 +2,11 @@ package com.intouch.aligooligo.Target;
 
 
 import com.intouch.aligooligo.Routine.Routine;
-import com.intouch.aligooligo.ShortUrl.ShortUrl;
 import com.intouch.aligooligo.Subgoal.Subgoal;
 import com.intouch.aligooligo.User.User;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -24,10 +22,10 @@ public class Target {
     private Long id;
 
     @Column(name = "start_date", nullable = false)
-    private LocalDate startDate;
+    private String startDate;
 
     @Column(name = "end_date", nullable = false)
-    private LocalDate endDate;
+    private String endDate;
 
     @Column(name = "goal", nullable = false, length = 100)
     private String goal;

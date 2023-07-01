@@ -10,7 +10,6 @@ import com.intouch.aligooligo.Subgoal.Subgoal;
 import com.intouch.aligooligo.Subgoal.SubgoalRepository;
 import com.intouch.aligooligo.User.User;
 import com.intouch.aligooligo.User.UserRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -77,7 +76,7 @@ public class TargetService {
     public boolean createTarget(String email, Target req){
         try {
             User user = userRepository.findByEmail(email).get();
-            Target saved = targetRepository.save(Target.builder().startDate(LocalDate.now()).endDate(req.getEndDate()).goal(req.getGoal()).subGoalTotal(0.0)
+            Target saved = targetRepository.save(Target.builder().startDate(LocalDate.now().toString()).endDate(req.getEndDate()).goal(req.getGoal()).subGoalTotal(0.0)
                     .successCount(0).failureVote(0).successVote(0).voteTotal(0).penalty(req.getPenalty()).user(user).subGoal(req.getSubGoal()).routine(req.getRoutine()).build());
             for (Subgoal subgoal : req.getSubGoal()) {
                 subgoalRepository.save(Subgoal.builder().target(saved).value(subgoal.getValue()).success(false).build());
@@ -105,9 +104,9 @@ public class TargetService {
         }
     }
 
-/*    public String updateTarget(TargetUpdateReq req){
-
-    }*/
+    //public String updateTarget(TargetUpdateReq req){
+    //
+   // }
 
     public boolean voteTarget(Long id, boolean success){
         try{

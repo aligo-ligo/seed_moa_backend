@@ -21,8 +21,11 @@ public class Subgoal {
     @Column(name = "value", nullable = false, length = 100, unique = true)
     String value;
 
-    @Column(name = "success", unique = true)
+    @Column(name = "success")
     boolean success;
+
+    @Column(name = "completed_date")
+    String completedDate;
 
     @ManyToOne
     @JsonIgnore
