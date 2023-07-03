@@ -23,6 +23,8 @@ public class TargetController {
     public ResponseEntity<List<TargetDTO>> getTargetList(HttpServletRequest request){
         try{
             String email = checkJwtValidation(request);
+            if(email.equals("Auth expired"))
+                return ResponseEntity.status(401).build();
             List<TargetDTO> list = targetService.getTargetList(email);
             return ResponseEntity.ok().body(list);
         }catch(Exception e){
@@ -59,7 +61,7 @@ public class TargetController {
                 }
             }
             System.out.println(jwtTokenProvider.validateToken(token));
-            return null;
+            return "Auth expired";
         }catch (Exception e){
             e.printStackTrace();
             return null;
