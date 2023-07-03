@@ -52,10 +52,10 @@ public class TargetController {
             String token = request.getHeader("Authorization");
             System.out.println(token);
             if (token != null) {
-                //String req_token = token.substring(7);
+                String req_token = token.substring(7);
                 System.out.println(jwtTokenProvider.validateToken(token));
-                if(jwtTokenProvider.validateToken(token)) {
-                    return jwtTokenProvider.getAuthentication(token).getName();
+                if(jwtTokenProvider.validateToken(req_token)) {
+                    return jwtTokenProvider.getAuthentication(req_token).getName();
                 }
             }
             System.out.println(jwtTokenProvider.validateToken(token));
