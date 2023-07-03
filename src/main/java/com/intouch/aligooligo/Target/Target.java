@@ -31,7 +31,7 @@ public class Target {
     private String goal;
 
     @Column(name = "subgoal_total")
-    private Double subGoalTotal;
+    private Integer subGoalTotal;
 
     @Column(name = "success_count")
     private Integer successCount;

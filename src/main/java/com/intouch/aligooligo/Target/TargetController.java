@@ -41,7 +41,7 @@ public class TargetController {
                     return ResponseEntity.ok().build();//ok
                 return ResponseEntity.internalServerError().build();//server error
             }
-            return ResponseEntity.status(403).build();//not auth
+            return ResponseEntity.status(401).build();//not auth
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();//server error
         }
@@ -50,9 +50,15 @@ public class TargetController {
     public String checkJwtValidation(HttpServletRequest request){
         try {
             String token = request.getHeader("Authorization");
-            if (token != null && jwtTokenProvider.validateToken(token)) {
-                return jwtTokenProvider.getAuthentication(token).getName();
+            System.out.println(token);
+            if (token != null) {
+                //String req_token = token.substring(7);
+                System.out.println(jwtTokenProvider.validateToken(token));
+                if(jwtTokenProvider.validateToken(token)) {
+                    return jwtTokenProvider.getAuthentication(token).getName();
+                }
             }
+            System.out.println(jwtTokenProvider.validateToken(token));
             return null;
         }catch (Exception e){
             e.printStackTrace();
@@ -78,7 +84,7 @@ public class TargetController {
         try{
             boolean updated = targetService.updateTarget(req);
             if(updated)
-                return ResponseEntity.ok().body("수정이 완료되었습니다.");
+                return ResponseEntity.ok().body("updating is completed");
             return ResponseEntity.internalServerError().build();
         }catch(Exception e){
             e.printStackTrace();

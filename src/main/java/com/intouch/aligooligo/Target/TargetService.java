@@ -46,11 +46,12 @@ public class TargetService {
     private String shortPrefix = "http://aligo.it/";
 
     public List<TargetDTO> getTargetList(String email){
+        System.out.println(email);
         User user = userRepository.findByEmail(email).orElseThrow(()->new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
         List<Target> list = targetRepository.findAllByUserId(user.getId());
         List<TargetDTO> DTOlist = new ArrayList<>();
         for(Target target : list){
-            DTOlist.add(getTargetDTO(target));
+            DTOlist.add(getTargetDTOforList(target));
         }
         return DTOlist;
     }
@@ -72,12 +73,23 @@ public class TargetService {
         dto.setVoteTotal(target.getVoteTotal());
         return dto;
     }
+    public TargetDTO getTargetDTOforList(Target target){
+        TargetDTO dto = new TargetDTO();
+        dto.setId(target.getId());
+        dto.setUserId(target.getUser().getId());
+        dto.setGoal(target.getGoal());
+        dto.setSubGoalTotal(target.getSubGoalTotal());
+        dto.setSuccessCount(target.getSuccessCount());
+        dto.setSuccessVote(target.getSuccessVote());
+        dto.setVoteTotal(target.getVoteTotal());
+        return dto;
+    }
 
     @Transactional
     public boolean createTarget(String email, Target req){
         try {
             User user = userRepository.findByEmail(email).get();
-            Target saved = targetRepository.save(Target.builder().startDate(LocalDate.now().toString()).endDate(req.getEndDate()).goal(req.getGoal()).subGoalTotal(0.0)
+            Target saved = targetRepository.save(Target.builder().startDate(LocalDate.now().toString()).endDate(req.getEndDate()).goal(req.getGoal()).subGoalTotal(req.getSubGoal().size())
                     .successCount(0).failureVote(0).successVote(0).voteTotal(0).penalty(req.getPenalty()).user(user).subGoal(req.getSubGoal()).routine(req.getRoutine()).build());
             for (Subgoal subgoal : req.getSubGoal()) {
                 subgoalRepository.save(Subgoal.builder().target(saved).value(subgoal.getValue()).success(false).build());

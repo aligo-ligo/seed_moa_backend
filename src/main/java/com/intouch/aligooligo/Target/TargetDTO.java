@@ -18,7 +18,7 @@ public class TargetDTO {
     private List<Subgoal> subGoal;
     private List<Routine> routine;
     private String penalty;
-    private Double subGoalTotal;
+    private Integer subGoalTotal;
     private Integer successCount;
     private Integer failureVote;
     private Integer successVote;
