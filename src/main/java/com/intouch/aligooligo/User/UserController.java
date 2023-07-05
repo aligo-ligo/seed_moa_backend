@@ -84,15 +84,15 @@ public class UserController {
             else if(res==1)
                 return ResponseEntity.badRequest().body("Email format is invalid");
             else if(res==2)
-                return ResponseEntity.badRequest().body("Password is invalid");
-            else if(res==3)
-                return ResponseEntity.badRequest().body("nickName is invalid");
-            else if(res==4)
                 return ResponseEntity.badRequest().body("Email already exists");
+            else if(res==3)
+                return ResponseEntity.badRequest().body("Password is invalid");
+            else if(res==4)
+                return ResponseEntity.badRequest().body("nickName is invalid");
             else if(res==5)
                 return ResponseEntity.badRequest().body("Bad request");
             else if(res==6)
-                return ResponseEntity.status(403).body("Email already exists");
+                return ResponseEntity.internalServerError().build();
             else
                 return ResponseEntity.internalServerError().body("Server error");
         }catch(Exception e){

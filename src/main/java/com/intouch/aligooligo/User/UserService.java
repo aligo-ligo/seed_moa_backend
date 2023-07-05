@@ -87,12 +87,12 @@ public class UserService {
             }
             if(!email.contains("@")||email.length()>50)
                 return 1;//이메일 형식 올바르지 않은 경우
-            if(!NumberCheck || !AlphabetCheck || pw.length()>20 || pw.length()<8)
-                return 2;//영문 or 숫자가 최소 하나 씩 들어가지 않은 경우, 길이 문제
-            if(name.length()>10)
-                return 3;//닉네임 길이문제
             if(checkedId)
-                return 4;//이메일 중복
+                return 2;//이메일 중복
+            if(!NumberCheck || !AlphabetCheck || pw.length()>20 || pw.length()<8)
+                return 3;//영문 or 숫자가 최소 하나 씩 들어가지 않은 경우, 길이 문제
+            if(name.length()>10)
+                return 4;//닉네임 길이문제
             else{
                 return 5;//bad request
             }
