@@ -22,20 +22,17 @@ public class UserController {
     private final UserService userService;
     public String getToken(User req){
         try {
-            String token = userService.SignIn(req, false);
-            if(token==null)
-                return "400";
-            return token;
+            return userService.SignIn(req, false);
         }catch(IllegalArgumentException e){//db에 없을 때
-            return "401";
+            return "400";
         }catch(UnsupportedJwtException e){//jwt가 예상하는 형식과 다른 형식이거나 구성
-            return "400";
+            return "401";
         }catch(MalformedJwtException e) {//잘못된 jwt 구조
-            return "400";
+            return "401";
         }catch(ExpiredJwtException e){//jwt 유효기간 초과
-            return "400";
+            return "401";
         }catch(SignatureException e){//jwt 서명실패(변조 데이터)
-            return "400";
+            return "401";
         } catch (Exception e){
             return "500";
         }
@@ -63,11 +60,11 @@ public class UserController {
         User user = userService.findByUserEmail(req.getEmail()).get();
 
         if(token==null)
-            return ResponseEntity.internalServerError().build();
-        else if(token.equals("401"))
+            return ResponseEntity.badRequest().body("Incorrect password");
+        else if(token.equals("400"))//bad request
+            return ResponseEntity.badRequest().body("Cannot find user");
+        else if(token.equals("401"))//not auth
             return ResponseEntity.status(401).build();
-        else if(token.equals("400"))
-            return ResponseEntity.badRequest().build();
         else if(token.equals("500"))
             return ResponseEntity.internalServerError().build();
         return ResponseEntity.ok().body(getResponse(token, user));
@@ -83,15 +80,6 @@ public class UserController {
             if (res == 0){
                 String token = getToken(req);
                 User user = userService.findByUserEmail(req.getEmail()).get();
-                System.out.println(token);
-                if(token==null)
-                    return ResponseEntity.internalServerError().build();
-                else if(token.equals("401"))
-                    return ResponseEntity.status(401).build();
-                else if(token.equals("400"))
-                    return ResponseEntity.badRequest().build();
-                else if(token.equals("500"))
-                    return ResponseEntity.internalServerError().build();
                 return ResponseEntity.ok().body(getResponse(token, user));
             }
             else if(res==1)

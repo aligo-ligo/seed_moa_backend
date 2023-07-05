@@ -20,12 +20,12 @@ public class TargetController {
     private final TargetService targetService;
 
     @GetMapping("/list")
-    public ResponseEntity<List<TargetDTO>> getTargetList(HttpServletRequest request){
+    public ResponseEntity<List<TargetListDTO>> getTargetList(HttpServletRequest request){
         try{
             String email = checkJwtValidation(request);
-            if(email.equals("Auth expired"))
+            if(email==null)
                 return ResponseEntity.status(401).build();
-            List<TargetDTO> list = targetService.getTargetList(email);
+            List<TargetListDTO> list = targetService.getTargetList(email);
             return ResponseEntity.ok().body(list);
         }catch(Exception e){
             e.printStackTrace();
@@ -37,13 +37,13 @@ public class TargetController {
     public ResponseEntity<HttpStatus> createTarget(HttpServletRequest request, @RequestBody Target req) {
         try {
             String email = checkJwtValidation(request);
-            if (email != null) {
-                boolean created = targetService.createTarget(email, req);
-                if(created)
-                    return ResponseEntity.ok().build();//ok
-                return ResponseEntity.internalServerError().build();//server error
-            }
-            return ResponseEntity.status(401).build();//not auth
+            if(email==null)
+                return ResponseEntity.status(401).build();//not auth
+
+            boolean created = targetService.createTarget(email, req);
+            if(created)
+                return ResponseEntity.ok().build();//ok
+            return ResponseEntity.internalServerError().build();//server error
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();//server error
         }
@@ -61,7 +61,7 @@ public class TargetController {
                 }
             }
             System.out.println(jwtTokenProvider.validateToken(token));
-            return "Auth expired";
+            return null;
         }catch (Exception e){
             e.printStackTrace();
             return null;
@@ -69,8 +69,11 @@ public class TargetController {
     }
 
     @GetMapping("/detail")
-    public ResponseEntity<TargetDTO> detailTarget(@RequestParam Long targetId){
+    public ResponseEntity<TargetDTO> detailTarget(HttpServletRequest request, @RequestParam Long targetId){
         try{
+            String email = checkJwtValidation(request);
+            if(email==null)
+                return ResponseEntity.status(401).build();
             TargetDTO targetDTO = targetService.getDetailTarget(targetId);
             if(targetDTO==null)
                 return ResponseEntity.internalServerError().build();
@@ -82,10 +85,12 @@ public class TargetController {
     }
 
     @PostMapping("/update")
-    public ResponseEntity<String> updateTarget(@RequestBody TargetUpdateReq req){
+    public ResponseEntity<String> updateTarget(HttpServletRequest request, @RequestBody TargetUpdateReq req){
         try{
-            boolean updated = targetService.updateTarget(req);
-            if(updated)
+            String email = checkJwtValidation(request);
+            if(email==null)
+                return ResponseEntity.status(401).build();
+            if(targetService.updateTarget(req))
                 return ResponseEntity.ok().body("updating is completed");
             return ResponseEntity.internalServerError().build();
         }catch(Exception e){
@@ -97,9 +102,7 @@ public class TargetController {
     @GetMapping("/share")
     public ResponseEntity<String> ShareUrl(@RequestParam Long targetId){
         try {
-            String shortUrl = targetService.shareUrl(targetId);
-            System.out.println(shortUrl);
-            return ResponseEntity.ok().body(shortUrl);
+            return ResponseEntity.ok().body(targetService.shareUrl(targetId));
         }catch (Exception e){
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();

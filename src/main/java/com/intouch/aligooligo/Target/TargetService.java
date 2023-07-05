@@ -11,16 +11,15 @@ import com.intouch.aligooligo.Subgoal.SubgoalRepository;
 import com.intouch.aligooligo.User.User;
 import com.intouch.aligooligo.User.UserRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -45,13 +44,13 @@ public class TargetService {
     private String originPrefix = "http://localhost:8081/target/result/id=";
     private String shortPrefix = "http://aligo.it/";
 
-    public List<TargetDTO> getTargetList(String email){
+    public List<TargetListDTO> getTargetList(String email){
         System.out.println(email);
-        User user = userRepository.findByEmail(email).orElseThrow(()->new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+        User user = userRepository.findByEmail(email).orElseThrow(()->new UsernameNotFoundException("can't get targetList : can't find userEmail"));
         List<Target> list = targetRepository.findAllByUserId(user.getId());
-        List<TargetDTO> DTOlist = new ArrayList<>();
+        List<TargetListDTO> DTOlist = new ArrayList<>();
         for(Target target : list){
-            DTOlist.add(getTargetDTOforList(target));
+            DTOlist.add(getTargetListDTO(target));
         }
         return DTOlist;
     }
@@ -73,8 +72,9 @@ public class TargetService {
         dto.setVoteTotal(target.getVoteTotal());
         return dto;
     }
-    public TargetDTO getTargetDTOforList(Target target){
-        TargetDTO dto = new TargetDTO();
+
+    public TargetListDTO getTargetListDTO(Target target){
+        TargetListDTO dto = new TargetListDTO();
         dto.setId(target.getId());
         dto.setUserId(target.getUser().getId());
         dto.setGoal(target.getGoal());
@@ -106,15 +106,12 @@ public class TargetService {
         }
     }
 
-    public TargetDTO getDetailTarget(Long targetId){
-        try {
-            Target target = targetRepository.findById(targetId).orElseThrow(() -> new IllegalArgumentException("타겟을 찾을 수 없습니다."));
-            TargetDTO targetDTO = getTargetDTO(target);
-            return targetDTO;
-        }catch (Exception e){
-            e.printStackTrace();
-            return null;
+    public TargetDTO getDetailTarget(Long targetId) {
+        if(targetRepository.findById(targetId).isPresent()) {//if exist
+            Target target = targetRepository.findById(targetId).get();
+            return getTargetDTO(target);
         }
+        return null;//if not exist
     }
 
     public boolean updateTarget(TargetUpdateReq req){
@@ -152,17 +149,23 @@ public class TargetService {
     }
 
     public ShortUrl createShareUrl(Long targetId){
+        String encodedUrl = null;
         try{
-            Target target = targetRepository.findById(targetId).orElseThrow(()->new IllegalArgumentException("URL을 만들 수 없습니다."));
+            Target target = targetRepository.findById(targetId).orElseThrow(()->new IllegalArgumentException("can't make shortUrl: can't find targetId"));
             //originUrl
             String originUrl = originPrefix+targetId.toString();
 
             //random create
-            UUID uuid = UUID.randomUUID();//uuid : 16 radix
-            BigInteger number = new BigInteger(uuid.toString().replace("-",""),16);
+            do {
+                BigInteger number = new BigInteger(RandomStringUtils.randomNumeric(1, 15), 10);
 
-            //encoding(shortedUrl)
-            String encodedUrl = shortPrefix + base62Util.UrlEncoding(number);
+                //UUID uuid = UUID.randomUUID();//uuid : 16 radix
+                //BigInteger number = new BigInteger(uuid.toString().replace("-",""),16);
+
+                //encoding(shortedUrl)
+                encodedUrl = shortPrefix + base62Util.UrlEncoding(number);
+                System.out.println(encodedUrl);
+            }while(shortUrlRepository.existsByShortUrl(encodedUrl));
             return shortUrlRepository.save(ShortUrl.builder().originUrl(originUrl).shortUrl(encodedUrl).target(target).build());
         }catch(Exception e){
             e.printStackTrace();

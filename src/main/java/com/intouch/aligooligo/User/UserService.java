@@ -1,8 +1,5 @@
 package com.intouch.aligooligo.User;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.intouch.aligooligo.Jwt.JwtTokenProvider;
@@ -15,8 +12,6 @@ import org.springframework.stereotype.Service;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.http.HttpClient;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Service
@@ -43,7 +38,7 @@ public class UserService {
 
     public String SignIn(User req, boolean kakaoChecked) throws UnsupportedJwtException, MalformedJwtException, ExpiredJwtException, SignatureException{
 
-        User user = findByUserEmail(req.getEmail()).orElseThrow(()->new IllegalArgumentException("가입되지 않은 E-MAIL 입니다."));
+        User user = findByUserEmail(req.getEmail()).orElseThrow(()->new IllegalArgumentException("can't find userEmail"));
         if(kakaoChecked)
             return jwtTokenProvider.createToken(user.getEmail(),user.getRoles());
         else if(passwordEncoder.matches(req.getPassword(),user.getPassword())){//email, password 모두 같을 경우
@@ -54,7 +49,7 @@ public class UserService {
     public Optional<User> findByUserEmail(String email) {
         Optional<User> user = userRepository.findByEmail(email);
         if(user.isEmpty())
-            throw new IllegalArgumentException("사용자를 찾을 수 없습니다.");
+            throw new IllegalArgumentException("don't exist user");
         return user;
     }
     public boolean existByUserEmail(String email){
