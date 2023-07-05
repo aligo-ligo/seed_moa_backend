@@ -57,7 +57,6 @@ public class UserController {
         System.out.println("hsafasdifadj");
 
         String token = getToken(req);
-        User user = userService.findByUserEmail(req.getEmail()).get();
 
         if(token==null)
             return ResponseEntity.badRequest().body("Incorrect password");
@@ -67,7 +66,7 @@ public class UserController {
             return ResponseEntity.status(401).build();
         else if(token.equals("500"))
             return ResponseEntity.internalServerError().build();
-        return ResponseEntity.ok().body(getResponse(token, user));
+        return ResponseEntity.ok().body(getResponse(token, userService.findByUserEmail(req.getEmail()).get()));
 
     }
     @PostMapping("/signup")
