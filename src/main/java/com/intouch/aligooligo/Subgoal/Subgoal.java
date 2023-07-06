@@ -1,5 +1,6 @@
 package com.intouch.aligooligo.Subgoal;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.intouch.aligooligo.Target.Target;
 import jakarta.persistence.*;
 import lombok.*;
@@ -23,6 +24,7 @@ public class Subgoal {
     String completedDate;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "target_id")
     private Target target;
 
