@@ -7,6 +7,8 @@ import lombok.*;
 @Entity
 @Getter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "subgoal")
 public class Subgoal {
     @Id

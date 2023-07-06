@@ -2,12 +2,16 @@ package com.intouch.aligooligo.ShortUrl;
 
 import com.intouch.aligooligo.Target.Target;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "short_url")
 public class ShortUrl {
 
