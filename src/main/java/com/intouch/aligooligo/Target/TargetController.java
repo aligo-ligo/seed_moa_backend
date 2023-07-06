@@ -1,6 +1,8 @@
 package com.intouch.aligooligo.Target;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.intouch.aligooligo.Jwt.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
@@ -20,12 +22,12 @@ public class TargetController {
     private final TargetService targetService;
 
     @GetMapping("/list")
-    public ResponseEntity<List<TargetListDTO>> getTargetList(HttpServletRequest request){
+    public ResponseEntity<List<TargetDTO>> getTargetList(HttpServletRequest request){
         try{
             String email = checkJwtValidation(request);
             if(email==null)
                 return ResponseEntity.status(401).build();
-            List<TargetListDTO> list = targetService.getTargetList(email);
+            List<TargetDTO> list = targetService.getTargetList(email);
             return ResponseEntity.ok().body(list);
         }catch(Exception e){
             e.printStackTrace();
@@ -34,7 +36,7 @@ public class TargetController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<HttpStatus> createTarget(HttpServletRequest request, @RequestBody Target req) {
+    public ResponseEntity<HttpStatus> createTarget(HttpServletRequest request, @RequestBody TargetDTO req) {
         try {
             String email = checkJwtValidation(request);
             if(email==null)
@@ -69,12 +71,12 @@ public class TargetController {
     }
 
     @GetMapping("/detail")
-    public ResponseEntity<TargetDTO> detailTarget(HttpServletRequest request, @RequestParam Long targetId){
+    public ResponseEntity<TargetDTO> detailTarget(HttpServletRequest request, @RequestParam Long id){
         try{
             String email = checkJwtValidation(request);
             if(email==null)
                 return ResponseEntity.status(401).build();
-            TargetDTO targetDTO = targetService.getDetailTarget(targetId);
+            TargetDTO targetDTO = targetService.getDetailTarget(id);
             if(targetDTO==null)
                 return ResponseEntity.internalServerError().build();
             return ResponseEntity.ok().body(targetDTO);
@@ -88,10 +90,17 @@ public class TargetController {
     public ResponseEntity<String> updateTarget(HttpServletRequest request, @RequestBody TargetUpdateReq req){
         try{
             String email = checkJwtValidation(request);
+            ObjectMapper objectMapper = new ObjectMapper();
+            ObjectNode mainNode = objectMapper.createObjectNode();
             if(email==null)
                 return ResponseEntity.status(401).build();
-            if(targetService.updateTarget(req))
-                return ResponseEntity.ok().body("updating is completed");
+            if(req==null){
+                return ResponseEntity.badRequest().build();
+            }
+            if(targetService.updateTarget(req)){
+                mainNode.put("message","updating is completed");
+                return ResponseEntity.ok().body(mainNode.toString());
+            }
             return ResponseEntity.internalServerError().build();
         }catch(Exception e){
             e.printStackTrace();
@@ -100,9 +109,9 @@ public class TargetController {
     }
 
     @GetMapping("/share")
-    public ResponseEntity<String> ShareUrl(@RequestParam Long targetId){
+    public ResponseEntity<String> ShareUrl(@RequestParam Long id){
         try {
-            return ResponseEntity.ok().body(targetService.shareUrl(targetId));
+            return ResponseEntity.ok().body(targetService.shareUrl(id));
         }catch (Exception e){
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();
@@ -122,7 +131,7 @@ public class TargetController {
     }
 
     @GetMapping("/vote")
-    public ResponseEntity<HttpStatus> voteTarget(@RequestParam(value = "targetId") Long id, @RequestParam(value = "success") boolean success){
+    public ResponseEntity<HttpStatus> voteTarget(@RequestParam(value = "id") Long id, @RequestParam(value = "success") boolean success){
         try{
             boolean voted = targetService.voteTarget(id, success);
             if(voted)

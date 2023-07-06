@@ -44,11 +44,11 @@ public class TargetService {
     private String originPrefix = "http://localhost:8081/target/result/id=";
     private String shortPrefix = "http://aligo.it/";
 
-    public List<TargetListDTO> getTargetList(String email){
+    public List<TargetDTO> getTargetList(String email){
         System.out.println(email);
         User user = userRepository.findByEmail(email).orElseThrow(()->new UsernameNotFoundException("can't get targetList : can't find userEmail"));
         List<Target> list = targetRepository.findAllByUserId(user.getId());
-        List<TargetListDTO> DTOlist = new ArrayList<>();
+        List<TargetDTO> DTOlist = new ArrayList<>();
         for(Target target : list){
             DTOlist.add(getTargetListDTO(target));
         }
@@ -56,43 +56,26 @@ public class TargetService {
     }
 
     public TargetDTO getTargetDTO(Target target){
-        TargetDTO dto = new TargetDTO();
-        dto.setId(target.getId());
-        dto.setUserId(target.getUser().getId());
-        dto.setGoal(target.getGoal());
-        dto.setPenalty(target.getPenalty());
-        dto.setStartDate(target.getStartDate());
-        dto.setEndDate(target.getEndDate());
-        dto.setSubGoal(target.getSubGoal());
-        dto.setRoutine(target.getRoutine());
-        dto.setSubGoalTotal(target.getSubGoalTotal());
-        dto.setSuccessCount(target.getSuccessCount());
-        dto.setSuccessVote(target.getSuccessVote());
-        dto.setFailureVote(target.getFailureVote());
-        dto.setVoteTotal(target.getVoteTotal());
-        return dto;
+        return new TargetDTO(target.getId(),target.getUser().getId(),target.getGoal(), target.getPenalty(),
+                target.getStartDate(), target.getEndDate(), target.getSubGoal(), target.getRoutine(),
+                target.getSubGoalTotal(),target.getSuccessCount(),target.getSuccessVote(), target.getFailureVote(),
+                target.getVoteTotal());
     }
 
-    public TargetListDTO getTargetListDTO(Target target){
-        TargetListDTO dto = new TargetListDTO();
-        dto.setId(target.getId());
-        dto.setUserId(target.getUser().getId());
-        dto.setGoal(target.getGoal());
-        dto.setSubGoalTotal(target.getSubGoalTotal());
-        dto.setSuccessCount(target.getSuccessCount());
-        dto.setSuccessVote(target.getSuccessVote());
-        dto.setVoteTotal(target.getVoteTotal());
-        return dto;
+    public TargetDTO getTargetListDTO(Target target){
+        return new TargetDTO(target.getId(),target.getUser().getId(),target.getGoal(),
+                target.getSubGoalTotal(),target.getSuccessCount(),target.getSuccessVote(),
+                target.getVoteTotal());
     }
 
     @Transactional
-    public boolean createTarget(String email, Target req){
+    public boolean createTarget(String email, TargetDTO req){
         try {
             User user = userRepository.findByEmail(email).get();
             Target saved = targetRepository.save(Target.builder().startDate(LocalDate.now().toString()).endDate(req.getEndDate()).goal(req.getGoal()).subGoalTotal(req.getSubGoal().size())
                     .successCount(0).failureVote(0).successVote(0).voteTotal(0).penalty(req.getPenalty()).user(user).subGoal(req.getSubGoal()).routine(req.getRoutine()).build());
             for (Subgoal subgoal : req.getSubGoal()) {
-                subgoalRepository.save(Subgoal.builder().target(saved).value(subgoal.getValue()).success(false).build());
+                subgoalRepository.save(Subgoal.builder().target(saved).value(subgoal.getValue()).build());
             }
             for (Routine routine : req.getRoutine()) {
                 routineRepository.save(Routine.builder().target(saved).value(routine.getValue()).build());
@@ -116,13 +99,25 @@ public class TargetService {
 
     public boolean updateTarget(TargetUpdateReq req){
         try{
-            Target target = targetRepository.findById(req.targetId()).orElseThrow(()->new IllegalArgumentException("사용자가 없습니다."));
+            Target target = targetRepository.findById(req.id()).orElseThrow(()->new IllegalArgumentException("사용자가 없습니다."));
+
             for(Subgoal subgoal:target.getSubGoal()){
-                if(Objects.equals(subgoal.getValue(), req.subGoal())){
-                    if(req.completeDate()==null)
-                        subgoalRepository.save(Subgoal.builder().id(subgoal.getId()).target(target).success(false).completedDate(null).value(subgoal.getValue()).build());
-                    else
-                        subgoalRepository.save(Subgoal.builder().id(subgoal.getId()).target(target).success(true).completedDate(req.completeDate()).value(subgoal.getValue()).build());
+                if(Objects.equals(subgoal.getValue(), req.value())){
+                    if(req.completeDate()==null) {//subGoal 체크 해제했을 경우
+                        subgoalRepository.save(Subgoal.builder().id(subgoal.getId()).target(target).completedDate(null).value(subgoal.getValue()).build());
+                        if(target.getSuccessCount()==0)//해당 target successCount가 0이면
+                            return true;
+                        else {
+                            targetRepository.save(target);
+                            targetRepository.save(Target.builder().id(target.getId()).startDate(target.getStartDate()).endDate(target.getEndDate())
+                                    .successCount(target.getSuccessCount() - 1).goal(target.getGoal()).penalty(target.getPenalty()).build());
+                        }
+                    }
+                    else{//subGoal 체크했을 경우
+                        subgoalRepository.save(Subgoal.builder().id(subgoal.getId()).target(target).completedDate(req.completeDate()).value(subgoal.getValue()).build());
+                        targetRepository.save(Target.builder().id(target.getId()).startDate(target.getStartDate()).endDate(target.getEndDate())
+                                .successCount(target.getSuccessCount()+1).goal(target.getGoal()).penalty(target.getPenalty()).build());
+                    }
                     return true;
                 }
             }

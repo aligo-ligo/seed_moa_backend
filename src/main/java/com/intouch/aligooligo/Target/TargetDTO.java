@@ -1,14 +1,17 @@
 package com.intouch.aligooligo.Target;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.intouch.aligooligo.Routine.Routine;
 import com.intouch.aligooligo.Subgoal.Subgoal;
-import lombok.Getter;
-import lombok.Setter;
+import com.intouch.aligooligo.User.User;
+import lombok.*;
 
 import java.util.List;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class TargetDTO {
     private Long id;
     private Long userId;
@@ -17,6 +20,7 @@ public class TargetDTO {
     private String goal;
     private List<Subgoal> subGoal;
     private List<Routine> routine;
+    private User user;
     private String penalty;
     private Integer subGoalTotal;
     private Integer successCount;
@@ -24,5 +28,30 @@ public class TargetDTO {
     private Integer successVote;
     private Integer voteTotal;
 
-
+    public TargetDTO(Long id, Long userId, String goal, Integer subGoalTotal, Integer successCount, Integer successVote, Integer voteTotal){
+        this.id = id;
+        this. userId = userId;
+        this.goal = goal;
+        this.subGoalTotal = subGoalTotal;
+        this.successCount = successCount;
+        this.successVote = successVote;
+        this.voteTotal = voteTotal;
+    }
+    public TargetDTO(Long id, Long userId, String goal, String penalty, String startDate, String endDate,
+                     List<Subgoal> subGoal, List<Routine> routine, Integer subGoalTotal, Integer successCount, Integer successVote,
+                     Integer failureVote, Integer voteTotal){
+        this.id = id;
+        this. userId = userId;
+        this.goal = goal;
+        this.penalty = penalty;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.subGoal = subGoal;
+        this.routine = routine;
+        this.subGoalTotal = subGoalTotal;
+        this.successCount = successCount;
+        this.successVote = successVote;
+        this.failureVote = failureVote;
+        this.voteTotal = voteTotal;
+    }
 }

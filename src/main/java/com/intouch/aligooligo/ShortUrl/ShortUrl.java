@@ -1,18 +1,13 @@
 package com.intouch.aligooligo.ShortUrl;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.intouch.aligooligo.Target.Target;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 
-@Data
 @Entity
+@Getter
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
 @Table(name = "short_url")
 public class ShortUrl {
 
@@ -25,7 +20,6 @@ public class ShortUrl {
     @Column(name = "origin_url", nullable = false, length = 200)
     private String originUrl;
     @OneToOne
-    @JsonIgnore
     @JoinColumn(name = "target_id")
     private Target target;
 }
