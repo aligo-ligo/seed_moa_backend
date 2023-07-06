@@ -71,7 +71,7 @@ public class TargetController {
     }
 
     @GetMapping("/detail")
-    public ResponseEntity<TargetDTO> detailTarget(HttpServletRequest request, @RequestParam Long id){
+    public ResponseEntity<TargetDTO> detailTarget(HttpServletRequest request, @RequestParam Integer id){
         try{
             String email = checkJwtValidation(request);
             if(email==null)
@@ -107,31 +107,8 @@ public class TargetController {
             return ResponseEntity.internalServerError().build();
         }
     }
-
-    @GetMapping("/share")
-    public ResponseEntity<String> ShareUrl(@RequestParam Long id){
-        try {
-            return ResponseEntity.ok().body(targetService.shareUrl(id));
-        }catch (Exception e){
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-    @GetMapping("/result")
-    public ResponseEntity<TargetDTO> resultTargetPage(@RequestParam String shortUrl){
-        try{
-            TargetDTO targetDTO = targetService.resultTargetPage(shortUrl);
-            if(targetDTO ==null)
-                return ResponseEntity.internalServerError().build();
-            return ResponseEntity.ok().body(targetDTO);
-        }catch(Exception e){
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
     @GetMapping("/vote")
-    public ResponseEntity<HttpStatus> voteTarget(@RequestParam(value = "id") Long id, @RequestParam(value = "success") boolean success){
+    public ResponseEntity<HttpStatus> voteTarget(@RequestParam(value = "id") Integer id, @RequestParam(value = "success") boolean success){
         try{
             boolean voted = targetService.voteTarget(id, success);
             if(voted)

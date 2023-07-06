@@ -1,24 +1,20 @@
 package com.intouch.aligooligo.Target;
 
 
-import com.intouch.aligooligo.Base62.Base62Util;
 import com.intouch.aligooligo.Routine.Routine;
 import com.intouch.aligooligo.Routine.RoutineRepository;
-import com.intouch.aligooligo.ShortUrl.ShortUrl;
-import com.intouch.aligooligo.ShortUrl.ShortUrlRepository;
 import com.intouch.aligooligo.Subgoal.Subgoal;
 import com.intouch.aligooligo.Subgoal.SubgoalRepository;
 import com.intouch.aligooligo.User.User;
 import com.intouch.aligooligo.User.UserRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
-import java.math.BigInteger;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 
 @Service
@@ -28,21 +24,19 @@ public class TargetService {
     private final UserRepository userRepository;
     private final SubgoalRepository subgoalRepository;
     private final RoutineRepository routineRepository;
-    private final ShortUrlRepository shortUrlRepository;
-    private final Base62Util base62Util;
 
-    public TargetService(ShortUrlRepository shortUrlRepository, TargetRepository targetRepository, Base62Util base62Util,
-                         UserRepository userRepository, SubgoalRepository subgoalRepository, RoutineRepository routineRepository){
-        this.shortUrlRepository = shortUrlRepository;
+    public TargetService(TargetRepository targetRepository, UserRepository userRepository,
+                         SubgoalRepository subgoalRepository, RoutineRepository routineRepository){
         this.targetRepository = targetRepository;
-        this.base62Util = base62Util;
         this.userRepository = userRepository;
         this.routineRepository = routineRepository;
         this.subgoalRepository = subgoalRepository;
     }
+    @Value("${ipSource}")
+    private String ipSource;
 
-    private String originPrefix = "http://localhost:8081/target/result/id=";
-    private String shortPrefix = "http://aligo.it/";
+    @Value("${port}")
+    private String port;
 
     public List<TargetDTO> getTargetList(String email){
         System.out.println(email);
@@ -56,7 +50,7 @@ public class TargetService {
     }
 
     public TargetDTO getTargetDTO(Target target){
-        return new TargetDTO(target.getId(),target.getUser().getId(),target.getGoal(), target.getPenalty(),
+        return new TargetDTO(target.getId(),target.getUser().getId(),target.getGoal(), target.getUrl(),target.getPenalty(),
                 target.getStartDate(), target.getEndDate(), target.getSubGoal(), target.getRoutine(),
                 target.getSubGoalTotal(),target.getSuccessCount(),target.getSuccessVote(), target.getFailureVote(),
                 target.getVoteTotal());
@@ -71,8 +65,12 @@ public class TargetService {
     @Transactional
     public boolean createTarget(String email, TargetDTO req){
         try {
+            Date date = new Date(req.getEndDate());
+            System.out.println(date);
+            LocalDate endDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            System.out.println(endDate);
             User user = userRepository.findByEmail(email).get();
-            Target saved = targetRepository.save(Target.builder().startDate(LocalDate.now().toString()).endDate(req.getEndDate()).goal(req.getGoal()).subGoalTotal(req.getSubGoal().size())
+            Target saved = targetRepository.save(Target.builder().startDate(LocalDate.now().toString()).endDate(endDate.toString()).goal(req.getGoal()).subGoalTotal(req.getSubGoal().size())
                     .successCount(0).failureVote(0).successVote(0).voteTotal(0).penalty(req.getPenalty()).user(user).subGoal(req.getSubGoal()).routine(req.getRoutine()).build());
             for (Subgoal subgoal : req.getSubGoal()) {
                 subgoalRepository.save(Subgoal.builder().target(saved).value(subgoal.getValue()).build());
@@ -80,8 +78,8 @@ public class TargetService {
             for (Routine routine : req.getRoutine()) {
                 routineRepository.save(Routine.builder().target(saved).value(routine.getValue()).build());
             }
-            ShortUrl shortUrl = createShareUrl(saved.getId());
-            //targetRepository.save(Target.builder().id(saved.getId()).shortUrl(shortUrl).build());
+            String url = "http://" + ipSource + ":" + port + "/result/" + saved.getId().toString();
+            saved.setUrl(url);
             return true;
         }catch (Exception e){
             e.printStackTrace();
@@ -89,9 +87,11 @@ public class TargetService {
         }
     }
 
-    public TargetDTO getDetailTarget(Long targetId) {
+    public TargetDTO getDetailTarget(Integer targetId) {
         if(targetRepository.findById(targetId).isPresent()) {//if exist
             Target target = targetRepository.findById(targetId).get();
+            System.out.println(target.getUrl());
+            System.out.println(target.getGoal());
             return getTargetDTO(target);
         }
         return null;//if not exist
@@ -128,7 +128,7 @@ public class TargetService {
         }
     }
 
-    public boolean voteTarget(Long id, boolean success){
+    public boolean voteTarget(Integer id, boolean success){
         try{
             Target target = targetRepository.findById(id).orElseThrow(()->new IllegalArgumentException("타겟을 찾을 수 없습니다."));
             if(success){
@@ -142,61 +142,14 @@ public class TargetService {
             return false;
         }
     }
-
-    public ShortUrl createShareUrl(Long targetId){
-        String encodedUrl = null;
+    public TargetDTO resultTargetPage(Integer id){
         try{
-            Target target = targetRepository.findById(targetId).orElseThrow(()->new IllegalArgumentException("can't make shortUrl: can't find targetId"));
-            //originUrl
-            String originUrl = originPrefix+targetId.toString();
-
-            //random create
-            do {
-                BigInteger number = new BigInteger(RandomStringUtils.randomNumeric(1, 15), 10);
-
-                //UUID uuid = UUID.randomUUID();//uuid : 16 radix
-                //BigInteger number = new BigInteger(uuid.toString().replace("-",""),16);
-
-                //encoding(shortedUrl)
-                encodedUrl = shortPrefix + base62Util.UrlEncoding(number);
-                System.out.println(encodedUrl);
-            }while(shortUrlRepository.existsByShortUrl(encodedUrl));
-            return shortUrlRepository.save(ShortUrl.builder().originUrl(originUrl).shortUrl(encodedUrl).target(target).build());
-        }catch(Exception e){
-            e.printStackTrace();
-            return null;
-        }
-    }
-    public boolean existId(Long id){
-        return shortUrlRepository.existsByTargetId(id);
-    }
-    public boolean existShortUrl(String shortUrl){
-        return shortUrlRepository.existsByShortUrl(shortUrl);
-    }
-
-    public String shareUrl(Long targetId){
-        try {
-            if (existId(targetId))
-                return shortUrlRepository.findByTargetId(targetId).getShortUrl();
-
-            else {
-                return null;
+            if(targetRepository.findById(id).isPresent()) {//if exist
+                TargetDTO targetDTO = getTargetDTO(targetRepository.findById(id).get());
+                System.out.println(targetDTO);
+                return targetDTO;
             }
-        }catch (Exception e){
-            e.printStackTrace();
             return null;
-        }
-    }
-
-    public TargetDTO resultTargetPage(String shortUrl){
-        try{
-            if(!existShortUrl(shortUrl))
-                return null;
-            ShortUrl url = shortUrlRepository.findByShortUrl(shortUrl);
-            System.out.println(url.getTarget());
-            TargetDTO targetDTO = getTargetDTO(url.getTarget());
-            System.out.println(targetDTO);
-            return targetDTO;
         }catch (Exception e){
             e.printStackTrace();
             return null;

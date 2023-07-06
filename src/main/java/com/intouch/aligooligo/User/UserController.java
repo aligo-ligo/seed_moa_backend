@@ -105,7 +105,7 @@ public class UserController {
         String access_Token = userService.getKakaoAcessToken(code);
         Map<String, String> kakaoUser = userService.createKakaoUser(access_Token);
         if(kakaoUser!=null)
-            return ResponseEntity.ok().body(getResponse(kakaoUser.get("accessToken"),new User(Long.parseLong(kakaoUser.get("id")), kakaoUser.get("email"),kakaoUser.get("nickName"))));
+            return ResponseEntity.ok().body(getResponse(kakaoUser.get("accessToken"),new User(Integer.parseInt(kakaoUser.get("id")), kakaoUser.get("email"),kakaoUser.get("nickName"))));
         return ResponseEntity.internalServerError().build();
 
     }

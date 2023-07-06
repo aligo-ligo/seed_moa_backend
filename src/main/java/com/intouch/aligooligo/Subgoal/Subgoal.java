@@ -15,7 +15,7 @@ public class Subgoal {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long id;
+    private Integer id;
 
     @Column(name = "value", nullable = false, length = 100, unique = true)
     String value;

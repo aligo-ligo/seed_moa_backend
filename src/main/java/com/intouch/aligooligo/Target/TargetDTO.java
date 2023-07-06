@@ -1,6 +1,5 @@
 package com.intouch.aligooligo.Target;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.intouch.aligooligo.Routine.Routine;
 import com.intouch.aligooligo.Subgoal.Subgoal;
 import com.intouch.aligooligo.User.User;
@@ -13,11 +12,12 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TargetDTO {
-    private Long id;
-    private Long userId;
+    private Integer id;
+    private Integer userId;
     private String startDate;
     private String endDate;
     private String goal;
+    private String url;
     private List<Subgoal> subGoal;
     private List<Routine> routine;
     private User user;
@@ -28,7 +28,7 @@ public class TargetDTO {
     private Integer successVote;
     private Integer voteTotal;
 
-    public TargetDTO(Long id, Long userId, String goal, Integer subGoalTotal, Integer successCount, Integer successVote, Integer voteTotal){
+    public TargetDTO(Integer id, Integer userId, String goal, Integer subGoalTotal, Integer successCount, Integer successVote, Integer voteTotal){
         this.id = id;
         this. userId = userId;
         this.goal = goal;
@@ -37,12 +37,13 @@ public class TargetDTO {
         this.successVote = successVote;
         this.voteTotal = voteTotal;
     }
-    public TargetDTO(Long id, Long userId, String goal, String penalty, String startDate, String endDate,
+    public TargetDTO(Integer id, Integer userId, String goal, String url, String penalty, String startDate, String endDate,
                      List<Subgoal> subGoal, List<Routine> routine, Integer subGoalTotal, Integer successCount, Integer successVote,
                      Integer failureVote, Integer voteTotal){
         this.id = id;
-        this. userId = userId;
+        this.userId = userId;
         this.goal = goal;
+        this.url = url;
         this.penalty = penalty;
         this.startDate = startDate;
         this.endDate = endDate;

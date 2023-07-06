@@ -1,6 +1,7 @@
 package com.intouch.aligooligo.Target;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.intouch.aligooligo.Routine.Routine;
 import com.intouch.aligooligo.Subgoal.Subgoal;
 import com.intouch.aligooligo.User.User;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "target")
@@ -19,7 +21,7 @@ public class Target {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long id;
+    private Integer id;
 
     @Column(name = "start_date", nullable = false)
     private String startDate;
@@ -29,6 +31,9 @@ public class Target {
 
     @Column(name = "goal", nullable = false, length = 100)
     private String goal;
+
+    @Column(name = "url", length = 50)
+    private String url;
 
     @Column(name = "subgoal_total")
     private Integer subGoalTotal;
@@ -49,6 +54,7 @@ public class Target {
     private String penalty;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "user_id")
     private User user;
 

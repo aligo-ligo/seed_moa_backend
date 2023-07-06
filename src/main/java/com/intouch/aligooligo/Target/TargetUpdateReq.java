@@ -1,4 +1,4 @@
 package com.intouch.aligooligo.Target;
 
-public record TargetUpdateReq(Long id, String value, String completeDate) {
+public record TargetUpdateReq(Integer id, String value, String completeDate) {
 }
