@@ -135,8 +135,11 @@ public class TargetService {
                 targetRepository.save(Target.builder().successVote(target.getSuccessVote()+1)
                         .voteTotal(target.getVoteTotal()+1).build());
             }
-            targetRepository.save(Target.builder().failureVote(target.getFailureVote()+1)
-                    .voteTotal(target.getVoteTotal()+1).build());
+            else {
+                targetRepository.save(Target.builder().failureVote(target.getFailureVote() + 1)
+                        .voteTotal(target.getVoteTotal() + 1).build());
+            }
+            System.out.println("test222");
             return true;
         }catch (Exception e){
             return false;

@@ -107,9 +107,10 @@ public class TargetController {
             return ResponseEntity.internalServerError().build();
         }
     }
-    @GetMapping("/vote")
+    @PostMapping("/vote")
     public ResponseEntity<HttpStatus> voteTarget(@RequestParam(value = "id") Integer id, @RequestParam(value = "success") boolean success){
         try{
+            System.out.println("test");
             boolean voted = targetService.voteTarget(id, success);
             if(voted)
                 return ResponseEntity.ok().build();//ok
