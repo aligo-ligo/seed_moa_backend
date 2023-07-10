@@ -32,11 +32,8 @@ public class TargetService {
         this.routineRepository = routineRepository;
         this.subgoalRepository = subgoalRepository;
     }
-    @Value("${ipSource}")
-    private String ipSource;
-
-    @Value("${port}")
-    private String port;
+    @Value("${urlPrefix}")
+    private String urlPrefix;
 
     public List<TargetDTO> getTargetList(String email){
         User user = userRepository.findByEmail(email).orElseThrow(()->new UsernameNotFoundException("can't get targetList : can't find userEmail"));
@@ -75,7 +72,7 @@ public class TargetService {
             for (Routine routine : req.getRoutine()) {
                 routineRepository.save(Routine.builder().target(saved).value(routine.getValue()).build());
             }
-            String url = "https://" + ipSource + ":" + port + "/result/" + saved.getId().toString();
+            String url = urlPrefix + saved.getId().toString();
             saved.updateUrl(url);
             return true;
         }catch (Exception e){
