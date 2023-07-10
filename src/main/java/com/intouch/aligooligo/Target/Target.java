@@ -12,11 +12,9 @@ import java.util.List;
 
 @Entity
 @Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "target")
-@Builder
 public class Target {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -65,4 +63,34 @@ public class Target {
     @OneToMany(mappedBy = "target")
     @Column(name = "routines")
     private List<Routine> routine;
+
+    @Builder
+    public Target(Integer id, String startDate, String endDate, String goal, String penalty, Integer subGoalTotal, Integer successCount,
+                  Integer failureVote,Integer successVote, Integer voteTotal, User user, List<Subgoal> subGoal, List<Routine> routine){
+        this.id = id;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.goal = goal;
+        this.penalty = penalty;
+        this.subGoalTotal = subGoalTotal;
+        this.successCount = successCount;
+        this.failureVote = failureVote;
+        this.successVote = successVote;
+        this.voteTotal = voteTotal;
+        this.user = user;
+        this.subGoal = subGoal;
+        this.routine = routine;
+    }
+    public void updateUrl(String url){
+        this.url = url;
+    }
+    public void updateTarget(Integer successCount){
+        this.successCount = successCount;
+    }
+
+    public void updateVote(Integer successVote, Integer failureVote, Integer voteTotal){
+        this.successVote = successVote;
+        this.failureVote = failureVote;
+        this.voteTotal = voteTotal;
+    }
 }

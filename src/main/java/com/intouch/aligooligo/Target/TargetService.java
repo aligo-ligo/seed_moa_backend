@@ -39,7 +39,6 @@ public class TargetService {
     private String port;
 
     public List<TargetDTO> getTargetList(String email){
-        System.out.println(email);
         User user = userRepository.findByEmail(email).orElseThrow(()->new UsernameNotFoundException("can't get targetList : can't find userEmail"));
         List<Target> list = targetRepository.findAllByUserId(user.getId());
         List<TargetDTO> DTOlist = new ArrayList<>();
@@ -66,9 +65,7 @@ public class TargetService {
     public boolean createTarget(String email, TargetDTO req){
         try {
             Date date = new Date(req.getEndDate());
-            System.out.println(date);
             LocalDate endDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-            System.out.println(endDate);
             User user = userRepository.findByEmail(email).get();
             Target saved = targetRepository.save(Target.builder().startDate(LocalDate.now().toString()).endDate(endDate.toString()).goal(req.getGoal()).subGoalTotal(req.getSubGoal().size())
                     .successCount(0).failureVote(0).successVote(0).voteTotal(0).penalty(req.getPenalty()).user(user).subGoal(req.getSubGoal()).routine(req.getRoutine()).build());
@@ -79,7 +76,7 @@ public class TargetService {
                 routineRepository.save(Routine.builder().target(saved).value(routine.getValue()).build());
             }
             String url = "http://" + ipSource + ":" + port + "/result/" + saved.getId().toString();
-            saved.setUrl(url);
+            saved.updateUrl(url);
             return true;
         }catch (Exception e){
             e.printStackTrace();
@@ -90,8 +87,6 @@ public class TargetService {
     public TargetDTO getDetailTarget(Integer targetId) {
         if(targetRepository.findById(targetId).isPresent()) {//if exist
             Target target = targetRepository.findById(targetId).get();
-            System.out.println(target.getUrl());
-            System.out.println(target.getGoal());
             return getTargetDTO(target);
         }
         return null;//if not exist
@@ -100,23 +95,25 @@ public class TargetService {
     public boolean updateTarget(TargetUpdateReq req){
         try{
             Target target = targetRepository.findById(req.id()).orElseThrow(()->new IllegalArgumentException("사용자가 없습니다."));
-
             for(Subgoal subgoal:target.getSubGoal()){
                 if(Objects.equals(subgoal.getValue(), req.value())){
                     if(req.completeDate()==null) {//subGoal 체크 해제했을 경우
-                        subgoalRepository.save(Subgoal.builder().id(subgoal.getId()).target(target).completedDate(null).value(subgoal.getValue()).build());
+                        subgoal.updateDate(null);
+                        subgoalRepository.save(subgoal);
                         if(target.getSuccessCount()==0)//해당 target successCount가 0이면
                             return true;
                         else {
+                            target.updateTarget(target.getSuccessCount()-1);
                             targetRepository.save(target);
-                            targetRepository.save(Target.builder().id(target.getId()).startDate(target.getStartDate()).endDate(target.getEndDate())
-                                    .successCount(target.getSuccessCount() - 1).goal(target.getGoal()).penalty(target.getPenalty()).build());
                         }
                     }
                     else{//subGoal 체크했을 경우
-                        subgoalRepository.save(Subgoal.builder().id(subgoal.getId()).target(target).completedDate(req.completeDate()).value(subgoal.getValue()).build());
-                        targetRepository.save(Target.builder().id(target.getId()).startDate(target.getStartDate()).endDate(target.getEndDate())
-                                .successCount(target.getSuccessCount()+1).goal(target.getGoal()).penalty(target.getPenalty()).build());
+                        Date date = new Date(req.completeDate());
+                        LocalDate completeDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                        subgoal.updateDate(completeDate.toString());
+                        target.updateTarget(target.getSuccessCount()+1);
+                        subgoalRepository.save(subgoal);
+                        targetRepository.save(target);
                     }
                     return true;
                 }
@@ -131,17 +128,17 @@ public class TargetService {
     public boolean voteTarget(Integer id, boolean success){
         try{
             Target target = targetRepository.findById(id).orElseThrow(()->new IllegalArgumentException("타겟을 찾을 수 없습니다."));
-            if(success){
-                targetRepository.save(Target.builder().successVote(target.getSuccessVote()+1)
-                        .voteTotal(target.getVoteTotal()+1).build());
+            if(success) {
+                target.updateVote(target.getSuccessVote() + 1, target.getFailureVote(), target.getVoteTotal()+1);
+                targetRepository.save(target);
             }
             else {
-                targetRepository.save(Target.builder().failureVote(target.getFailureVote() + 1)
-                        .voteTotal(target.getVoteTotal() + 1).build());
+                target.updateVote(target.getSuccessVote(), target.getFailureVote() + 1, target.getVoteTotal()+1);
+                targetRepository.save(target);
             }
-            System.out.println("test222");
             return true;
         }catch (Exception e){
+            e.printStackTrace();
             return false;
         }
     }
@@ -149,7 +146,6 @@ public class TargetService {
         try{
             if(targetRepository.findById(id).isPresent()) {//if exist
                 TargetDTO targetDTO = getTargetDTO(targetRepository.findById(id).get());
-                System.out.println(targetDTO);
                 return targetDTO;
             }
             return null;

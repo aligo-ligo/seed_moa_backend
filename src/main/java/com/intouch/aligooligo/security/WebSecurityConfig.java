@@ -38,8 +38,6 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws  Exception {
         http
-
-
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable) // csrf 보안 토큰 disable처리.
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

@@ -3,17 +3,13 @@ package com.intouch.aligooligo.Routine;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.intouch.aligooligo.Target.Target;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-
 @Entity
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @Table(name = "routine")
 public class Routine {
     @Id
@@ -30,5 +26,11 @@ public class Routine {
     @JoinColumn(name = "target_id")
     private Target target;
 
+    @Builder
+    Routine(Integer id, String value, Target target){
+        this.id = id;
+        this.value = value;
+        this.target = target;
+    }
 
 }

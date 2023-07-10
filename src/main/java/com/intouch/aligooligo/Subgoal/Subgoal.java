@@ -7,8 +7,6 @@ import lombok.*;
 
 @Entity
 @Getter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "subgoal")
 public class Subgoal {
@@ -28,4 +26,15 @@ public class Subgoal {
     @JoinColumn(name = "target_id")
     private Target target;
 
+    @Builder
+    Subgoal(Integer id, String value, String completedDate, Target target){
+        this.id = id;
+        this.value = value;
+        this.completedDate = completedDate;
+        this.target = target;
+    }
+
+    public void updateDate(String completedDate){
+        this.completedDate = completedDate;
+    }
 }

@@ -54,15 +54,12 @@ public class TargetController {
     public String checkJwtValidation(HttpServletRequest request){
         try {
             String token = request.getHeader("Authorization");
-            System.out.println(token);
             if (token != null) {
                 String req_token = token.substring(7);
-                System.out.println(jwtTokenProvider.validateToken(token));
                 if(jwtTokenProvider.validateToken(req_token)) {
                     return jwtTokenProvider.getAuthentication(req_token).getName();
                 }
             }
-            System.out.println(jwtTokenProvider.validateToken(token));
             return null;
         }catch (Exception e){
             e.printStackTrace();
@@ -107,10 +104,9 @@ public class TargetController {
             return ResponseEntity.internalServerError().build();
         }
     }
-    @PostMapping("/vote")
+    @GetMapping("/vote")
     public ResponseEntity<HttpStatus> voteTarget(@RequestParam(value = "id") Integer id, @RequestParam(value = "success") boolean success){
         try{
-            System.out.println("test");
             boolean voted = targetService.voteTarget(id, success);
             if(voted)
                 return ResponseEntity.ok().build();//ok

@@ -7,7 +7,6 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +17,6 @@ import java.util.Map;
 @RestController
 @CrossOrigin
 public class UserController {
-
     private final UserService userService;
     public String getToken(User req){
         try {
@@ -54,8 +52,6 @@ public class UserController {
 
     @PostMapping("/signin")
     public ResponseEntity<String> SignInUser(@RequestBody User req){
-        System.out.println("hsafasdifadj");
-
         String token = getToken(req);
 
         if(token==null)
@@ -67,15 +63,11 @@ public class UserController {
         else if(token.equals("500"))
             return ResponseEntity.internalServerError().build();
         return ResponseEntity.ok().body(getResponse(token, userService.findByUserEmail(req.getEmail()).get()));
-
     }
     @PostMapping("/signup")
     public ResponseEntity<String> SignUpUser(@RequestBody User req){
-        System.out.println("hsafasdifadj");
         try {
             int res = userService.SignUp(req);
-            System.out.println(req);
-            System.out.println(res);
             if (res == 0){
                 String token = getToken(req);
                 User user = userService.findByUserEmail(req.getEmail()).get();
@@ -99,7 +91,6 @@ public class UserController {
             return ResponseEntity.internalServerError().build();
         }
     }
-
     @GetMapping("/kakao")
     public ResponseEntity<String> SignUpKakao(@RequestParam String code){
         String access_Token = userService.getKakaoAcessToken(code);
@@ -107,8 +98,5 @@ public class UserController {
         if(kakaoUser!=null)
             return ResponseEntity.ok().body(getResponse(kakaoUser.get("accessToken"),new User(Integer.parseInt(kakaoUser.get("id")), kakaoUser.get("email"),kakaoUser.get("nickName"))));
         return ResponseEntity.internalServerError().build();
-
     }
-
-
 }
