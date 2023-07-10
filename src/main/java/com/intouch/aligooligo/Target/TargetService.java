@@ -75,7 +75,7 @@ public class TargetService {
             for (Routine routine : req.getRoutine()) {
                 routineRepository.save(Routine.builder().target(saved).value(routine.getValue()).build());
             }
-            String url = "http://" + ipSource + ":" + port + "/result/" + saved.getId().toString();
+            String url = "https://" + ipSource + ":" + port + "/result/" + saved.getId().toString();
             saved.updateUrl(url);
             return true;
         }catch (Exception e){
