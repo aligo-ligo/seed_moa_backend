@@ -48,7 +48,7 @@ public class Target {
     @Column(name = "vote_total")
     private Integer voteTotal;
 
-    @Column(name = "penalty", nullable = false, length = 50)
+    @Column(name = "penalty", length = 50)
     private String penalty;
 
     @ManyToOne
