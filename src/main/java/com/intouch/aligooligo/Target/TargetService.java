@@ -9,6 +9,7 @@ import com.intouch.aligooligo.User.User;
 import com.intouch.aligooligo.User.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +38,7 @@ public class TargetService {
 
     public List<TargetDTO> getTargetList(String email){
         User user = userRepository.findByEmail(email).orElseThrow(()->new UsernameNotFoundException("can't get targetList : can't find userEmail"));
-        List<Target> list = targetRepository.findAllByUserId(user.getId());
+        List<Target> list = targetRepository.findByUserIdOrderByIdDesc(user.getId());
         List<TargetDTO> DTOlist = new ArrayList<>();
         for(Target target : list){
             DTOlist.add(getTargetListDTO(target));
