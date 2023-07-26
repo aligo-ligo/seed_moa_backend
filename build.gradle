@@ -53,3 +53,12 @@ task copySecret(type: Copy) {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+bootJar {
+	mainClassName = 'com.intouch.aligooligo.AligooligoApplication'
+}
+
+bootRun {
+	String activeProfile = System.properties['spring.profiles.active']
+	systemProperty "spring.profiles.active", activeProfile
+}
