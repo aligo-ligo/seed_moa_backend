@@ -40,7 +40,15 @@ dependencies {
 tasks.withType(JavaCompile){
 	options.encoding = "UTF-8"
 }
+processResources.dependsOn('copySecret')
 
+task copySecret(type: Copy) {
+	from 'backend_private/application.properties' // auth 서브모듈에 있는 oauth 설정파일을 복사한다.
+	into 'src/main/resources'
+
+	from 'backend_private/application-dev.properties'
+	into 'src/main/resources'
+}
 
 tasks.named('test') {
 	useJUnitPlatform()
