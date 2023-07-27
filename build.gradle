@@ -54,6 +54,7 @@ task copySecret(type: Copy) {
 
 	from 'backend_private/keystore.p12'
 	into 'src/main/resources'
+
 }
 
 tasks.named('test') {
