@@ -4,7 +4,6 @@ import com.intouch.aligooligo.Routine.Routine;
 import com.intouch.aligooligo.Subgoal.Subgoal;
 import com.intouch.aligooligo.User.User;
 import lombok.*;
-
 import java.util.List;
 
 @Getter
