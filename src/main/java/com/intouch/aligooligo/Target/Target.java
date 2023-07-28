@@ -8,6 +8,7 @@ import com.intouch.aligooligo.User.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -22,22 +23,16 @@ public class Target {
     private Integer id;
 
     @Column(name = "start_date", nullable = false)
-    private String startDate;
+    private Date startDate;
 
     @Column(name = "end_date", nullable = false)
-    private String endDate;
+    private Date endDate;
 
     @Column(name = "goal", nullable = false, length = 100)
     private String goal;
 
     @Column(name = "url", length = 50)
     private String url;
-
-    @Column(name = "subgoal_total")
-    private Integer subGoalTotal;
-
-    @Column(name = "success_count")
-    private Integer successCount;
 
     @Column(name = "failure_vote")
     private Integer failureVote;
@@ -65,15 +60,13 @@ public class Target {
     private List<Routine> routine;
 
     @Builder
-    public Target(Integer id, String startDate, String endDate, String goal, String penalty, Integer subGoalTotal, Integer successCount,
+    public Target(Integer id, Date startDate, Date endDate, String goal, String penalty, Integer subGoalTotal,
                   Integer failureVote,Integer successVote, Integer voteTotal, User user, List<Subgoal> subGoal, List<Routine> routine){
         this.id = id;
         this.startDate = startDate;
         this.endDate = endDate;
         this.goal = goal;
         this.penalty = penalty;
-        this.subGoalTotal = subGoalTotal;
-        this.successCount = successCount;
         this.failureVote = failureVote;
         this.successVote = successVote;
         this.voteTotal = voteTotal;
@@ -83,9 +76,6 @@ public class Target {
     }
     public void updateUrl(String url){
         this.url = url;
-    }
-    public void updateTarget(Integer successCount){
-        this.successCount = successCount;
     }
 
     public void updateVote(Integer successVote, Integer failureVote, Integer voteTotal){
