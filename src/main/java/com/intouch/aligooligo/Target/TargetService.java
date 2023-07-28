@@ -36,6 +36,7 @@ public class TargetService {
 
     public List<TargetDTO> getTargetList(String email){
         User user = userRepository.findByEmail(email).orElseThrow(()->new UsernameNotFoundException("can't get targetList : can't find userEmail"));
+        System.out.println("0.5 point");
         List<Target> list = targetRepository.findByUserIdOrderByIdDesc(user.getId());
         System.out.println("first point");
         List<TargetDTO> DTOlist = new ArrayList<>();
