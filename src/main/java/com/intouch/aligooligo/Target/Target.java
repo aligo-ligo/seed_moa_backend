@@ -60,8 +60,8 @@ public class Target {
     private List<Routine> routine;
 
     @Builder
-    public Target(Integer id, Date startDate, Date endDate, String goal, String penalty, Integer subGoalTotal,
-                  Integer failureVote,Integer successVote, Integer voteTotal, User user, List<Subgoal> subGoal, List<Routine> routine){
+    public Target(Integer id, Date startDate, Date endDate, String goal, String penalty, Integer failureVote,Integer successVote,
+                  Integer voteTotal, User user, List<Subgoal> subGoal, List<Routine> routine){
         this.id = id;
         this.startDate = startDate;
         this.endDate = endDate;

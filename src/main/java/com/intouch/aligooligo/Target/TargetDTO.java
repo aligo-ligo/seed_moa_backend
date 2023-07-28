@@ -5,7 +5,6 @@ import com.intouch.aligooligo.Subgoal.Subgoal;
 import com.intouch.aligooligo.User.User;
 import lombok.*;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 

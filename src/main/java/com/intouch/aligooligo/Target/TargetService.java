@@ -1,8 +1,5 @@
 package com.intouch.aligooligo.Target;
 
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.intouch.aligooligo.Routine.Routine;
 import com.intouch.aligooligo.Routine.RoutineRepository;
 import com.intouch.aligooligo.Subgoal.Subgoal;
@@ -11,13 +8,10 @@ import com.intouch.aligooligo.User.User;
 import com.intouch.aligooligo.User.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cglib.core.Local;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
