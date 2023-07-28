@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 @RequestMapping(value="/result")
 @RestController
-@CrossOrigin(origins = "https://aligoligo.me")
+@CrossOrigin
 public class ResultController {
 
     private final TargetService targetService;

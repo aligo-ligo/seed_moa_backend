@@ -1,6 +1,5 @@
 package com.intouch.aligooligo.Target;
 
-
 import com.intouch.aligooligo.Routine.Routine;
 import com.intouch.aligooligo.Routine.RoutineRepository;
 import com.intouch.aligooligo.Subgoal.Subgoal;
@@ -9,7 +8,6 @@ import com.intouch.aligooligo.User.User;
 import com.intouch.aligooligo.User.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,17 +44,16 @@ public class TargetService {
         return DTOlist;
     }
 
-    public TargetDTO getTargetDTO(Target target){
+    public TargetDTO getTargetDTO(Target target, Map<String, Integer> resMap){
         return new TargetDTO(target.getId(),target.getUser().getId(),target.getGoal(), target.getUrl(),target.getPenalty(),
-                target.getStartDate(), target.getEndDate(), target.getSubGoal(), target.getRoutine(),
-                target.getSubGoalTotal(),target.getSuccessCount(),target.getSuccessVote(), target.getFailureVote(),
-                target.getVoteTotal());
+                target.getStartDate().toString(), target.getEndDate().toString(), target.getSubGoal(), target.getRoutine(),
+                target.getSuccessVote(), target.getFailureVote(),
+                target.getVoteTotal(), resMap);
     }
 
     public TargetDTO getTargetListDTO(Target target){
         return new TargetDTO(target.getId(),target.getUser().getId(),target.getGoal(),
-                target.getSubGoalTotal(),target.getSuccessCount(),target.getSuccessVote(),
-                target.getVoteTotal());
+                target.getSuccessVote(), target.getVoteTotal());
     }
 
     @Transactional
@@ -65,8 +62,8 @@ public class TargetService {
             Date date = new Date(req.getEndDate());
             LocalDate endDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
             User user = userRepository.findByEmail(email).get();
-            Target saved = targetRepository.save(Target.builder().startDate(LocalDate.now().toString()).endDate(endDate.toString()).goal(req.getGoal()).subGoalTotal(req.getSubGoal().size())
-                    .successCount(0).failureVote(0).successVote(0).voteTotal(0).penalty(req.getPenalty()).user(user).subGoal(req.getSubGoal()).routine(req.getRoutine()).build());
+            Target saved = targetRepository.save(Target.builder().startDate(java.sql.Date.valueOf(LocalDate.now())).endDate(java.sql.Date.valueOf(endDate)).goal(req.getGoal())
+                    .failureVote(0).successVote(0).voteTotal(0).penalty(req.getPenalty()).user(user).subGoal(req.getSubGoal()).routine(req.getRoutine()).build());
             for (Subgoal subgoal : req.getSubGoal()) {
                 subgoalRepository.save(Subgoal.builder().target(saved).value(subgoal.getValue()).build());
             }
@@ -81,11 +78,43 @@ public class TargetService {
             return false;
         }
     }
+    public Map<String, Integer> getChartDate(Target target) {
+        Date startDate = target.getStartDate();
+        LocalDate tmpToday = LocalDate.now();
+        Date today = java.sql.Date.valueOf(tmpToday);
+
+        int den = Long.valueOf(subgoalRepository.countByTargetId(target.getId())).intValue();//denominator
+        int num = 0;//numerator
+        int subGoalDateIdx = 0;
+        double tmpNum;
+        SortedMap<String, Integer> map = new TreeMap<>();
+        List<Subgoal> subgoalList = subgoalRepository.findByTargetIdAndCompletedDateNotNullOrderByCompletedDateAsc(target.getId());
+
+        Calendar cal = Calendar.getInstance();
+        Calendar todayCal = Calendar.getInstance();
+        cal.setTime(startDate);
+        todayCal.setTime(today);
+        todayCal.add(Calendar.DATE, 1);
+
+        while(!cal.getTime().equals(todayCal.getTime())){
+            if(subGoalDateIdx<subgoalList.size() && cal.getTime().equals(subgoalList.get(subGoalDateIdx).getCompletedDate())){
+                num++;
+                subGoalDateIdx++;
+            }
+            tmpNum = ((double)num/den)*100;
+            map.put(cal.getTime().toString(), (int) tmpNum);
+            cal.add(Calendar.DATE, 1);
+        }
+        return map;
+    }
 
     public TargetDTO getDetailTarget(Integer targetId) {
         if(targetRepository.findById(targetId).isPresent()) {//if exist
+
             Target target = targetRepository.findById(targetId).get();
-            return getTargetDTO(target);
+            Map<String, Integer> resMap = getChartDate(target);
+
+            return getTargetDTO(target, resMap);
         }
         return null;//if not exist
     }
@@ -98,20 +127,11 @@ public class TargetService {
                     if(req.completeDate()==null) {//subGoal 체크 해제했을 경우
                         subgoal.updateDate(null);
                         subgoalRepository.save(subgoal);
-                        if(target.getSuccessCount()==0)//해당 target successCount가 0이면
-                            return true;
-                        else {
-                            target.updateTarget(target.getSuccessCount()-1);
-                            targetRepository.save(target);
-                        }
                     }
                     else{//subGoal 체크했을 경우
-                        Date date = new Date(req.completeDate());
-                        LocalDate completeDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                        subgoal.updateDate(completeDate.toString());
-                        target.updateTarget(target.getSuccessCount()+1);
+                        Date date = java.sql.Date.valueOf(LocalDate.now());
+                        subgoal.updateDate(date);
                         subgoalRepository.save(subgoal);
-                        targetRepository.save(target);
                     }
                     return true;
                 }
@@ -143,8 +163,8 @@ public class TargetService {
     public TargetDTO resultTargetPage(Integer id){
         try{
             if(targetRepository.findById(id).isPresent()) {//if exist
-                TargetDTO targetDTO = getTargetDTO(targetRepository.findById(id).get());
-                return targetDTO;
+                Target target = targetRepository.findById(id).get();
+                return getTargetDTO(target, getChartDate(target));
             }
             return null;
         }catch (Exception e){

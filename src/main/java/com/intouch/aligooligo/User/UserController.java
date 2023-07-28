@@ -15,7 +15,7 @@ import java.util.Map;
 @AllArgsConstructor
 @RequestMapping(value="/users")
 @RestController
-@CrossOrigin(origins = "https://aligoligo.me")
+@CrossOrigin
 public class UserController {
     private final UserService userService;
     public String getToken(User req){

@@ -6,6 +6,7 @@ import com.intouch.aligooligo.User.User;
 import lombok.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -22,24 +23,22 @@ public class TargetDTO {
     private List<Routine> routine;
     private User user;
     private String penalty;
-    private Integer subGoalTotal;
-    private Integer successCount;
     private Integer failureVote;
     private Integer successVote;
     private Integer voteTotal;
+    private Map<String, Integer> resMap;
 
-    public TargetDTO(Integer id, Integer userId, String goal, Integer subGoalTotal, Integer successCount, Integer successVote, Integer voteTotal){
+    public TargetDTO(Integer id, Integer userId, String goal, Integer successVote, Integer voteTotal){
         this.id = id;
         this. userId = userId;
         this.goal = goal;
-        this.subGoalTotal = subGoalTotal;
-        this.successCount = successCount;
         this.successVote = successVote;
         this.voteTotal = voteTotal;
+
     }
     public TargetDTO(Integer id, Integer userId, String goal, String url, String penalty, String startDate, String endDate,
-                     List<Subgoal> subGoal, List<Routine> routine, Integer subGoalTotal, Integer successCount, Integer successVote,
-                     Integer failureVote, Integer voteTotal){
+                     List<Subgoal> subGoal, List<Routine> routine, Integer successVote,
+                     Integer failureVote, Integer voteTotal, Map<String, Integer> resMap){
         this.id = id;
         this.userId = userId;
         this.goal = goal;
@@ -49,10 +48,9 @@ public class TargetDTO {
         this.endDate = endDate;
         this.subGoal = subGoal;
         this.routine = routine;
-        this.subGoalTotal = subGoalTotal;
-        this.successCount = successCount;
         this.successVote = successVote;
         this.failureVote = failureVote;
         this.voteTotal = voteTotal;
+        this.resMap = resMap;
     }
 }
