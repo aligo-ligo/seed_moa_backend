@@ -35,6 +35,7 @@ public class TargetDTO {
         this.goal = goal;
         this.successVote = successVote;
         this.voteTotal = voteTotal;
+
     }
     public TargetDTO(Integer id, Integer userId, String goal, String url, String penalty, String startDate, String endDate,
                      List<Subgoal> subGoal, List<Routine> routine, Integer successVote,
