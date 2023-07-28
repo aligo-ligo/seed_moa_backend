@@ -15,7 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @RequestMapping(value="/target")
 @RestController
-@CrossOrigin(origins = "https://aligoligo.me")
+@CrossOrigin
 public class TargetController {
 
     private final JwtTokenProvider jwtTokenProvider;
