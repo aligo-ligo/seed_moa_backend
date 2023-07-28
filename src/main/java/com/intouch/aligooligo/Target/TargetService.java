@@ -85,15 +85,18 @@ public class TargetService {
 
         int den = Long.valueOf(subgoalRepository.countByTargetId(target.getId())).intValue();//denominator
         int num = 0;//numerator
+        int subGoalDateIdx = 0;
         double tmpNum;
         SortedMap<String, Integer> map = new TreeMap<>();
-        List<Subgoal> subgoalList =  subgoalRepository.findByTargetIdOrderByCompletedDateAsc(target.getId());
-        int subGoalDateIdx = 0;
+        List<Subgoal> subgoalList = subgoalRepository.findByTargetIdAndCompletedDateNotNullOrderByCompletedDateAsc(target.getId());
 
         Calendar cal = Calendar.getInstance();
+        Calendar todayCal = Calendar.getInstance();
         cal.setTime(startDate);
+        todayCal.setTime(today);
+        todayCal.add(Calendar.DATE, 1);
 
-        while(!cal.getTime().equals(today)){
+        while(!cal.getTime().equals(todayCal.getTime())){
             if(subGoalDateIdx<subgoalList.size() && cal.getTime().equals(subgoalList.get(subGoalDateIdx).getCompletedDate())){
                 num++;
                 subGoalDateIdx++;
