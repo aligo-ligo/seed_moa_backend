@@ -27,7 +27,6 @@ public class TargetController {
             String email = checkJwtValidation(request);
             if(email==null)
                 return ResponseEntity.status(401).build();
-            System.out.println("zero point");
             List<TargetDTO> list = targetService.getTargetList(email);
             return ResponseEntity.ok().body(list);
         }catch(Exception e){

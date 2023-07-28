@@ -36,13 +36,10 @@ public class TargetService {
 
     public List<TargetDTO> getTargetList(String email){
         User user = userRepository.findByEmail(email).orElseThrow(()->new UsernameNotFoundException("can't get targetList : can't find userEmail"));
-        System.out.println("0.5 point");
         List<Target> list = targetRepository.findByUserIdOrderByIdDesc(user.getId());
-        System.out.println("first point");
         List<TargetDTO> DTOlist = new ArrayList<>();
         for(Target target : list){
             DTOlist.add(getTargetListDTO(target));
-            System.out.println("third point");
         }
         return DTOlist;
     }
@@ -55,7 +52,6 @@ public class TargetService {
     }
 
     public TargetDTO getTargetListDTO(Target target){
-        System.out.println("second point");
         return new TargetDTO(target.getId(),target.getUser().getId(),target.getGoal(),
                 target.getSuccessVote(), target.getVoteTotal());
     }
@@ -65,7 +61,6 @@ public class TargetService {
         try {
             Date date = new Date(req.getEndDate());
             LocalDate endDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-            System.out.println(endDate);
             User user = userRepository.findByEmail(email).get();
             Target saved = targetRepository.save(Target.builder().startDate(java.sql.Date.valueOf(LocalDate.now())).endDate(java.sql.Date.valueOf(endDate)).goal(req.getGoal())
                     .failureVote(0).successVote(0).voteTotal(0).penalty(req.getPenalty()).user(user).subGoal(req.getSubGoal()).routine(req.getRoutine()).build());
@@ -104,8 +99,8 @@ public class TargetService {
                 subGoalDateIdx++;
             }
             tmpNum = ((double)num/den)*100;
-            System.out.println(cal.getTime().toString()+"    "+(int)tmpNum);
             map.put(cal.getTime().toString(), (int) tmpNum);
+            cal.add(Calendar.DATE, 1);
         }
         return map;
     }
