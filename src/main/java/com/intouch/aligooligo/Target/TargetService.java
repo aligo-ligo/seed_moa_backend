@@ -37,9 +37,11 @@ public class TargetService {
     public List<TargetDTO> getTargetList(String email){
         User user = userRepository.findByEmail(email).orElseThrow(()->new UsernameNotFoundException("can't get targetList : can't find userEmail"));
         List<Target> list = targetRepository.findByUserIdOrderByIdDesc(user.getId());
+        System.out.println("first point");
         List<TargetDTO> DTOlist = new ArrayList<>();
         for(Target target : list){
             DTOlist.add(getTargetListDTO(target));
+            System.out.println("third point");
         }
         return DTOlist;
     }
@@ -52,6 +54,7 @@ public class TargetService {
     }
 
     public TargetDTO getTargetListDTO(Target target){
+        System.out.println("second point");
         return new TargetDTO(target.getId(),target.getUser().getId(),target.getGoal(),
                 target.getSuccessVote(), target.getVoteTotal());
     }
