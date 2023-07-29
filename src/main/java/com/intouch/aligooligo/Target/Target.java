@@ -8,6 +8,7 @@ import com.intouch.aligooligo.User.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -23,10 +24,10 @@ public class Target {
     private Integer id;
 
     @Column(name = "start_date", nullable = false)
-    private Date startDate;
+    private LocalDate startDate;
 
     @Column(name = "end_date", nullable = false)
-    private Date endDate;
+    private LocalDate endDate;
 
     @Column(name = "goal", nullable = false, length = 100)
     private String goal;
@@ -60,7 +61,7 @@ public class Target {
     private List<Routine> routine;
 
     @Builder
-    public Target(Integer id, Date startDate, Date endDate, String goal, String penalty, Integer failureVote,Integer successVote,
+    public Target(Integer id, LocalDate startDate, LocalDate endDate, String goal, String penalty, Integer failureVote,Integer successVote,
                   Integer voteTotal, User user, List<Subgoal> subGoal, List<Routine> routine){
         this.id = id;
         this.startDate = startDate;

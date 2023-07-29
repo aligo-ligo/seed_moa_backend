@@ -8,6 +8,7 @@ import com.intouch.aligooligo.User.User;
 import com.intouch.aligooligo.User.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cglib.core.Local;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,7 +63,7 @@ public class TargetService {
             Date date = new Date(req.getEndDate());
             LocalDate endDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
             User user = userRepository.findByEmail(email).get();
-            Target saved = targetRepository.save(Target.builder().startDate(java.sql.Date.valueOf(LocalDate.now())).endDate(java.sql.Date.valueOf(endDate)).goal(req.getGoal())
+            Target saved = targetRepository.save(Target.builder().startDate(LocalDate.now()).endDate(endDate).goal(req.getGoal())
                     .failureVote(0).successVote(0).voteTotal(0).penalty(req.getPenalty()).user(user).subGoal(req.getSubGoal()).routine(req.getRoutine()).build());
             for (Subgoal subgoal : req.getSubGoal()) {
                 subgoalRepository.save(Subgoal.builder().target(saved).value(subgoal.getValue()).build());
@@ -79,9 +80,8 @@ public class TargetService {
         }
     }
     public Map<String, Integer> getChartDate(Target target) {
-        Date startDate = target.getStartDate();
-        LocalDate tmpToday = LocalDate.now();
-        Date today = java.sql.Date.valueOf(tmpToday);
+        LocalDate startDate = target.getStartDate();
+        LocalDate calDay = LocalDate.now().plusDays(1);
 
         int den = Long.valueOf(subgoalRepository.countByTargetId(target.getId())).intValue();//denominator
         int num = 0;//numerator
@@ -90,20 +90,14 @@ public class TargetService {
         SortedMap<String, Integer> map = new TreeMap<>();
         List<Subgoal> subgoalList = subgoalRepository.findByTargetIdAndCompletedDateNotNullOrderByCompletedDateAsc(target.getId());
 
-        Calendar cal = Calendar.getInstance();
-        Calendar todayCal = Calendar.getInstance();
-        cal.setTime(startDate);
-        todayCal.setTime(today);
-        todayCal.add(Calendar.DATE, 1);
-
-        while(!cal.getTime().equals(todayCal.getTime())){
-            if(subGoalDateIdx<subgoalList.size() && cal.getTime().equals(subgoalList.get(subGoalDateIdx).getCompletedDate())){
+        while(!calDay.equals(startDate)){
+            if(subGoalDateIdx<subgoalList.size() && startDate.equals(subgoalList.get(subGoalDateIdx).getCompletedDate())){
                 num++;
                 subGoalDateIdx++;
             }
             tmpNum = ((double)num/den)*100;
-            map.put(cal.getTime().toString(), (int) tmpNum);
-            cal.add(Calendar.DATE, 1);
+            map.put(startDate.toString(), (int) tmpNum);
+            startDate = startDate.plusDays(1);
         }
         return map;
     }
@@ -129,8 +123,7 @@ public class TargetService {
                         subgoalRepository.save(subgoal);
                     }
                     else{//subGoal 체크했을 경우
-                        Date date = java.sql.Date.valueOf(LocalDate.now());
-                        subgoal.updateDate(date);
+                        subgoal.updateDate(LocalDate.now());
                         subgoalRepository.save(subgoal);
                     }
                     return true;

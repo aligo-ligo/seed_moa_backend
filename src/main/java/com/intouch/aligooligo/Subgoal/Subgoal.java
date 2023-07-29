@@ -5,6 +5,7 @@ import com.intouch.aligooligo.Target.Target;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -21,7 +22,7 @@ public class Subgoal {
     String value;
 
     @Column(name = "completed_date")
-    Date completedDate;
+    LocalDate completedDate;
 
     @ManyToOne
     @JsonIgnore
@@ -29,14 +30,14 @@ public class Subgoal {
     private Target target;
 
     @Builder
-    Subgoal(Integer id, String value, Date completedDate, Target target){
+    Subgoal(Integer id, String value, LocalDate completedDate, Target target){
         this.id = id;
         this.value = value;
         this.completedDate = completedDate;
         this.target = target;
     }
 
-    public void updateDate(Date completedDate){
+    public void updateDate(LocalDate completedDate){
         this.completedDate = completedDate;
     }
 }
