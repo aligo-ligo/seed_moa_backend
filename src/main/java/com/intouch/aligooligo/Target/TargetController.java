@@ -84,21 +84,19 @@ public class TargetController {
     }
 
     @PostMapping("/update")
-    public ResponseEntity<String> updateTarget(HttpServletRequest request, @RequestBody TargetUpdateReq req){
+    public ResponseEntity<TargetDTO> updateTarget(HttpServletRequest request, @RequestBody TargetUpdateReq req){
         try{
             String email = checkJwtValidation(request);
-            ObjectMapper objectMapper = new ObjectMapper();
-            ObjectNode mainNode = objectMapper.createObjectNode();
+            TargetDTO targetDTO = targetService.updateTarget(req);
             if(email==null)
                 return ResponseEntity.status(401).build();
             if(req==null){
                 return ResponseEntity.badRequest().build();
             }
-            if(targetService.updateTarget(req)){
-                mainNode.put("message","updating is completed");
-                return ResponseEntity.ok().body(mainNode.toString());
+            if(targetDTO==null){
+                return ResponseEntity.internalServerError().build();
             }
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.ok().body(targetDTO);
         }catch(Exception e){
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();

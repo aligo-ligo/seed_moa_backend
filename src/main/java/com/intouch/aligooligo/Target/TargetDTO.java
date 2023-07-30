@@ -26,7 +26,7 @@ public class TargetDTO {
     private Integer failureVote;
     private Integer successVote;
     private Integer voteTotal;
-    private Map<String, Integer> resMap;
+    private Map<String, Integer> achievementDate;
 
     public TargetDTO(Integer id, Integer userId, String goal, Integer successVote, Integer voteTotal){
         this.id = id;
@@ -38,7 +38,7 @@ public class TargetDTO {
     }
     public TargetDTO(Integer id, Integer userId, String goal, String url, String penalty, String startDate, String endDate,
                      List<Subgoal> subGoal, List<Routine> routine, Integer successVote,
-                     Integer failureVote, Integer voteTotal, Map<String, Integer> resMap){
+                     Integer failureVote, Integer voteTotal, Map<String, Integer> achievementDate){
         this.id = id;
         this.userId = userId;
         this.goal = goal;
@@ -51,6 +51,6 @@ public class TargetDTO {
         this.successVote = successVote;
         this.failureVote = failureVote;
         this.voteTotal = voteTotal;
-        this.resMap = resMap;
+        this.achievementDate = achievementDate;
     }
 }

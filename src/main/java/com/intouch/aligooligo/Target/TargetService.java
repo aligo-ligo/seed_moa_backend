@@ -79,7 +79,7 @@ public class TargetService {
             return false;
         }
     }
-    public Map<String, Integer> getChartDate(Target target) {
+    public SortedMap<String, Integer> getChartDate(Target target) {
         LocalDate startDate = target.getStartDate();
         LocalDate calDay = LocalDate.now().plusDays(1);
 
@@ -106,14 +106,14 @@ public class TargetService {
         if(targetRepository.findById(targetId).isPresent()) {//if exist
 
             Target target = targetRepository.findById(targetId).get();
-            Map<String, Integer> resMap = getChartDate(target);
+            SortedMap<String, Integer> resMap = getChartDate(target);
 
             return getTargetDTO(target, resMap);
         }
         return null;//if not exist
     }
 
-    public boolean updateTarget(TargetUpdateReq req){
+    public TargetDTO updateTarget(TargetUpdateReq req){
         try{
             Target target = targetRepository.findById(req.id()).orElseThrow(()->new IllegalArgumentException("사용자가 없습니다."));
             for(Subgoal subgoal:target.getSubGoal()){
@@ -126,13 +126,13 @@ public class TargetService {
                         subgoal.updateDate(LocalDate.now());
                         subgoalRepository.save(subgoal);
                     }
-                    return true;
+                    return getTargetDTO(target,getChartDate(target));
                 }
             }
-            return false;
+            return null;
         }catch (Exception e){
             e.printStackTrace();
-            return false;
+            return null;
         }
     }
 
