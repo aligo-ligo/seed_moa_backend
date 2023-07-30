@@ -45,7 +45,8 @@ public class TargetService {
         return DTOlist;
     }
 
-    public TargetDTO getTargetDTO(Target target, Map<String, Integer> resMap){
+    public TargetDTO getTargetDTO(Integer targetId,Map<String, Integer> resMap){
+        Target target = targetRepository.findById(targetId).get();
         return new TargetDTO(target.getId(),target.getUser().getId(),target.getGoal(), target.getUrl(),target.getPenalty(),
                 target.getStartDate().toString(), target.getEndDate().toString(), target.getSubGoal(), target.getRoutine(),
                 target.getSuccessVote(), target.getFailureVote(),
@@ -79,7 +80,8 @@ public class TargetService {
             return false;
         }
     }
-    public SortedMap<String, Integer> getChartDate(Target target) {
+    public SortedMap<String, Integer> getChartDate(Integer targetid) {
+        Target target = targetRepository.findById(targetid).get();
         LocalDate startDate = target.getStartDate();
         LocalDate calDay = LocalDate.now().plusDays(1);
 
@@ -89,9 +91,12 @@ public class TargetService {
         double tmpNum;
         SortedMap<String, Integer> map = new TreeMap<>();
         List<Subgoal> subgoalList = subgoalRepository.findByTargetIdAndCompletedDateNotNullOrderByCompletedDateAsc(target.getId());
-
+        for(Subgoal subgoal:subgoalList){
+            System.out.println(subgoalList.size());
+            System.out.println(subgoal.getCompletedDate());
+        }
         while(!calDay.equals(startDate)){
-            if(subGoalDateIdx<subgoalList.size() && startDate.equals(subgoalList.get(subGoalDateIdx).getCompletedDate())){
+            while (subGoalDateIdx<subgoalList.size() && startDate.equals(subgoalList.get(subGoalDateIdx).getCompletedDate())){
                 num++;
                 subGoalDateIdx++;
             }
@@ -105,10 +110,9 @@ public class TargetService {
     public TargetDTO getDetailTarget(Integer targetId) {
         if(targetRepository.findById(targetId).isPresent()) {//if exist
 
-            Target target = targetRepository.findById(targetId).get();
-            SortedMap<String, Integer> resMap = getChartDate(target);
+            SortedMap<String, Integer> resMap = getChartDate(targetId);
 
-            return getTargetDTO(target, resMap);
+            return getTargetDTO(targetId,resMap);
         }
         return null;//if not exist
     }
@@ -126,7 +130,7 @@ public class TargetService {
                         subgoal.updateDate(LocalDate.now());
                         subgoalRepository.save(subgoal);
                     }
-                    return getTargetDTO(target,getChartDate(target));
+                    return getTargetDTO(req.id(),getChartDate(req.id()));
                 }
             }
             return null;
@@ -156,8 +160,7 @@ public class TargetService {
     public TargetDTO resultTargetPage(Integer id){
         try{
             if(targetRepository.findById(id).isPresent()) {//if exist
-                Target target = targetRepository.findById(id).get();
-                return getTargetDTO(target, getChartDate(target));
+                return getTargetDTO(id,getChartDate(id));
             }
             return null;
         }catch (Exception e){
