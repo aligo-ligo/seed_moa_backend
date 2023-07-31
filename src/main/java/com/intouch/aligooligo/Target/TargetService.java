@@ -8,7 +8,6 @@ import com.intouch.aligooligo.User.User;
 import com.intouch.aligooligo.User.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cglib.core.Local;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +39,12 @@ public class TargetService {
         List<Target> list = targetRepository.findByUserIdOrderByIdDesc(user.getId());
         List<TargetDTO> DTOlist = new ArrayList<>();
         for(Target target : list){
-            DTOlist.add(getTargetListDTO(target));
+            int count=target.getSubGoal().size();
+            for(Subgoal subgoal : target.getSubGoal())
+                if(subgoal.getCompletedDate()==null)
+                    count--;
+            double achievePer = (double)count/target.getSubGoal().size() * 100;
+            DTOlist.add(getTargetListDTO(target, (int)achievePer));
         }
         return DTOlist;
     }
@@ -53,9 +57,9 @@ public class TargetService {
                 target.getVoteTotal(), resMap);
     }
 
-    public TargetDTO getTargetListDTO(Target target){
+    public TargetDTO getTargetListDTO(Target target, Integer achievementPer){
         return new TargetDTO(target.getId(),target.getUser().getId(),target.getGoal(),
-                target.getSuccessVote(), target.getVoteTotal());
+                target.getSuccessVote(), target.getVoteTotal(), achievementPer);
     }
 
     @Transactional

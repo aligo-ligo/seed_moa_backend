@@ -26,14 +26,16 @@ public class TargetDTO {
     private Integer failureVote;
     private Integer successVote;
     private Integer voteTotal;
+    private Integer achievementPer;
     private Map<String, Integer> achievementDate;
 
-    public TargetDTO(Integer id, Integer userId, String goal, Integer successVote, Integer voteTotal){
+    public TargetDTO(Integer id, Integer userId, String goal, Integer successVote, Integer voteTotal, Integer achievementPer){
         this.id = id;
         this. userId = userId;
         this.goal = goal;
         this.successVote = successVote;
         this.voteTotal = voteTotal;
+        this.achievementPer = achievementPer;
 
     }
     public TargetDTO(Integer id, Integer userId, String goal, String url, String penalty, String startDate, String endDate,
