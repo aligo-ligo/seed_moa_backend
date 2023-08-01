@@ -1,7 +1,6 @@
-package com.intouch.aligooligo.User;
+package com.intouch.aligooligo.entity;
 
 
-import com.intouch.aligooligo.Target.Target;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -44,6 +43,11 @@ public class User implements UserDetails {
     @JoinColumn(name = "target_id")
     private List<Target> targetList;
 
+    public User(String email, List<String> roles) {
+        this.email = email;
+        this.roles = roles;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return this.roles.stream()
@@ -51,12 +55,8 @@ public class User implements UserDetails {
                 .collect(Collectors.toList());
     }
 
-    User(String email, List<String> list){
-        this.email = email;
-        this.roles = list;
-    }
 
-    User(Integer id, String email, String nickName){
+    public User(Integer id, String email, String nickName){
         this.id = id;
         this.email = email;
         this.nickName = nickName;

@@ -1,9 +1,11 @@
-package com.intouch.aligooligo.Target;
+package com.intouch.aligooligo.Controller;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.intouch.aligooligo.Jwt.JwtTokenProvider;
+import com.intouch.aligooligo.dto.TargetDTO;
+import com.intouch.aligooligo.Service.TargetService;
+import com.intouch.aligooligo.dto.TargetlistDTO;
+import com.intouch.aligooligo.req.TargetUpdateReq;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,17 +19,16 @@ import java.util.List;
 @RestController
 @CrossOrigin
 public class TargetController {
-
     private final JwtTokenProvider jwtTokenProvider;
     private final TargetService targetService;
 
     @GetMapping("/list")
-    public ResponseEntity<List<TargetDTO>> getTargetList(HttpServletRequest request){
+    public ResponseEntity<List<TargetlistDTO>> getTargetList(HttpServletRequest request){
         try{
             String email = checkJwtValidation(request);
             if(email==null)
                 return ResponseEntity.status(401).build();
-            List<TargetDTO> list = targetService.getTargetList(email);
+            List<TargetlistDTO> list = targetService.getTargetList(email);
             return ResponseEntity.ok().body(list);
         }catch(Exception e){
             e.printStackTrace();
@@ -84,21 +85,19 @@ public class TargetController {
     }
 
     @PostMapping("/update")
-    public ResponseEntity<String> updateTarget(HttpServletRequest request, @RequestBody TargetUpdateReq req){
+    public ResponseEntity<TargetDTO> updateTarget(HttpServletRequest request, @RequestBody TargetUpdateReq req){
         try{
             String email = checkJwtValidation(request);
-            ObjectMapper objectMapper = new ObjectMapper();
-            ObjectNode mainNode = objectMapper.createObjectNode();
+            TargetDTO targetDTO = targetService.updateTarget(req);
             if(email==null)
                 return ResponseEntity.status(401).build();
             if(req==null){
                 return ResponseEntity.badRequest().build();
             }
-            if(targetService.updateTarget(req)){
-                mainNode.put("message","updating is completed");
-                return ResponseEntity.ok().body(mainNode.toString());
+            if(targetDTO==null){
+                return ResponseEntity.internalServerError().build();
             }
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.ok().body(targetDTO);
         }catch(Exception e){
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();

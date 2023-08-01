@@ -1,5 +1,6 @@
-package com.intouch.aligooligo.User;
+package com.intouch.aligooligo.repository;
 
+import com.intouch.aligooligo.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

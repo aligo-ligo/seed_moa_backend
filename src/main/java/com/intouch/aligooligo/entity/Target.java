@@ -1,14 +1,14 @@
-package com.intouch.aligooligo.Target;
+package com.intouch.aligooligo.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.intouch.aligooligo.Routine.Routine;
-import com.intouch.aligooligo.Subgoal.Subgoal;
-import com.intouch.aligooligo.User.User;
+import com.intouch.aligooligo.entity.Routine;
+import com.intouch.aligooligo.entity.Subgoal;
+import com.intouch.aligooligo.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -23,10 +23,10 @@ public class Target {
     private Integer id;
 
     @Column(name = "start_date", nullable = false)
-    private Date startDate;
+    private LocalDate startDate;
 
     @Column(name = "end_date", nullable = false)
-    private Date endDate;
+    private LocalDate endDate;
 
     @Column(name = "goal", nullable = false, length = 100)
     private String goal;
@@ -60,7 +60,7 @@ public class Target {
     private List<Routine> routine;
 
     @Builder
-    public Target(Integer id, Date startDate, Date endDate, String goal, String penalty, Integer failureVote,Integer successVote,
+    public Target(Integer id, LocalDate startDate, LocalDate endDate, String goal, String penalty, Integer failureVote,Integer successVote,
                   Integer voteTotal, User user, List<Subgoal> subGoal, List<Routine> routine){
         this.id = id;
         this.startDate = startDate;
