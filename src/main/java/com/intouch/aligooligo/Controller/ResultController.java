@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 public class ResultController {
 
     private final TargetService targetService;
+    
     @GetMapping
     public ResponseEntity<TargetDTO> resultTargetPage(@RequestParam Integer id){
         try{
