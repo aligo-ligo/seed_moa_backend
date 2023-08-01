@@ -19,7 +19,6 @@ import java.util.List;
 @RestController
 @CrossOrigin
 public class TargetController {
-
     private final JwtTokenProvider jwtTokenProvider;
     private final TargetService targetService;
 
