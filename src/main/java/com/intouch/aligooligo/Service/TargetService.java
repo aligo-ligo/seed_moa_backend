@@ -100,10 +100,6 @@ public class TargetService {
         double tmpNum;
         SortedMap<String, Integer> map = new TreeMap<>();
         List<Subgoal> subgoalList = subgoalRepository.findByTargetIdAndCompletedDateNotNullOrderByCompletedDateAsc(target.getId());
-        for(Subgoal subgoal:subgoalList){
-            System.out.println(subgoalList.size());
-            System.out.println(subgoal.getCompletedDate());
-        }
         while(!calDay.equals(startDate)){
             while (subGoalDateIdx<subgoalList.size() && startDate.equals(subgoalList.get(subGoalDateIdx).getCompletedDate())){
                 num++;
