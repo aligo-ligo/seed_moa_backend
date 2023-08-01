@@ -1,7 +1,6 @@
-package com.intouch.aligooligo.Routine;
+package com.intouch.aligooligo.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.intouch.aligooligo.Target.Target;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;

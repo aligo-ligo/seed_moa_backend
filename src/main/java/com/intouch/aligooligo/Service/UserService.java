@@ -1,8 +1,10 @@
-package com.intouch.aligooligo.User;
+package com.intouch.aligooligo.Service;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.intouch.aligooligo.Jwt.JwtTokenProvider;
+import com.intouch.aligooligo.entity.User;
+import com.intouch.aligooligo.repository.UserRepository;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

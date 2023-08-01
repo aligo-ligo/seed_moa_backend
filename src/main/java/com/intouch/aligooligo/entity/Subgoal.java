@@ -1,12 +1,10 @@
-package com.intouch.aligooligo.Subgoal;
+package com.intouch.aligooligo.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.intouch.aligooligo.Target.Target;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 @Entity
 @Getter

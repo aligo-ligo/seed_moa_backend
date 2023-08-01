@@ -1,11 +1,16 @@
-package com.intouch.aligooligo.Target;
+package com.intouch.aligooligo.Service;
 
-import com.intouch.aligooligo.Routine.Routine;
-import com.intouch.aligooligo.Routine.RoutineRepository;
-import com.intouch.aligooligo.Subgoal.Subgoal;
-import com.intouch.aligooligo.Subgoal.SubgoalRepository;
-import com.intouch.aligooligo.User.User;
-import com.intouch.aligooligo.User.UserRepository;
+import com.intouch.aligooligo.dto.TargetlistDTO;
+import com.intouch.aligooligo.entity.Routine;
+import com.intouch.aligooligo.repository.RoutineRepository;
+import com.intouch.aligooligo.entity.Subgoal;
+import com.intouch.aligooligo.repository.SubgoalRepository;
+import com.intouch.aligooligo.entity.Target;
+import com.intouch.aligooligo.dto.TargetDTO;
+import com.intouch.aligooligo.repository.TargetRepository;
+import com.intouch.aligooligo.req.TargetUpdateReq;
+import com.intouch.aligooligo.entity.User;
+import com.intouch.aligooligo.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -34,10 +39,10 @@ public class TargetService {
     @Value("${urlPrefix}")
     private String urlPrefix;
 
-    public List<TargetDTO> getTargetList(String email){
+    public List<TargetlistDTO> getTargetList(String email){
         User user = userRepository.findByEmail(email).orElseThrow(()->new UsernameNotFoundException("can't get targetList : can't find userEmail"));
         List<Target> list = targetRepository.findByUserIdOrderByIdDesc(user.getId());
-        List<TargetDTO> DTOlist = new ArrayList<>();
+        List<TargetlistDTO> DTOlist = new ArrayList<>();
         for(Target target : list){
             int count=target.getSubGoal().size();
             for(Subgoal subgoal : target.getSubGoal())
@@ -51,14 +56,14 @@ public class TargetService {
 
     public TargetDTO getTargetDTO(Integer targetId,Map<String, Integer> resMap){
         Target target = targetRepository.findById(targetId).get();
-        return new TargetDTO(target.getId(),target.getUser().getId(),target.getGoal(), target.getUrl(),target.getPenalty(),
-                target.getStartDate().toString(), target.getEndDate().toString(), target.getSubGoal(), target.getRoutine(),
-                target.getSuccessVote(), target.getFailureVote(),
+        return new TargetDTO(target.getId(),target.getUser().getId(),target.getStartDate().toString(),
+                target.getEndDate().toString(), target.getGoal(), target.getUrl(), target.getSubGoal(),
+                target.getRoutine(), target.getPenalty(), target.getFailureVote(), target.getSuccessVote(),
                 target.getVoteTotal(), resMap);
     }
 
-    public TargetDTO getTargetListDTO(Target target, Integer achievementPer){
-        return new TargetDTO(target.getId(),target.getUser().getId(),target.getGoal(),
+    public TargetlistDTO getTargetListDTO(Target target, Integer achievementPer){
+        return new TargetlistDTO(target.getId(),target.getUser().getId(),target.getGoal(),
                 target.getSuccessVote(), target.getVoteTotal(), achievementPer);
     }
 

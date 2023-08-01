@@ -1,7 +1,9 @@
-package com.intouch.aligooligo.User;
+package com.intouch.aligooligo.Controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.intouch.aligooligo.entity.User;
+import com.intouch.aligooligo.Service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;

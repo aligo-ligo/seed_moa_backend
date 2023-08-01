@@ -1,5 +1,7 @@
-package com.intouch.aligooligo.Target;
+package com.intouch.aligooligo.Controller;
 
+import com.intouch.aligooligo.dto.TargetDTO;
+import com.intouch.aligooligo.Service.TargetService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

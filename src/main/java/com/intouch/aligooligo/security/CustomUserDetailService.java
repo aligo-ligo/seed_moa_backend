@@ -1,6 +1,6 @@
 package com.intouch.aligooligo.security;
 
-import com.intouch.aligooligo.User.UserRepository;
+import com.intouch.aligooligo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
