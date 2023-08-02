@@ -52,10 +52,13 @@
 
 ## <img src="https://github.com/aligo-ligo/aligo-oligo-frontend-latest/assets/93697790/37ea3489-8c58-40c4-a220-468f5a49a643" alt="logo_img" width="25px"/> 기술 스택
 
-1. next.js (v13.4) -> react.js [이유 보러 가기](https://www.notion.so/Next-js-react-3c05b2fc8d064f81b37f07e21053e6ca)
-2. Typescript
-3. react-query
-4. axios
+1. springboot
+2. gradle
+3. spring jpa
+4. mysql
+5. jenkins
+6. ec2
+7. docker
 
 ## <img src="https://github.com/aligo-ligo/aligo-oligo-frontend-latest/assets/93697790/37ea3489-8c58-40c4-a220-468f5a49a643" alt="logo_img" width="25px"/> UI
 
