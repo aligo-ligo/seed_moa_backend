@@ -89,8 +89,8 @@ public class TargetService {
             return false;
         }
     }
-    public SortedMap<String, Integer> getChartDate(Integer targetid) {
-        Target target = targetRepository.findById(targetid).get();
+    public SortedMap<String, Integer> getChartDate(Integer targetId) {
+        Target target = targetRepository.findById(targetId).get();
         LocalDate startDate = target.getStartDate();
         LocalDate calDay = LocalDate.now().plusDays(1);
 
