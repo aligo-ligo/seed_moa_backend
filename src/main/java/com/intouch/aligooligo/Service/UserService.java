@@ -3,9 +3,7 @@ package com.intouch.aligooligo.Service;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.intouch.aligooligo.Jwt.JwtTokenProvider;
-import com.intouch.aligooligo.entity.KakaoUser;
 import com.intouch.aligooligo.entity.User;
-import com.intouch.aligooligo.repository.KakaoUserRepository;
 import com.intouch.aligooligo.repository.UserRepository;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +19,6 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final KakaoUserRepository kakaoUserRepository;
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
@@ -167,14 +164,14 @@ public class UserService {
             //요청을 통해 얻은 JSON타입의 Response 메세지 읽어오기
             BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(),"UTF-8"));
             String line = "";
-            StringBuilder result = new StringBuilder();
+            String result = "";
 
             while ((line = br.readLine()) != null) {
-                result.append(line);
+                result += line;
             }
 
             //Gson 라이브러리로 JSON파싱
-            JsonElement element = JsonParser.parseString(result.toString());
+            JsonElement element = JsonParser.parseString(result);
             int id = element.getAsJsonObject().get("id").getAsInt();
             boolean hasEmail = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("has_email").getAsBoolean();
             String email = "";
@@ -187,12 +184,12 @@ public class UserService {
             br.close();
 
             if(!existByUserEmail(email)) {
-                kakaoUserRepository.save(KakaoUser.builder().email(email)
+                userRepository.save(User.builder().email(email)
                         .nickName(name).roles(Collections.singletonList("ROLE_USER")).build());
             }
-            KakaoUser user = kakaoUserRepository.findByEmail(email).get();
+            User user = findByUserEmail(email).get();
             List<String> list = user.getRoles();
-            String localAccessToken = SignIn(new KakaoUser(email,list), true);
+            String localAccessToken = SignIn(new User(email,list), true);
             Map<String, String> returnValue = new HashMap<>();
             returnValue.put("id",user.getId().toString());
             returnValue.put("email",user.getEmail());
