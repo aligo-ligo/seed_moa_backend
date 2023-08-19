@@ -1,9 +1,9 @@
-package com.intouch.aligooligo.Service;
+package com.intouch.aligooligo.Target.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.intouch.aligooligo.repository.TargetRepository;
-import com.intouch.aligooligo.repository.UserRepository;
+import com.intouch.aligooligo.Target.Repository.TargetRepository;
+import com.intouch.aligooligo.User.Repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 

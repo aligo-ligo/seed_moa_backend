@@ -1,6 +1,7 @@
-package com.intouch.aligooligo.entity;
+package com.intouch.aligooligo.User.Entity;
 
 
+import com.intouch.aligooligo.Target.Entity.Target;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;

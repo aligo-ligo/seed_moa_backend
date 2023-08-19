@@ -1,8 +1,7 @@
-package com.intouch.aligooligo.dto;
+package com.intouch.aligooligo.Target.Controller.Dto;
 
-import com.intouch.aligooligo.entity.Routine;
-import com.intouch.aligooligo.entity.Subgoal;
-import com.intouch.aligooligo.entity.User;
+import com.intouch.aligooligo.Target.Entity.Routine;
+import com.intouch.aligooligo.Target.Entity.Subgoal;
 import lombok.*;
 
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.intouch.aligooligo.dto;
+package com.intouch.aligooligo.Target.Controller.Dto;
 
 
 import lombok.AllArgsConstructor;

@@ -1,11 +1,11 @@
-package com.intouch.aligooligo.Controller;
+package com.intouch.aligooligo.Target.Controller;
 
 
 import com.intouch.aligooligo.Jwt.JwtTokenProvider;
-import com.intouch.aligooligo.dto.TargetDTO;
-import com.intouch.aligooligo.Service.TargetService;
-import com.intouch.aligooligo.dto.TargetlistDTO;
-import com.intouch.aligooligo.req.TargetUpdateReq;
+import com.intouch.aligooligo.Target.Controller.Dto.TargetDTO;
+import com.intouch.aligooligo.Target.Service.TargetService;
+import com.intouch.aligooligo.Target.Controller.Dto.TargetlistDTO;
+import com.intouch.aligooligo.Target.Controller.Dto.TargetUpdateReq;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,10 +25,7 @@ public class TargetController {
     @GetMapping("/list")
     public ResponseEntity<List<TargetlistDTO>> getTargetList(HttpServletRequest request){
         try{
-            String email = checkJwtValidation(request);
-            if(email==null)
-                return ResponseEntity.status(401).build();
-            List<TargetlistDTO> list = targetService.getTargetList(email);
+            List<TargetlistDTO> list = targetService.getTargetList(ExtractEmail(request));
             return ResponseEntity.ok().body(list);
         }catch(Exception e){
             e.printStackTrace();
@@ -39,12 +36,7 @@ public class TargetController {
     @PostMapping("/create")
     public ResponseEntity<HttpStatus> createTarget(HttpServletRequest request, @RequestBody TargetDTO req) {
         try {
-            String email = checkJwtValidation(request);
-            if(email==null)
-                return ResponseEntity.status(401).build();//not auth
-
-            boolean created = targetService.createTarget(email, req);
-            if(created)
+            if(targetService.createTarget(ExtractEmail(request), req))
                 return ResponseEntity.ok().build();//ok
             return ResponseEntity.internalServerError().build();//server error
         } catch (Exception e) {
@@ -52,28 +44,21 @@ public class TargetController {
         }
     }
 
-    public String checkJwtValidation(HttpServletRequest request){
-        try {
-            String token = request.getHeader("Authorization");
-            if (token != null) {
-                String req_token = token.substring(7);
-                if(jwtTokenProvider.validateToken(req_token)) {
-                    return jwtTokenProvider.getAuthentication(req_token).getName();
-                }
-            }
-            return null;
-        }catch (Exception e){
-            e.printStackTrace();
-            return null;
-        }
+    @DeleteMapping("/delete")
+    public ResponseEntity<HttpStatus> deleteTarget(@RequestParam Integer id){
+        targetService.deleteTarget(id);
+        return ResponseEntity.ok().build();
+    }
+
+    public String ExtractEmail(HttpServletRequest request){
+        return jwtTokenProvider.getAuthentication(
+                request.getHeader("Authorization").
+                        substring(7)).getName();
     }
 
     @GetMapping("/detail")
-    public ResponseEntity<TargetDTO> detailTarget(HttpServletRequest request, @RequestParam Integer id){
+    public ResponseEntity<TargetDTO> detailTarget(@RequestParam Integer id){
         try{
-            String email = checkJwtValidation(request);
-            if(email==null)
-                return ResponseEntity.status(401).build();
             TargetDTO targetDTO = targetService.getDetailTarget(id);
             if(targetDTO==null)
                 return ResponseEntity.internalServerError().build();
@@ -85,15 +70,10 @@ public class TargetController {
     }
 
     @PostMapping("/update")
-    public ResponseEntity<TargetDTO> updateTarget(HttpServletRequest request, @RequestBody TargetUpdateReq req){
+    public ResponseEntity<TargetDTO> updateTarget(@RequestBody TargetUpdateReq req){
         try{
-            String email = checkJwtValidation(request);
+            if(req==null){return ResponseEntity.badRequest().build();}
             TargetDTO targetDTO = targetService.updateTarget(req);
-            if(email==null)
-                return ResponseEntity.status(401).build();
-            if(req==null){
-                return ResponseEntity.badRequest().build();
-            }
             if(targetDTO==null){
                 return ResponseEntity.internalServerError().build();
             }
@@ -106,8 +86,7 @@ public class TargetController {
     @GetMapping("/vote")
     public ResponseEntity<HttpStatus> voteTarget(@RequestParam(value = "id") Integer id, @RequestParam(value = "success") boolean success){
         try{
-            boolean voted = targetService.voteTarget(id, success);
-            if(voted)
+            if(targetService.voteTarget(id, success))
                 return ResponseEntity.ok().build();//ok
             return ResponseEntity.internalServerError().build();//server error
         }catch(Exception e){

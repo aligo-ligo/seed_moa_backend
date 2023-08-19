@@ -1,16 +1,16 @@
-package com.intouch.aligooligo.Service;
+package com.intouch.aligooligo.Target.Service;
 
-import com.intouch.aligooligo.dto.TargetlistDTO;
-import com.intouch.aligooligo.entity.Routine;
-import com.intouch.aligooligo.repository.RoutineRepository;
-import com.intouch.aligooligo.entity.Subgoal;
-import com.intouch.aligooligo.repository.SubgoalRepository;
-import com.intouch.aligooligo.entity.Target;
-import com.intouch.aligooligo.dto.TargetDTO;
-import com.intouch.aligooligo.repository.TargetRepository;
-import com.intouch.aligooligo.req.TargetUpdateReq;
-import com.intouch.aligooligo.entity.User;
-import com.intouch.aligooligo.repository.UserRepository;
+import com.intouch.aligooligo.Target.Controller.Dto.TargetlistDTO;
+import com.intouch.aligooligo.Target.Entity.Routine;
+import com.intouch.aligooligo.Target.Repository.RoutineRepository;
+import com.intouch.aligooligo.Target.Entity.Subgoal;
+import com.intouch.aligooligo.Target.Repository.SubgoalRepository;
+import com.intouch.aligooligo.Target.Entity.Target;
+import com.intouch.aligooligo.Target.Controller.Dto.TargetDTO;
+import com.intouch.aligooligo.Target.Repository.TargetRepository;
+import com.intouch.aligooligo.Target.Controller.Dto.TargetUpdateReq;
+import com.intouch.aligooligo.User.Entity.User;
+import com.intouch.aligooligo.User.Repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -89,6 +89,13 @@ public class TargetService {
             return false;
         }
     }
+
+    public void deleteTarget(Integer targetId){
+        boolean isExist = targetRepository.existsById(targetId);
+        if(isExist)
+            targetRepository.deleteById(targetId);
+    }
+
     public SortedMap<String, Integer> getChartDate(Integer targetId) {
         Target target = targetRepository.findById(targetId).get();
         LocalDate startDate = target.getStartDate();
@@ -147,7 +154,7 @@ public class TargetService {
 
     public boolean voteTarget(Integer id, boolean success){
         try{
-            Target target = targetRepository.findById(id).orElseThrow(()->new IllegalArgumentException("타겟을 찾을 수 없습니다."));
+            Target target = targetRepository.findById(id).orElseThrow(()->new IllegalArgumentException("can't find target"));
             if(success) {
                 target.updateVote(target.getSuccessVote() + 1, target.getFailureVote(), target.getVoteTotal()+1);
                 targetRepository.save(target);
@@ -164,13 +171,13 @@ public class TargetService {
     }
     public TargetDTO resultTargetPage(Integer id){
         try{
-            if(targetRepository.findById(id).isPresent()) {//if exist
+            if(targetRepository.existsById(id)) {//if exist
                 return getTargetDTO(id,getChartDate(id));
             }
-            return null;
         }catch (Exception e){
             e.printStackTrace();
             return null;
         }
+        throw new IllegalArgumentException("can't exist target");
     }
 }

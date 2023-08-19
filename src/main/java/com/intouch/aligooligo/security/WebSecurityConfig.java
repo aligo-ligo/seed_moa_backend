@@ -41,13 +41,12 @@ public class WebSecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable) // csrf 보안 토큰 disable처리.
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeRequests() // 요청에 대한 사용권한 체크
-                .requestMatchers("/admin/**").hasRole("ADMIN")
-                .requestMatchers("/user/**").hasRole("USER")
-                .anyRequest().permitAll() // 그외 나머지 요청은 누구나 접근 가능
-                .and()
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
-                        UsernamePasswordAuthenticationFilter.class);
+                        UsernamePasswordAuthenticationFilter.class)
+                .authorizeHttpRequests(authorize -> authorize // 요청에 대한 사용권한 체크
+                .requestMatchers("/admin/**").hasRole("ADMIN")//ADMIN 역할은 /admin/만 접근가능
+                .requestMatchers("/user/**").hasRole("USER")//USER역할은 /user/만 접근가능
+                .anyRequest().permitAll()); // 그외 나머지 요청은 누구나 접근 가능
         // JwtAuthenticationFilter를 UsernamePasswordAuthenticationFilter 전에 넣는다
         return http.build();
     }

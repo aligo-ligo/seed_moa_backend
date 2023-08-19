@@ -1,6 +1,6 @@
-package com.intouch.aligooligo.Controller;
+package com.intouch.aligooligo.Target.Controller;
 
-import com.intouch.aligooligo.Service.InitService;
+import com.intouch.aligooligo.Target.Service.InitService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -18,7 +18,7 @@ public class InitController {
     public ResponseEntity<String> mainPage(){
         String res = initService.getUserAndTargetNumber();
         if(res==null)
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.internalServerError().body("unknown server error");
         return ResponseEntity.ok(res);
     }
 }

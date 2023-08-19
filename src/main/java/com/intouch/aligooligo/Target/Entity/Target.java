@@ -1,10 +1,10 @@
-package com.intouch.aligooligo.entity;
+package com.intouch.aligooligo.Target.Entity;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.intouch.aligooligo.entity.Routine;
-import com.intouch.aligooligo.entity.Subgoal;
-import com.intouch.aligooligo.entity.User;
+import com.intouch.aligooligo.Target.Entity.Routine;
+import com.intouch.aligooligo.Target.Entity.Subgoal;
+import com.intouch.aligooligo.User.Entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 

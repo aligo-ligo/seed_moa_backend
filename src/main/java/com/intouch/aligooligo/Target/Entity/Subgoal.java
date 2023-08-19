@@ -1,4 +1,4 @@
-package com.intouch.aligooligo.entity;
+package com.intouch.aligooligo.Target.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;

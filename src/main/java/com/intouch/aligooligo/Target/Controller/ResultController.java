@@ -1,7 +1,7 @@
-package com.intouch.aligooligo.Controller;
+package com.intouch.aligooligo.Target.Controller;
 
-import com.intouch.aligooligo.dto.TargetDTO;
-import com.intouch.aligooligo.Service.TargetService;
+import com.intouch.aligooligo.Target.Controller.Dto.TargetDTO;
+import com.intouch.aligooligo.Target.Service.TargetService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,8 +21,7 @@ public class ResultController {
             if(targetDTO ==null)
                 return ResponseEntity.internalServerError().build();
             return ResponseEntity.ok().body(targetDTO);
-        }catch(Exception e){
-            e.printStackTrace();
+        }catch(IllegalArgumentException e){
             return ResponseEntity.internalServerError().build();
         }
     }
