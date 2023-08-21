@@ -32,4 +32,9 @@ public class Routine {
         this.target = target;
     }
 
+    public Routine(String value, Target target){
+        this.value = value;
+        this.target = target;
+    }
+
 }

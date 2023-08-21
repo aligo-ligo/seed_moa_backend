@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @AllArgsConstructor
 @RestController
 @CrossOrigin
@@ -15,10 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class InitController {
     private final InitService initService;
     @GetMapping
-    public ResponseEntity<String> mainPage(){
-        String res = initService.getUserAndTargetNumber();
+    public ResponseEntity<Map<String, Integer>> mainPage(){
+        Map<String, Integer> res = initService.getUserAndTargetNumber();
         if(res==null)
-            return ResponseEntity.internalServerError().body("unknown server error");
+            return ResponseEntity.internalServerError().build();
         return ResponseEntity.ok(res);
     }
 }

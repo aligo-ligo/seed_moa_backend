@@ -7,25 +7,22 @@ import com.intouch.aligooligo.User.Repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 @AllArgsConstructor
 public class InitService {
     private final UserRepository userRepository;
     private final TargetRepository targetRepository;
-    public String getUserAndTargetNumber(){
-        try{
-            Long userCount = userRepository.count();
-            Long targetCount = targetRepository.count();
+    public Map<String, Integer> getUserAndTargetNumber(){
+        Map<String, Integer> res = new HashMap<>();
+        Integer userCount = Long.valueOf(userRepository.count()).intValue();
+        Integer targetCount = Long.valueOf(targetRepository.count()).intValue();
 
-            ObjectMapper objectMapper = new ObjectMapper();
-            ObjectNode mainNode = objectMapper.createObjectNode();
+        res.put("userCount",userCount);
+        res.put("targetCount",targetCount);
 
-            mainNode.put("userCount",userCount);
-            mainNode.put("targetCount",targetCount);
-            return mainNode.toString();
-        }catch (Exception e){
-            e.printStackTrace();
-            return null;
-        }
+        return res;
     }
 }

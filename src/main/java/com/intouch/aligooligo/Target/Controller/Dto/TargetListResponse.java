@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class TargetlistDTO {
+public class TargetListResponse {
     private Integer id;
     private Integer userId;
     private String goal;

@@ -16,13 +16,11 @@ public class ResultController {
     
     @GetMapping
     public ResponseEntity<TargetDTO> resultTargetPage(@RequestParam Integer id){
-        try{
-            TargetDTO targetDTO = targetService.resultTargetPage(id);
-            if(targetDTO ==null)
-                return ResponseEntity.internalServerError().build();
-            return ResponseEntity.ok().body(targetDTO);
-        }catch(IllegalArgumentException e){
+
+        TargetDTO targetDTO = targetService.resultTargetPage(id);
+        if(targetDTO ==null)
             return ResponseEntity.internalServerError().build();
-        }
+        return ResponseEntity.ok().body(targetDTO);
+
     }
 }

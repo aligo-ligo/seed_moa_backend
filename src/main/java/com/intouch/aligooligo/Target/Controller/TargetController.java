@@ -4,7 +4,7 @@ package com.intouch.aligooligo.Target.Controller;
 import com.intouch.aligooligo.Jwt.JwtTokenProvider;
 import com.intouch.aligooligo.Target.Controller.Dto.TargetDTO;
 import com.intouch.aligooligo.Target.Service.TargetService;
-import com.intouch.aligooligo.Target.Controller.Dto.TargetlistDTO;
+import com.intouch.aligooligo.Target.Controller.Dto.TargetListResponse;
 import com.intouch.aligooligo.Target.Controller.Dto.TargetUpdateReq;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
@@ -23,9 +23,9 @@ public class TargetController {
     private final TargetService targetService;
 
     @GetMapping("/list")
-    public ResponseEntity<List<TargetlistDTO>> getTargetList(HttpServletRequest request){
+    public ResponseEntity<List<TargetListResponse>> getTargetList(HttpServletRequest request){
         try{
-            List<TargetlistDTO> list = targetService.getTargetList(ExtractEmail(request));
+            List<TargetListResponse> list = targetService.getTargetList(ExtractEmail(request));
             return ResponseEntity.ok().body(list);
         }catch(Exception e){
             e.printStackTrace();
