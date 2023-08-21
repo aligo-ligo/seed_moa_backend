@@ -20,7 +20,6 @@ public class TargetDTO {
     private String url;
     private List<Subgoal> subGoal;
     private List<Routine> routine;
-    private String penalty;
     private Integer failureVote;
     private Integer successVote;
     private Integer voteTotal;

@@ -61,7 +61,7 @@ public class TargetService {
         Target target = targetRepository.findById(targetId).get();
         return new TargetDTO(target.getId(),target.getUser().getId(),target.getStartDate().toString(),
                 target.getEndDate().toString(), target.getGoal(), target.getUrl(), target.getSubGoal(),
-                target.getRoutine(), target.getPenalty(), target.getFailureVote(), target.getSuccessVote(),
+                target.getRoutine(), target.getFailureVote(), target.getSuccessVote(),
                 target.getVoteTotal(), resMap);
     }
 
@@ -72,7 +72,7 @@ public class TargetService {
             LocalDate endDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
             User user = userRepository.findByEmail(email).orElseThrow(()->new UsernameNotFoundException("can't create target : can't find userEmail"));
             Target saved = targetRepository.save(Target.builder().startDate(LocalDate.now()).endDate(endDate).goal(req.getGoal())
-                    .failureVote(0).successVote(0).voteTotal(0).penalty(req.getPenalty()).user(user).subGoal(req.getSubGoal()).routine(req.getRoutine()).build());
+                    .failureVote(0).successVote(0).voteTotal(0).user(user).subGoal(req.getSubGoal()).routine(req.getRoutine()).build());
             String url = urlPrefix + saved.getId().toString();
             List<Subgoal> subgoals = req.getSubGoal().stream()
                     .map(SubgoalDTO -> new Subgoal(SubgoalDTO.getValue(), SubgoalDTO.getCompletedDate(),saved)).toList();
