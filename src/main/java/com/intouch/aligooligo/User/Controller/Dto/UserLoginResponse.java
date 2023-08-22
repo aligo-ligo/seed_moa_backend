@@ -16,7 +16,6 @@ public class UserLoginResponse {
     @Setter
     @Getter
     public static class UserLoginDTO{
-        private String email;
         private String nickName;
     }
     private String accessToken;
