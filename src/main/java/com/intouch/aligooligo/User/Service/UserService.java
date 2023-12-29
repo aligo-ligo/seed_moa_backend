@@ -3,15 +3,12 @@ package com.intouch.aligooligo.User.Service;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.intouch.aligooligo.Jwt.JwtTokenProvider;
-import com.intouch.aligooligo.User.Controller.Dto.UserLoginResponse;
+import com.intouch.aligooligo.User.Controller.Dto.UserLoginResponseDto;
 import com.intouch.aligooligo.User.Entity.User;
 import com.intouch.aligooligo.User.Repository.UserRepository;
-import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -40,14 +37,14 @@ public class UserService {
     @Value("${kakaoUserInfo}")
     private String kakaoUserInfo;
 
-    public UserLoginResponse SignIn(User req, boolean kakaoChecked) {
+    public UserLoginResponseDto SignIn(User req, boolean kakaoChecked) {
         User user;
-        UserLoginResponse response = new UserLoginResponse();
+        UserLoginResponseDto response = new UserLoginResponseDto();
 
         user = findByUserEmail(req.getEmail());
         if(kakaoChecked || passwordEncoder.matches(req.getPassword(),user.getPassword())){
             response.setAccessToken(jwtTokenProvider.createToken(user.getEmail(), user.getRoles()));//exception
-            response.setUserLoginDTO(new UserLoginResponse.UserLoginDTO(user.getNickName()));
+            response.setUserLoginDTO(new UserLoginResponseDto.UserLoginDTO(user.getNickName()));
             return response;
         }
         return null;
@@ -155,7 +152,7 @@ public class UserService {
         }
     }
 
-    public UserLoginResponse createKakaoUser(String accessToken) {
+    public UserLoginResponseDto createKakaoUser(String accessToken) {
         try{
             URL url = new URL(kakaoUserInfo);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -190,7 +187,7 @@ public class UserService {
                         .nickName(name).roles(Collections.singletonList("ROLE_USER")).build());
             }
 
-            UserLoginResponse response = SignIn(new User(email, findByUserEmail(email).getRoles()), true);
+            UserLoginResponseDto response = SignIn(new User(email, findByUserEmail(email).getRoles()), true);
             return response;
 
         }catch(IOException e){

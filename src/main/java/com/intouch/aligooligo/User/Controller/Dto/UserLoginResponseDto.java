@@ -9,7 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 @Getter
-public class UserLoginResponse {
+public class UserLoginResponseDto {
 
 
     @AllArgsConstructor

@@ -1,8 +1,6 @@
 package com.intouch.aligooligo.User.Controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.intouch.aligooligo.User.Controller.Dto.UserLoginResponse;
+import com.intouch.aligooligo.User.Controller.Dto.UserLoginResponseDto;
 import com.intouch.aligooligo.User.Entity.User;
 import com.intouch.aligooligo.User.Service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -12,9 +10,6 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpClientErrorException;
-
-import java.util.Map;
 
 @AllArgsConstructor
 @RequestMapping(value="/users")
@@ -25,9 +20,9 @@ public class UserController {
 
     @PostMapping("/signin")
     public ResponseEntity<Object> SignInUser(@RequestBody User req) {
-        UserLoginResponse userLoginResponse;
+        UserLoginResponseDto userLoginResponseDto;
         try{
-            userLoginResponse = userService.SignIn(req, false);
+            userLoginResponseDto = userService.SignIn(req, false);
         }catch (IllegalArgumentException e){
             return ResponseEntity.badRequest().body("Cannot find user");
         }catch (UnsupportedJwtException e){
@@ -39,10 +34,10 @@ public class UserController {
         } catch(SignatureException e){
             return ResponseEntity.status(401).body("not valid jwt signature");
         }
-        if(userLoginResponse==null)
+        if(userLoginResponseDto ==null)
             return ResponseEntity.badRequest().body("Incorrect password");
         else
-            return ResponseEntity.ok().body(userLoginResponse);
+            return ResponseEntity.ok().body(userLoginResponseDto);
     }
     @PostMapping("/signup")
     public ResponseEntity<Object> SignUpUser(@RequestBody User req)throws Exception{
@@ -50,8 +45,8 @@ public class UserController {
         int res = userService.SignUp(req);
         switch (res) {
             case 0 -> {
-                UserLoginResponse userLoginResponse = userService.SignIn(req,false);
-                return ResponseEntity.ok().body(userLoginResponse);
+                UserLoginResponseDto userLoginResponseDto = userService.SignIn(req,false);
+                return ResponseEntity.ok().body(userLoginResponseDto);
             }
             case 1 -> {return ResponseEntity.badRequest().body("Email format is invalid");}
             case 2 -> {return ResponseEntity.badRequest().body("Email already exists");}
@@ -62,9 +57,9 @@ public class UserController {
         }
     }
     @GetMapping("/kakao")
-    public ResponseEntity<UserLoginResponse> SignUpKakao(@RequestParam String code){
+    public ResponseEntity<UserLoginResponseDto> SignUpKakao(@RequestParam String code){
         String access_Token = userService.getKakaoAcessToken(code);
-        UserLoginResponse response = userService.createKakaoUser(access_Token);
+        UserLoginResponseDto response = userService.createKakaoUser(access_Token);
         if(response!=null)
             return ResponseEntity.ok().body(response);
         return ResponseEntity.internalServerError().build();
