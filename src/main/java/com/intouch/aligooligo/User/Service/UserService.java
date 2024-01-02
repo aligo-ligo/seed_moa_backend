@@ -65,44 +65,6 @@ public class UserService {
         }
     }
 
-    public Integer SignUp(User req){
-        return CheckValidation(req);
-    }
-    public Integer CheckValidation(User req){
-        boolean NumberCheck = false;
-        boolean AlphabetCheck = false;
-        String email = req.getEmail();
-        String pw = req.getPassword();
-        String name = req.getNickName();
-        boolean checkedId = existByUserEmail(email);
-
-        for(char i : pw.toCharArray()){
-            if(Character.isDigit(i))
-                NumberCheck = true;
-            if(Character.isAlphabetic(i))
-                AlphabetCheck = true;
-        }
-        if(email.contains("@") && NumberCheck && AlphabetCheck &&
-                pw.length()>=8 && email.length()<=50 && pw.length()<=20 &&
-                name.length()<=10 && !checkedId){
-
-            saveUser(email,pw,name,Collections.singletonList("ROLE_USER"));
-
-            return 0;//ok
-        }
-        if(!email.contains("@")||email.length()>50)
-            return 1;//이메일 형식 올바르지 않은 경우
-        if(checkedId)
-            return 2;//이메일 중복
-        if(!NumberCheck || !AlphabetCheck || pw.length()>20 || pw.length()<8)
-            return 3;//영문 or 숫자가 최소 하나 씩 들어가지 않은 경우, 길이 문제
-        if(name.length()>10)
-            return 4;//닉네임 길이문제
-        else{
-            return 5;//bad request
-        }
-    }
-
     public String getKakaoAcessToken(String code){
         String access_Token = "";
         String refresh_Token = "";
