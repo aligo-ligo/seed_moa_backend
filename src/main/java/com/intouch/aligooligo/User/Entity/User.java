@@ -2,6 +2,7 @@ package com.intouch.aligooligo.User.Entity;
 
 
 import com.intouch.aligooligo.Target.Entity.Target;
+import com.intouch.aligooligo.User.Enum.SocialType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -25,7 +26,7 @@ public class User implements UserDetails {
     @Column(name = "id")
     private Integer id;
 
-    @Column(name = "user_email", length = 50, nullable = false, unique = true)
+    @Column(name = "user_email", length = 50, nullable = false)
     private String email;
 
     @Column(name = "user_password", length = 20)
@@ -33,6 +34,11 @@ public class User implements UserDetails {
 
     @Column(name = "nickname", length = 10, nullable = false)
     private String nickName;
+
+    //socialType 추가
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private SocialType socialType;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Builder.Default
