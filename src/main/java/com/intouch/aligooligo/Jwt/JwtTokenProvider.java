@@ -1,5 +1,6 @@
 package com.intouch.aligooligo.Jwt;
 
+import com.intouch.aligooligo.security.CustomUserDetailService;
 import io.jsonwebtoken.*;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,25 +22,47 @@ public class JwtTokenProvider {
     @Value("${secretKey}")
     private String secretKey;
 
-    private final UserDetailsService userDetailsService;
+    private final CustomUserDetailService userDetailsService;
+
+    private final String ACCESS_TOKEN_SUBJECT = "ACCESS_TOKEN";
+    private final String REFRESH_TOKEN_SUBJECT = "REFRESH_TOKEN";
+
+    private final long ACCESS_TOKEN_VALID_TIME = 60 * 60 * 1000L;//60분
+    private final long REFRESH_TOKEN_VALID_TIME = 14 * 24 * 60 * 60 * 1000L;//2주
 
     @PostConstruct
     protected void init() {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
     // JWT 토큰 생성
-    public String createToken(String userPk, List<String> roles) {
-        Claims claims = Jwts.claims().setSubject(userPk); // JWT payload 에 저장되는 정보단위
+    public String createAccessToken(String userPk, List<String> roles) {
+        Claims claims = Jwts.claims().setSubject(ACCESS_TOKEN_SUBJECT); // JWT payload 에 저장되는 정보단위
+        claims.put("userId", userPk);
         claims.put("roles", roles); // 정보는 key / value 쌍으로 저장된다.
         Date now = new Date();
-        long tokenValidTime = 180 * 60 * 1000L;
         return Jwts.builder()
                 .setClaims(claims) // 정보 저장
                 .setIssuedAt(now) // 토큰 발행 시간 정보
-                .setExpiration(new Date(now.getTime() + tokenValidTime)) // set Expire Time
+                .setExpiration(new Date(now.getTime() + ACCESS_TOKEN_VALID_TIME)) // set Expire Time
                 .signWith(SignatureAlgorithm.HS256, secretKey)  // 사용할 암호화 알고리즘과
                 // signature 에 들어갈 secret값 세팅
                 .compact();
+    }
+
+    public String createRefreshToken(String userPk, List<String> roles) {
+        Claims claims = Jwts.claims().setSubject(REFRESH_TOKEN_SUBJECT);
+        claims.put("userId", userPk);
+        claims.put("roles", roles);
+        Date now = new Date();
+        String refreshToken = Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + REFRESH_TOKEN_VALID_TIME))
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .compact();
+
+        //redisService.setValues(String.valueOf(userPk), refreshToken, REFRESH_TOKEN_VALID_TIME);
+        return refreshToken;
     }
 
     // JWT 토큰에서 인증 정보 조회
@@ -61,10 +84,25 @@ public class JwtTokenProvider {
     // 토큰의 유효성 + 만료일자 확인
     public boolean validateToken(String jwtToken) {
         try {
-            Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(jwtToken);
-            return !claims.getBody().getExpiration().before(new Date());
-        } catch (JwtException | IllegalArgumentException e) {
+            Claims claims = getClaims(jwtToken);
+            return !claims.getExpiration().before(new Date());
+        } catch (JwtException e) {
             return false;
+            //throw new CustomException(Result.BAD_REQUEST);
+        } //catch (ExpiredJwtException e) {
+            //throw new CustomException(Result.BAD_REQUEST);
+        //}
+    }
+
+    private Claims getClaims(String token) {
+        try {
+            return Jwts.parser()
+                    .setSigningKey(secretKey)
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch(JwtException e) {
+            return null;
+            //throw new CustomException(Result.BAD_REQUEST);
         }
     }
 }

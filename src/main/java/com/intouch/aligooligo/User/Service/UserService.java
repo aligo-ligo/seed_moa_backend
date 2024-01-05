@@ -43,7 +43,7 @@ public class UserService {
 
         user = findByUserEmail(req.getEmail());
         if(kakaoChecked || passwordEncoder.matches(req.getPassword(),user.getPassword())){
-            response.setAccessToken(jwtTokenProvider.createToken(user.getEmail(), user.getRoles()));//exception
+            response.setAccessToken(jwtTokenProvider.createAccessToken(user.getEmail(), user.getRoles()));//exception
             response.setUserLoginDTO(new UserLoginResponseDto.UserLoginDTO(user.getNickName()));
             return response;
         }
