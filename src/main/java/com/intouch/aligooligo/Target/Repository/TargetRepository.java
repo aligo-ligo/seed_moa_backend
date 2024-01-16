@@ -10,5 +10,7 @@ import java.util.List;
 public interface TargetRepository extends JpaRepository<Target, Integer> {
     Page<Target> findByUserIdOrderByIdDesc(Integer userId, Pageable pageable);
 
+    Integer CountByUserId(Integer userId);
+
     boolean existsById(Integer targetId);
 }

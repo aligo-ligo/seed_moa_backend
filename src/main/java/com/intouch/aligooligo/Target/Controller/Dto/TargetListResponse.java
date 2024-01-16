@@ -1,6 +1,7 @@
 package com.intouch.aligooligo.Target.Controller.Dto;
 
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,11 +12,17 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TargetListResponse {
-    private Integer id;
-    private Integer userId;
-    private String goal;
-    private Integer successVote;
-    private Integer voteTotal;
-    private Integer achievementPer;
+    /* 유저당 총 타겟 개수와 해당 타겟 정보 리스트 */
 
+    private Integer totalCount;
+    private List<TargetInfo> targetInfo;
+
+    @AllArgsConstructor
+    public static class TargetInfo {
+        private Integer id;
+        private Integer userId;
+        private String goal;
+        private Integer successRate;
+        private Integer achievementPer;
+    }
 }
