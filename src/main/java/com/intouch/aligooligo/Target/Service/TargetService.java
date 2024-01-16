@@ -12,6 +12,9 @@ import com.intouch.aligooligo.User.Entity.User;
 import com.intouch.aligooligo.User.Repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,9 +40,10 @@ public class TargetService {
         this.subgoalRepository = subgoalRepository;
     }
 
-    public List<TargetListResponse> getTargetList(String email){
+    public List<TargetListResponse> getTargetList(String email, Integer page, Integer size){
         User user = userRepository.findByEmail(email).orElseThrow(()->new UsernameNotFoundException("can't get targetList : can't find userEmail"));
-        List<Target> list = targetRepository.findByUserIdOrderByIdDesc(user.getId());
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<Target> list = targetRepository.findByUserIdOrderByIdDesc(user.getId(), pageRequest);
         List<TargetListResponse> DTOlist = new ArrayList<>();
         for(Target target : list){
             int count=target.getSubGoal().size();
