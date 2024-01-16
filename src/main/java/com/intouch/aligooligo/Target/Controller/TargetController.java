@@ -23,9 +23,12 @@ public class TargetController {
     private final TargetService targetService;
 
     @GetMapping("/list")
-    public ResponseEntity<List<TargetListResponse>> getTargetList(HttpServletRequest request){
+    public ResponseEntity<List<TargetListResponse>> getTargetList(
+            HttpServletRequest request,
+            @RequestParam Integer page,
+            @RequestParam Integer size){
         try{
-            List<TargetListResponse> list = targetService.getTargetList(ExtractEmail(request));
+            List<TargetListResponse> list = targetService.getTargetList(ExtractEmail(request), page, size);
             return ResponseEntity.ok().body(list);
         }catch(Exception e){
             e.printStackTrace();
