@@ -45,7 +45,7 @@ public class TargetService {
         User user = userRepository.findByEmail(email).orElseThrow(()->new UsernameNotFoundException("can't get targetList : can't find userEmail"));
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Target> list = targetRepository.findByUserIdOrderByIdDesc(user.getId(), pageRequest);
-        Integer targetListLength = targetRepository.CountByUserId(user.getId());
+        Integer targetListLength = targetRepository.CountByUserId(user.getId()); //특정 유저당 총 타겟 개수 조회
         List<TargetInfo> DTOlist = new ArrayList<>();
         for(Target target : list){
             int count=target.getSubGoal().size();
@@ -54,16 +54,16 @@ public class TargetService {
                     count--;
             double successRate = (double)target.getSuccessVote()/target.getVoteTotal() * 100;
             double achievePer = (double)count/target.getSubGoal().size() * 100;
-            DTOlist.add(getTargetListDTO(target, (int) successRate, (int)achievePer));
+            DTOlist.add(getTargetInfo(target, (int) successRate, (int)achievePer));
         }
         return getTargetListResponse(targetListLength, DTOlist);
     }
 
-    public TargetListResponse getTargetListResponse(Integer targetListLength, List<TargetInfo> targetInfoList) {
+    public TargetListResponse getTargetListResponse(Integer targetListLength, List<TargetInfo> targetInfoList) {//타겟 정보 리스트에 총 타겟 개수 추가
         return new TargetListResponse(targetListLength, targetInfoList);
     }
 
-    public TargetInfo getTargetListDTO(Target target, Integer successRate, Integer achievementPer){
+    public TargetInfo getTargetInfo(Target target, Integer successRate, Integer achievementPer){//각 타겟 객체 생성
         return new TargetInfo(target.getId(), target.getUser().getId(), target.getGoal(), successRate, achievementPer);
     }
 

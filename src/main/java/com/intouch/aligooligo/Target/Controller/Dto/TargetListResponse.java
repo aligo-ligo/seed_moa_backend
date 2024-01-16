@@ -12,6 +12,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TargetListResponse {
+    /* 유저당 총 타겟 개수와 해당 타겟 정보 리스트 */
+
     private Integer totalCount;
     private List<TargetInfo> targetInfo;
 
