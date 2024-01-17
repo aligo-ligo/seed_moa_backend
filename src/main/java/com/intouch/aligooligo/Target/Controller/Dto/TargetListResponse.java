@@ -17,7 +17,7 @@ public class TargetListResponse {
     private Integer totalCount;
     private List<TargetInfo> targetInfo;
 
-    //@Getter
+    @Getter
     @AllArgsConstructor
     public static class TargetInfo {
         private Integer id;
