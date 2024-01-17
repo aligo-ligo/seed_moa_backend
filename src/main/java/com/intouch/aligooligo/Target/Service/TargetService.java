@@ -45,7 +45,7 @@ public class TargetService {
         User user = userRepository.findByEmail(email).orElseThrow(()->new UsernameNotFoundException("can't get targetList : can't find userEmail"));
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Target> list = targetRepository.findByUserIdOrderByIdDesc(user.getId(), pageRequest);
-        Integer targetListLength = targetRepository.CountByUserId(user.getId()); //특정 유저당 총 타겟 개수 조회
+        Integer targetListLength = targetRepository.countByUserId(user.getId()); //특정 유저당 총 타겟 개수 조회
         List<TargetInfo> DTOlist = new ArrayList<>();
         for(Target target : list){
             int count=target.getSubGoal().size();
