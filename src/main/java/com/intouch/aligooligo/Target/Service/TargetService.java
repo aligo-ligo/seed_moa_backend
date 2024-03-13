@@ -1,7 +1,6 @@
 package com.intouch.aligooligo.Target.Service;
 
 import com.intouch.aligooligo.Target.Controller.Dto.TargetListResponse;
-import com.intouch.aligooligo.Target.Controller.Dto.TargetListResponse.TargetInfo;
 import com.intouch.aligooligo.Target.Entity.Routine;
 import com.intouch.aligooligo.Target.Entity.Subgoal;
 import com.intouch.aligooligo.Target.Repository.SubgoalRepository;
@@ -45,26 +44,12 @@ public class TargetService {
         User user = userRepository.findByEmail(email).orElseThrow(()->new UsernameNotFoundException("can't get targetList : can't find userEmail"));
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Target> list = targetRepository.findByUserIdOrderByIdDesc(user.getId(), pageRequest);
-        Integer targetListLength = targetRepository.countByUserId(user.getId()); //특정 유저당 총 타겟 개수 조회
-        List<TargetInfo> DTOlist = new ArrayList<>();
-        for(Target target : list){
-            int count=target.getSubGoal().size();
-            for(Subgoal subgoal : target.getSubGoal())
-                if(subgoal.getCompletedDate()==null)
-                    count--;
-            double successRate = (double)target.getSuccessVote()/target.getVoteTotal() * 100;
-            double achievePer = (double)count/target.getSubGoal().size() * 100;
-            DTOlist.add(getTargetInfo(target, (int) successRate, (int)achievePer));
-        }
-        return getTargetListResponse(targetListLength, DTOlist);
-    }
 
-    public TargetListResponse getTargetListResponse(Integer targetListLength, List<TargetInfo> targetInfoList) {//타겟 정보 리스트에 총 타겟 개수 추가
-        return new TargetListResponse(targetListLength, targetInfoList);
-    }
+        TargetListResponse listResponse = new TargetListResponse();
+        listResponse.updateInfo(list);
+        listResponse.updatePages(list);
 
-    public TargetInfo getTargetInfo(Target target, Integer successRate, Integer achievementPer){//각 타겟 객체 생성
-        return new TargetInfo(target.getId(), target.getUser().getId(), target.getGoal(), successRate, achievementPer);
+        return listResponse;
     }
 
     public TargetDTO getTargetDTO(Integer targetId,Map<String, Integer> resMap){
