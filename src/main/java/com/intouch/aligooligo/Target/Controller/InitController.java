@@ -15,6 +15,7 @@ import java.util.Map;
 @CrossOrigin
 @RequestMapping
 public class InitController {
+
     private final InitService initService;
     @GetMapping
     public ResponseEntity<Map<String, Integer>> mainPage(){
