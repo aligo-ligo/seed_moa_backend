@@ -1,8 +1,7 @@
-package com.intouch.aligooligo.dto;
+package com.intouch.aligooligo.Target.Controller.Dto;
 
-import com.intouch.aligooligo.entity.Routine;
-import com.intouch.aligooligo.entity.Subgoal;
-import com.intouch.aligooligo.entity.User;
+import com.intouch.aligooligo.Target.Entity.Routine;
+import com.intouch.aligooligo.Target.Entity.Subgoal;
 import lombok.*;
 
 import java.util.List;
@@ -21,7 +20,6 @@ public class TargetDTO {
     private String url;
     private List<Subgoal> subGoal;
     private List<Routine> routine;
-    private String penalty;
     private Integer failureVote;
     private Integer successVote;
     private Integer voteTotal;

@@ -1,4 +1,4 @@
-package com.intouch.aligooligo.entity;
+package com.intouch.aligooligo.Target.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -28,6 +28,11 @@ public class Routine {
     @Builder
     Routine(Integer id, String value, Target target){
         this.id = id;
+        this.value = value;
+        this.target = target;
+    }
+
+    public Routine(String value, Target target){
         this.value = value;
         this.target = target;
     }

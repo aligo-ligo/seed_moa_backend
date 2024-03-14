@@ -1,4 +1,4 @@
-package com.intouch.aligooligo.entity;
+package com.intouch.aligooligo.Target.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -28,8 +28,13 @@ public class Subgoal {
     private Target target;
 
     @Builder
-    Subgoal(Integer id, String value, LocalDate completedDate, Target target){
+    public Subgoal(Integer id, String value, LocalDate completedDate, Target target){
         this.id = id;
+        this.value = value;
+        this.completedDate = completedDate;
+        this.target = target;
+    }
+    public Subgoal(String value, LocalDate completedDate, Target target){
         this.value = value;
         this.completedDate = completedDate;
         this.target = target;

@@ -1,6 +1,6 @@
-package com.intouch.aligooligo.repository;
+package com.intouch.aligooligo.Target.Repository;
 
-import com.intouch.aligooligo.entity.Subgoal;
+import com.intouch.aligooligo.Target.Entity.Subgoal;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
