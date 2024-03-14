@@ -18,7 +18,6 @@ import org.springframework.data.domain.Page;
 public class TargetListResponse {
     /* 유저당 총 타겟 개수와 해당 타겟 정보 리스트 */
 
-
     private Pages pages;
     private List<TargetInfo> targetInfo;
 
