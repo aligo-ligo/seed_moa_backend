@@ -58,7 +58,6 @@
 4. mysql
 5. jenkins
 6. ec2
-7. docker
 
 ## <img src="https://github.com/aligo-ligo/aligo-oligo-frontend-latest/assets/93697790/37ea3489-8c58-40c4-a220-468f5a49a643" alt="logo_img" width="25px"/> UI
 
