@@ -3,6 +3,8 @@ package com.intouch.aligooligo.User.Service;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.intouch.aligooligo.Jwt.JwtTokenProvider;
+import com.intouch.aligooligo.User.Controller.Dto.KakaoMember;
+import com.intouch.aligooligo.User.Controller.Dto.KakaoToken;
 import com.intouch.aligooligo.User.Controller.Dto.UserLoginResponseDto;
 import com.intouch.aligooligo.User.Entity.User;
 import com.intouch.aligooligo.User.Repository.UserRepository;
@@ -10,6 +12,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +24,9 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 @Slf4j
@@ -105,91 +115,42 @@ public class UserService {
         }
     }
 
-    public String getKakaoAcessToken(String code){
-        String access_Token = "";
-        String refresh_Token = "";
-        log.info("getSocialAccessToken start");
-        try{
-            URL url = new URL(kakaoUrl);
-            HttpURLConnection conn= (HttpURLConnection) url.openConnection();
+    public String getKakaoAccessToken(String code) {
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
 
-            //POST 요청을 위해 기본값이 false인 setDoOutput을 true로
-            conn.setRequestMethod("POST");
-            conn.setDoOutput(true);
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("grant_type","authorization_code");
+        body.add("client_id", clientId);
+        body.add("client_secret", clientSecret);
+        body.add("redirect_uri", redirectUrl);
+        body.add("code",code);
 
-            //POST 요청에 필요로 요구하는 파라미터 스트림을 통해 전송
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));
-            String sb = "grant_type=authorization_code" +
-                    "&client_id=" + clientId +// TODO REST_API_KEY 입력
-                    "&redirect_uri=" + redirectUrl +// TODO 인가코드 받은 redirect_uri 입력
-                    "&code=" + code +
-                    "&client_secret=" + clientSecret;
-            bw.write(sb);
-            bw.flush();
+        HttpEntity<MultiValueMap<String, String>> tokenRequest = new HttpEntity<>(body, headers);
+        KakaoToken kakaoToken = restTemplate.postForObject("https://kauth.kakao.com/oauth/token",tokenRequest, KakaoToken.class);
 
-            //결과 코드가 200이라면 성공
-            int responseCode = conn.getResponseCode();
-
-            if (responseCode != 200) {
-                log.info("response code : " + responseCode);
-                log.error("not get socialAccessToken");
-            }
-
-            //요청을 통해 얻은 JSON타입의 Response 메세지 읽어오기
-            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            String line = "";
-            StringBuilder result = new StringBuilder();
-
-            while ((line = br.readLine()) != null) {
-                result.append(line);
-            }
-            //Gson 라이브러리에 포함된 클래스로 JSON파싱 객체 생성
-            JsonElement element = JsonParser.parseString(result.toString());
-
-            access_Token = element.getAsJsonObject().get("access_token").getAsString();
-            refresh_Token = element.getAsJsonObject().get("refresh_token").getAsString();
-
-            br.close();
-            bw.close();
-            log.info("getSocialAccessToken end");
-            return access_Token;
-        }catch(IOException e){
-            log.error("getSocialAccessToken error");
-            e.printStackTrace();
+        if (kakaoToken == null) {
+            log.error("카카오 토큰 에러");
             return null;
         }
+        return kakaoToken.getAccess_token();
     }
 
-    public UserLoginResponseDto createKakaoUser(String accessToken) {
-        log.info("createKakaoUser start");
-        try{
-            URL url = new URL(kakaoUserInfo);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setDoOutput(true);
-            conn.setRequestProperty("Authorization", "Bearer "+accessToken);
+    public UserLoginResponseDto getKakaoUserInfo(String accessToken) {
+        RestTemplate restTemplate = new RestTemplate();
 
-            //요청을 통해 얻은 JSON타입의 Response 메세지 읽어오기
-            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(),"UTF-8"));
-            String line = "";
-            StringBuilder result = new StringBuilder();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
+        headers.add("Authorization", "Bearer " + accessToken);
 
-            while ((line = br.readLine()) != null) {
-                result.append(line);
-            }
+        //헤더 + 바디
+        HttpEntity<MultiValueMap<String, String>> memberInfoRequest = new HttpEntity<>(headers);
+        ResponseEntity<KakaoMember> kakaoMember = restTemplate.exchange(kakaoUserInfo, HttpMethod.GET, memberInfoRequest, KakaoMember.class);
 
-            //Gson 라이브러리로 JSON파싱
-            JsonElement element = JsonParser.parseString(result.toString());
-            int id = element.getAsJsonObject().get("id").getAsInt();
-            boolean hasEmail = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("has_email").getAsBoolean();
-            String email = null;
-            String name;
-
-            if(hasEmail){
-                email = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("email").getAsString();
-            }
-            name = element.getAsJsonObject().get("kakao_account").getAsJsonObject().get("profile").getAsJsonObject().get("nickname").getAsString();
-            br.close();
+        if (kakaoMember.getBody() != null) {
+            String email = kakaoMember.getBody().getKakaoAccount().getEmail();
+            String name = kakaoMember.getBody().getKakaoProperties().getNickName();
 
             if(!existByUserEmail(email)) {
                 userRepository.save(User.builder().email(email)
@@ -199,11 +160,8 @@ public class UserService {
             UserLoginResponseDto response = SignIn(new User(email, findByUserEmail(email).getRoles()), true);
             log.info("createKakaoUser end");
             return response;
-
-        }catch(IOException e){
-            log.error("createKakaoUser error");
-            e.printStackTrace();
-            return null;
         }
+        log.error("createKakaoUser error");
+        return null;
     }
 }

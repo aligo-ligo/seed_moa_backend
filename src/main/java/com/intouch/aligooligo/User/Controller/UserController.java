@@ -58,8 +58,8 @@ public class UserController {
     }
     @PostMapping("/kakao")
     public ResponseEntity<UserLoginResponseDto> SignUpKakao(@RequestParam String code){
-        String access_Token = userService.getKakaoAcessToken(code);
-        UserLoginResponseDto response = userService.createKakaoUser(access_Token);
+        String access_Token = userService.getKakaoAccessToken(code);
+        UserLoginResponseDto response = userService.getKakaoUserInfo(access_Token);
         if(response!=null)
             return ResponseEntity.ok().body(response);
         return ResponseEntity.internalServerError().build();
