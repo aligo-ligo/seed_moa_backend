@@ -7,6 +7,7 @@ import com.intouch.aligooligo.User.Controller.Dto.UserLoginResponseDto;
 import com.intouch.aligooligo.User.Entity.User;
 import com.intouch.aligooligo.User.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,6 +19,7 @@ import java.net.URL;
 import java.util.*;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
@@ -106,7 +108,7 @@ public class UserService {
     public String getKakaoAcessToken(String code){
         String access_Token = "";
         String refresh_Token = "";
-
+        log.info("getSocialAccessToken start");
         try{
             URL url = new URL(kakaoUrl);
             HttpURLConnection conn= (HttpURLConnection) url.openConnection();
@@ -144,15 +146,17 @@ public class UserService {
 
             br.close();
             bw.close();
-
+            log.info("getSocialAccessToken end");
             return access_Token;
         }catch(IOException e){
+            log.error("getSocialAccessToken error");
             e.printStackTrace();
             return null;
         }
     }
 
     public UserLoginResponseDto createKakaoUser(String accessToken) {
+        log.info("createKakaoUser start");
         try{
             URL url = new URL(kakaoUserInfo);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -186,11 +190,13 @@ public class UserService {
                 userRepository.save(User.builder().email(email)
                         .nickName(name).roles(Collections.singletonList("ROLE_USER")).build());
             }
-
+            log.info("createKakaoUser before signin");
             UserLoginResponseDto response = SignIn(new User(email, findByUserEmail(email).getRoles()), true);
+            log.info("createKakaoUser end");
             return response;
 
         }catch(IOException e){
+            log.error("createKakaoUser error");
             e.printStackTrace();
             return null;
         }
