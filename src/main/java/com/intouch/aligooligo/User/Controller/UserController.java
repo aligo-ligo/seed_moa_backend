@@ -56,7 +56,7 @@ public class UserController {
             default -> {return ResponseEntity.internalServerError().body("unknown server error");}
         }
     }
-    @GetMapping("/kakao")
+    @PostMapping("/kakao")
     public ResponseEntity<UserLoginResponseDto> SignUpKakao(@RequestParam String code){
         String access_Token = userService.getKakaoAcessToken(code);
         UserLoginResponseDto response = userService.createKakaoUser(access_Token);
