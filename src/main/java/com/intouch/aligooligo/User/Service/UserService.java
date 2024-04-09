@@ -131,6 +131,7 @@ public class UserService {
             int responseCode = conn.getResponseCode();
 
             if (responseCode != 200) {
+                log.info("response code : " + responseCode);
                 log.error("not get socialAccessToken");
             }
 
