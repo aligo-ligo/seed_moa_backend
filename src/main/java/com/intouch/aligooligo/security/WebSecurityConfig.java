@@ -3,8 +3,6 @@ package com.intouch.aligooligo.security;
 import com.intouch.aligooligo.Jwt.JwtAuthenticationFilter;
 import com.intouch.aligooligo.Jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,7 +20,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 @EnableWebSecurity
 @Configuration
-@Slf4j
 public class WebSecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
 
