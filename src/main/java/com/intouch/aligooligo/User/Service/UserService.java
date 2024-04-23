@@ -116,6 +116,8 @@ public class UserService {
     }
 
     public String getKakaoAccessToken(String code) {
+        log.info(redirectUrl);
+
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
