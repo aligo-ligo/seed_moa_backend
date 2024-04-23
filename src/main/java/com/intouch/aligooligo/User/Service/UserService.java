@@ -117,6 +117,7 @@ public class UserService {
 
     public String getKakaoAccessToken(String code) {
         log.info(redirectUrl);
+        log.info(code);
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
