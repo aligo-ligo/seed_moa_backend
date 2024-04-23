@@ -3,6 +3,8 @@ package com.intouch.aligooligo.security;
 import com.intouch.aligooligo.Jwt.JwtAuthenticationFilter;
 import com.intouch.aligooligo.Jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,12 +22,24 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 @EnableWebSecurity
 @Configuration
+@Slf4j
 public class WebSecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
+
+    @Value("${redirectUrl}")
+    private String redirectUrl;
+    @Value("${clientId}")
+    private String clientId;
+
+    @Value("${clientSecret}")
+    private String clientSecret;
 
     // 암호화에 필요한 PasswordEncoder 를 Bean 등록합니다.
     @Bean
     public PasswordEncoder passwordEncoder() {
+        log.info(redirectUrl);
+        log.info(clientId);
+        log.info(clientSecret);
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
