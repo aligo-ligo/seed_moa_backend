@@ -132,6 +132,7 @@ public class UserService {
         HttpEntity<MultiValueMap<String, String>> tokenRequest = new HttpEntity<>(body, headers);
         KakaoToken kakaoToken = restTemplate.postForObject("https://kauth.kakao.com/oauth/token",tokenRequest, KakaoToken.class);
 
+        log.info("카카오 엑세스 토큰 받아옴");
         if (kakaoToken == null) {
             log.error("카카오 토큰 에러");
             return null;
