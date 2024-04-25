@@ -40,14 +40,25 @@ public class TargetService {
         this.subgoalRepository = subgoalRepository;
     }
 
-    public TargetListResponse getTargetList(String email, Integer page, Integer size){
+//    public TargetListResponse getTargetList(String email, Integer page, Integer size){
+//        User user = userRepository.findByEmail(email).orElseThrow(()->new UsernameNotFoundException("can't get targetList : can't find userEmail"));
+//        PageRequest pageRequest = PageRequest.of(page, size);
+//        Page<Target> list = targetRepository.findByUserIdOrderByIdDesc(user.getId(), pageRequest);
+//
+//        TargetListResponse listResponse = new TargetListResponse();
+//        listResponse.updateInfo(list);
+//        listResponse.updatePages(list);
+//
+//        return listResponse;
+//    }
+
+    public TargetListResponse getTargetList(String email){
         User user = userRepository.findByEmail(email).orElseThrow(()->new UsernameNotFoundException("can't get targetList : can't find userEmail"));
-        PageRequest pageRequest = PageRequest.of(page, size);
-        Page<Target> list = targetRepository.findByUserIdOrderByIdDesc(user.getId(), pageRequest);
+
+        List<Target> list = targetRepository.findByUserIdOrderByIdDesc(user.getId());
 
         TargetListResponse listResponse = new TargetListResponse();
         listResponse.updateInfo(list);
-        listResponse.updatePages(list);
 
         return listResponse;
     }

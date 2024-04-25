@@ -8,7 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface TargetRepository extends JpaRepository<Target, Integer> {
-    Page<Target> findByUserIdOrderByIdDesc(Integer userId, Pageable pageable);
+//    Page<Target> findByUserIdOrderByIdDesc(Integer userId, Pageable pageable);
+    List<Target> findByUserIdOrderByIdDesc(Integer userId);
 
     Integer countByUserId(Integer userId);
 
