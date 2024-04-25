@@ -53,13 +53,14 @@ public class TargetService {
 //    }
 
     public TargetListResponse getTargetList(String email){
+        log.info("list 함수 시작");
         User user = userRepository.findByEmail(email).orElseThrow(()->new UsernameNotFoundException("can't get targetList : can't find userEmail"));
 
         List<Target> list = targetRepository.findByUserIdOrderByIdDesc(user.getId());
 
         TargetListResponse listResponse = new TargetListResponse();
         listResponse.updateInfo(list);
-
+        log.info("list 함수 끝");
         return listResponse;
     }
 
