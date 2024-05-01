@@ -22,24 +22,13 @@ public class TargetController {
     private final JwtTokenProvider jwtTokenProvider;
     private final TargetService targetService;
 
-//    @GetMapping("/list")
-//    public ResponseEntity<TargetListResponse> getTargetList(
-//            HttpServletRequest request,
-//            @RequestParam Integer page,
-//            @RequestParam Integer size){
-//        try{
-//            TargetListResponse response = targetService.getTargetList(ExtractEmail(request), page, size);
-//            return ResponseEntity.ok().body(response);
-//        }catch(Exception e){
-//            e.printStackTrace();
-//            return ResponseEntity.internalServerError().build();
-//        }
-//    }
-
     @GetMapping("/list")
-    public ResponseEntity<TargetListResponse> getTargetList(HttpServletRequest request){
+    public ResponseEntity<TargetListResponse> getTargetList(
+            HttpServletRequest request,
+            @RequestParam Integer page,
+            @RequestParam Integer size){
         try{
-            TargetListResponse response = targetService.getTargetList(ExtractEmail(request));
+            TargetListResponse response = targetService.getTargetList(ExtractEmail(request), page, size);
             return ResponseEntity.ok().body(response);
         }catch(Exception e){
             e.printStackTrace();
