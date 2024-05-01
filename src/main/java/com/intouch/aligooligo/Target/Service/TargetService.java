@@ -40,27 +40,15 @@ public class TargetService {
         this.subgoalRepository = subgoalRepository;
     }
 
-//    public TargetListResponse getTargetList(String email, Integer page, Integer size){
-//        User user = userRepository.findByEmail(email).orElseThrow(()->new UsernameNotFoundException("can't get targetList : can't find userEmail"));
-//        PageRequest pageRequest = PageRequest.of(page, size);
-//        Page<Target> list = targetRepository.findByUserIdOrderByIdDesc(user.getId(), pageRequest);
-//
-//        TargetListResponse listResponse = new TargetListResponse();
-//        listResponse.updateInfo(list);
-//        listResponse.updatePages(list);
-//
-//        return listResponse;
-//    }
-
-    public TargetListResponse getTargetList(String email){
-        log.info("list 함수 시작");
+    public TargetListResponse getTargetList(String email, Integer page, Integer size){
         User user = userRepository.findByEmail(email).orElseThrow(()->new UsernameNotFoundException("can't get targetList : can't find userEmail"));
-
-        List<Target> list = targetRepository.findByUserIdOrderByIdDesc(user.getId());
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<Target> list = targetRepository.findByUserIdOrderByIdDesc(user.getId(), pageRequest);
 
         TargetListResponse listResponse = new TargetListResponse();
         listResponse.updateInfo(list);
-        log.info("list 함수 끝");
+        listResponse.updatePages(list);
+
         return listResponse;
     }
 

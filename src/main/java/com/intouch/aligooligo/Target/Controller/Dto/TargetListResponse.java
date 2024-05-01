@@ -45,21 +45,8 @@ public class TargetListResponse {
         private Boolean hasPrevious;
         private Boolean hasNext;
     }
-//    public void updateInfo (Page<Target> targetList) {
-//        for(Target target : targetList){
-//            int count=target.getSubGoal().size();
-//            for(Subgoal subgoal : target.getSubGoal())
-//                if(subgoal.getCompletedDate()==null)
-//                    count--;
-//            double successRate = (double)target.getSuccessVote()/target.getVoteTotal() * 100;
-//            double achievePer = (double)count/target.getSubGoal().size() * 100;
-//            TargetInfo targetinfo = new TargetInfo(target.getId(), target.getUser().getId(), target.getGoal(),
-//                    (int) successRate, (int) achievePer);
-//            this.targetInfo.add(targetinfo);
-//        }
-//    }
 
-    public void updateInfo (List<Target> targetList) {
+    public void updateInfo (Page<Target> targetList) {
         for(Target target : targetList){
             int count=target.getSubGoal().size();
             for(Subgoal subgoal : target.getSubGoal())
