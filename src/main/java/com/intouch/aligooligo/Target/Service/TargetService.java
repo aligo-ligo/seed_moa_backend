@@ -41,14 +41,17 @@ public class TargetService {
     }
 
     public TargetListResponse getTargetList(String email, Integer page, Integer size){
+        log.info("타겟 리스트 함수 시작");
         User user = userRepository.findByEmail(email).orElseThrow(()->new UsernameNotFoundException("can't get targetList : can't find userEmail"));
+        log.info("유저 이메일 조회");
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Target> list = targetRepository.findByUserIdOrderByIdDesc(user.getId(), pageRequest);
-
+        log.info("페이지 리스트 객체 조회");
         TargetListResponse listResponse = new TargetListResponse();
         listResponse.updateInfo(list);
         listResponse.updatePages(list);
 
+        log.info("타겟 리스트 함수 끝");
         return listResponse;
     }
 
