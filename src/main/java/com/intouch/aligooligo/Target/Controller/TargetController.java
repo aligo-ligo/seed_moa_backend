@@ -8,6 +8,7 @@ import com.intouch.aligooligo.Target.Controller.Dto.TargetListResponse;
 import com.intouch.aligooligo.Target.Controller.Dto.TargetUpdateReq;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,7 @@ import java.util.List;
 @RequestMapping(value="/target")
 @RestController
 @CrossOrigin
+@Slf4j
 public class TargetController {
     private final JwtTokenProvider jwtTokenProvider;
     private final TargetService targetService;
@@ -28,9 +30,12 @@ public class TargetController {
             @RequestParam Integer page,
             @RequestParam Integer size){
         try{
+            log.info("타겟리스트 컨트롤러 시작");
             TargetListResponse response = targetService.getTargetList(ExtractEmail(request), page, size);
+            log.info("타겟리스트 컨트롤러 끝");
             return ResponseEntity.ok().body(response);
         }catch(Exception e){
+            log.error(e.getMessage());
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
