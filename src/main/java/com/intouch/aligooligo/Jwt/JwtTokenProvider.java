@@ -1,5 +1,7 @@
 package com.intouch.aligooligo.Jwt;
 
+import com.intouch.aligooligo.auth.RefreshTokenService;
+import com.intouch.aligooligo.auth.dto.TokenInfo;
 import io.jsonwebtoken.*;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Component;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
+import org.springframework.util.StringUtils;
 
 @Component
 @RequiredArgsConstructor
@@ -22,40 +25,70 @@ public class JwtTokenProvider {
     private String secretKey;
 
     private final UserDetailsService userDetailsService;
+    private final RefreshTokenService refreshTokenService;
+    private final static String AUTHORIZATION_HEADER = "Authorization";
+    private final static String REFRESH_HEADER = "RefreshToken";
+    private final static String BEARER_TYPE = "bearer";
+
 
     @PostConstruct
     protected void init() {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
     // JWT 토큰 생성
-    public String createToken(String userPk, List<String> roles) {
+    public TokenInfo createToken(String userPk, List<String> roles) {
         Claims claims = Jwts.claims().setSubject(userPk); // JWT payload 에 저장되는 정보단위
         claims.put("roles", roles); // 정보는 key / value 쌍으로 저장된다.
         Date now = new Date();
-        long tokenValidTime = 180 * 60 * 1000L;
-        return Jwts.builder()
+        long accessTokenValidTime = now.getTime() + 180 * 60 * 1000L;
+        long refreshTokenValidTime = now.getTime() + 14 * 24 * 60 * 60 * 1000L;
+
+        String accessToken = Jwts.builder()
                 .setClaims(claims) // 정보 저장
                 .setIssuedAt(now) // 토큰 발행 시간 정보
-                .setExpiration(new Date(now.getTime() + tokenValidTime)) // set Expire Time
+                .setExpiration(new Date(accessTokenValidTime)) // set Expire Time
                 .signWith(SignatureAlgorithm.HS256, secretKey)  // 사용할 암호화 알고리즘과
                 // signature 에 들어갈 secret값 세팅
                 .compact();
+
+        String refreshToken = Jwts.builder()
+                .setClaims(claims) // 정보 저장
+                .setIssuedAt(now) // 토큰 발행 시간 정보
+                .setExpiration(new Date(refreshTokenValidTime))
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .compact();
+
+        refreshTokenService.saveTokenInfo(userPk, refreshToken);
+
+        return new TokenInfo(accessToken, refreshToken, accessTokenValidTime);
     }
 
     // JWT 토큰에서 인증 정보 조회
     public Authentication getAuthentication(String token) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(this.getUserPk(token));
+        UserDetails userDetails = userDetailsService.loadUserByUsername(this.parseClaims(token).getSubject());
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
     // 토큰에서 회원 정보 추출
-    public String getUserPk(String token) {
-        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
+    public Claims parseClaims(String token) {
+        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
     }
 
     // Request의 Header에서 token 값을 가져옵니다. "X-AUTH-TOKEN" : "TOKEN값'
-    public String resolveToken(HttpServletRequest request) {
-        return request.getHeader("X-AUTH-TOKEN");
+    public String resolveAccessToken(HttpServletRequest request) {
+        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_TYPE)) {
+            return bearerToken.substring(7);
+        }
+        return null;
+    }
+
+    public String resolveRefreshToken(HttpServletRequest request) {
+        String bearerToken = request.getHeader(REFRESH_HEADER);
+        if (StringUtils.hasText(bearerToken)) {
+            return bearerToken;
+        }
+        return null;
     }
 
     // 토큰의 유효성 + 만료일자 확인
@@ -64,7 +97,7 @@ public class JwtTokenProvider {
             Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(jwtToken);
             return !claims.getBody().getExpiration().before(new Date());
         } catch (JwtException | IllegalArgumentException e) {
-            return false;
+            throw new JwtException(e.getMessage());
         }
     }
 }
