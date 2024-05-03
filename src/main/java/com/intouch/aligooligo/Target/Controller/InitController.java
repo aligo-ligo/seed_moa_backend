@@ -12,7 +12,6 @@ import java.util.Map;
 
 @AllArgsConstructor
 @RestController
-@CrossOrigin
 @RequestMapping
 public class InitController {
 

@@ -18,7 +18,6 @@ import java.util.List;
 @AllArgsConstructor
 @RequestMapping(value="/target")
 @RestController
-@CrossOrigin
 @Slf4j
 public class TargetController {
     private final JwtTokenProvider jwtTokenProvider;
