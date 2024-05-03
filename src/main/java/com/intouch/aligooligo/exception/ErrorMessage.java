@@ -1,2 +1,10 @@
-package com.intouch.aligooligo.exception;public class ErrorMessage {
+package com.intouch.aligooligo.exception;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
+public class ErrorMessage {
+    private String message;
 }

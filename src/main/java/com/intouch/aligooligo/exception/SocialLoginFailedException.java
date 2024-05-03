@@ -1,2 +1,7 @@
-package com.intouch.aligooligo.exception;public class KakaoLoginFailedException {
+package com.intouch.aligooligo.exception;
+
+public class SocialLoginFailedException extends RuntimeException{
+    public SocialLoginFailedException(String message) {
+        super(message);
+    }
 }
