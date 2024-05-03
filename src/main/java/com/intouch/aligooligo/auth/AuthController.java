@@ -36,10 +36,12 @@ public class AuthController {
     @Operation(summary = "토큰 재발급", description = "토큰 재발급 API")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "로그인 성공",
-                    content = @Content(schema = @Schema(implementation = LoginResponseDto.class)),
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = LoginResponseDto.class)),
                     headers = @Header(name = "refresh Token", description = "리프레시 토큰, http-only설정, 헤더 속 쿠키로 반환")),
             @ApiResponse(responseCode = "401", description = "1. 헤더에 refresh token이 없을 때\t\n 2. refresh token이 일치하지 않을 때",
-                    content = @Content(schema = @Schema(implementation = ErrorMessage.class)))
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorMessage.class)))
     })
     @Parameter(name = "refresh token", in = ParameterIn.HEADER)
     public ResponseEntity<?> reissueToken(HttpServletRequest request, HttpServletResponse response) {

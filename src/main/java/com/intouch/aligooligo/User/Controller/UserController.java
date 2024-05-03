@@ -30,13 +30,16 @@ public class UserController {
     @Operation(summary = "유저 소셜 로그인", description = "소셜 로그인 API")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "로그인 성공",
-                    content = @Content(schema = @Schema(implementation = LoginResponseDto.class)),
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = LoginResponseDto.class)),
                     headers = @Header(name = "refresh Token", description = "리프레시 토큰, http-only설정, 헤더 속 쿠키로 반환")),
             @ApiResponse(responseCode = "401", description = "1. 카카오 엑세스 토큰을 가져오지 못했을 때 \t\n"
                     + "2. 카카오 유저 정보를 가져오지 못했을 때 \t\n 3. 레디스에 연결되지 못했을 때",
-                    content = @Content(schema = @Schema(implementation = ErrorMessage.class))),
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorMessage.class))),
             @ApiResponse(responseCode = "500", description = "서버 인증 에러",
-                    content = @Content(schema = @Schema(implementation = ErrorMessage.class)))
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorMessage.class)))
     })
     @PostMapping("/kakao")
     public ResponseEntity<?> SignInKakao(
