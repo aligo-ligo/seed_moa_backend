@@ -16,12 +16,7 @@ public class RefreshTokenService {
 
     @Transactional
     public void saveTokenInfo(String userEmail, String refreshToken) {
-        try {
-            refreshTokenRepository.save(new RefreshToken(userEmail, refreshToken));
-        } catch (RedisConnectionFailureException e) {
-            log.error(e.getMessage());
-            throw new SocialLoginFailedException("레디스에 연결할 수 없습니다.");
-        }
+        refreshTokenRepository.save(new RefreshToken(userEmail, refreshToken));
     }
     @Transactional(readOnly = true)
     public RefreshToken findById(String userEmail) {
