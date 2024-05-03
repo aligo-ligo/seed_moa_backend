@@ -1,4 +1,4 @@
-package com.intouch.aligooligo.token;
+package com.intouch.aligooligo.auth;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;

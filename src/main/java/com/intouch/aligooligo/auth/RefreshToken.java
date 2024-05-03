@@ -1,4 +1,4 @@
-package com.intouch.aligooligo.token;
+package com.intouch.aligooligo.auth;
 
 
 import lombok.AllArgsConstructor;
@@ -11,7 +11,7 @@ import org.springframework.data.redis.core.RedisHash;
 @RedisHash(value = "jwtToken", timeToLive = 60 * 30)//임시로 30분 실제로는 2주할 예정
 public class RefreshToken {
     @Id
-    private String userPk;
+    private String userEmail;
 
 
     private String refreshToken;
