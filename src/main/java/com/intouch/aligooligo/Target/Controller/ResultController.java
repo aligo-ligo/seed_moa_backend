@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 @RequestMapping(value="/result")
 @RestController
-@CrossOrigin
 public class ResultController {
 
     private final TargetService targetService;
