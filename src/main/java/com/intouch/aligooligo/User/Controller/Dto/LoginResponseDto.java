@@ -6,18 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @AllArgsConstructor
-@NoArgsConstructor
-@Setter
 @Getter
-public class UserLoginResponseDto {
-
-
-    @AllArgsConstructor
-    @Setter
-    @Getter
-    public static class UserLoginDTO{
-        private String nickName;
-    }
+public class LoginResponseDto {
     private String accessToken;
-    private UserLoginDTO userLoginDTO;
+    private Long accessTokenExpiredTime;
 }
