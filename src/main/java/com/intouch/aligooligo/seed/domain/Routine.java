@@ -1,7 +1,8 @@
-package com.intouch.aligooligo.Target.Entity;
+package com.intouch.aligooligo.seed.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import java.time.LocalDate;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,27 +15,26 @@ public class Routine {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer id;
+    private Long id;
 
-    @Column(name = "value", nullable = false, length = 50, unique = true)
-    String value;
-
+    @Column(name = "title", nullable = false, length = 50)
+    String title;
 
     @ManyToOne
     @JsonIgnore
-    @JoinColumn(name = "target_id")
-    private Target target;
+    @JoinColumn(name = "seed_id", nullable = false)
+    private Seed seed;
 
     @Builder
-    Routine(Integer id, String value, Target target){
+    Routine(Long id, String title, Seed seed){
         this.id = id;
-        this.value = value;
-        this.target = target;
+        this.title = title;
+        this.seed = seed;
     }
 
-    public Routine(String value, Target target){
-        this.value = value;
-        this.target = target;
+    public Routine(String title, Seed seed){
+        this.title = title;
+        this.seed = seed;
     }
 
 }

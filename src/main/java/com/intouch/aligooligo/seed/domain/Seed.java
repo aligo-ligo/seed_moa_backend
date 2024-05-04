@@ -1,9 +1,7 @@
-package com.intouch.aligooligo.Target.Entity;
+package com.intouch.aligooligo.seed.domain;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.intouch.aligooligo.Target.Entity.Routine;
-import com.intouch.aligooligo.Target.Entity.Subgoal;
 import com.intouch.aligooligo.User.Entity.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -15,12 +13,12 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "target")
-public class Target {
+@Table(name = "seed")
+public class Seed {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer id;
+    private Long id;
 
     @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
@@ -28,60 +26,38 @@ public class Target {
     @Column(name = "end_date", nullable = false)
     private LocalDate endDate;
 
-    @Column(name = "goal", nullable = false, length = 100)
-    private String goal;
+    @Column(name = "seed", nullable = false, length = 100)
+    private String seed;
 
     @Column(name = "url", length = 50)
     private String url;
 
-    @Column(name = "failure_vote")
-    private Integer failureVote;
-
-    @Column(name = "success_vote")
-    private Integer successVote;
-
-    @Column(name = "vote_total")
-    private Integer voteTotal;
+    @Column(name = "state", length = 10, nullable = false)
+    private String state;
 
     @ManyToOne
     @JsonIgnore
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToMany(mappedBy = "target", cascade = CascadeType.ALL)
-    @Column(name = "subgoals")
-    private List<Subgoal> subGoal;
-
-    @OneToMany(mappedBy = "target", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "seed", cascade = CascadeType.ALL)
     @Column(name = "routines")
     private List<Routine> routine;
 
     @Builder
-    public Target(Integer id, LocalDate startDate, LocalDate endDate, String goal, Integer failureVote,Integer successVote,
-                  Integer voteTotal, User user, List<Subgoal> subGoal, List<Routine> routine){
+    public Seed(Long id, LocalDate startDate, LocalDate endDate, String seed, User user, List<Routine> routine){
         this.id = id;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.goal = goal;
-        this.failureVote = failureVote;
-        this.successVote = successVote;
-        this.voteTotal = voteTotal;
+        this.seed = seed;
         this.user = user;
-        this.subGoal = subGoal;
         this.routine = routine;
     }
     public void updateUrl(String url){
         this.url = url;
     }
 
-    public void setSubGoalRoutine(List<Subgoal> subGoals, List<Routine> routines){
-        this.subGoal = subGoals;
+    public void updateRoutine(List<Routine> routines){
         this.routine = routines;
-    }
-
-    public void updateVote(Integer successVote, Integer failureVote, Integer voteTotal){
-        this.successVote = successVote;
-        this.failureVote = failureVote;
-        this.voteTotal = voteTotal;
     }
 }
