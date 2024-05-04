@@ -14,7 +14,9 @@ import com.intouch.aligooligo.User.Entity.User;
 import com.intouch.aligooligo.User.Repository.UserRepository;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -98,6 +100,35 @@ public class SeedService {
         }
         routineRepository.deleteBySeedId(seedId);
         seedRepository.deleteById(seedId);
+    }
+
+    public SeedDetailResponse getDetailSeed(Long seedId) {
+        Seed seed = seedRepository.findById(seedId)
+                .orElseThrow(() -> new IllegalArgumentException("doesn't find seed"));
+        List<Routine> routines = routineRepository.findBySeedId(seedId);
+        LocalDate today = LocalDate.now();
+
+        Map<String, Boolean> responseRoutines = completedTodayRoutines(routines, today);
+        Integer completedRoutineCount = getCompletedRoutineCount(routines);
+
+        return SeedDetailResponse.builder().seed(seed.getSeed()).startDate(String.valueOf(seed.getStartDate()))
+                .endDate(String.valueOf(seed.getEndDate())).completedRoutineCount(completedRoutineCount)
+                .completedTodayRoutines(responseRoutines).state(seed.getState()).build();
+    }
+
+    private Map<String, Boolean> completedTodayRoutines(List<Routine> routines, LocalDate today) {
+        Map<String, Boolean> responseRoutines = new HashMap<>();
+
+        for (Routine routine : routines) {
+            if (routineTimestampRepository.existsByRoutineIdAndTimestamp(routine.getId(), today)) {
+                responseRoutines.put(routine.getTitle(), true);
+            }
+            else {
+                responseRoutines.put(routine.getTitle(), false);
+            }
+        }
+
+        return responseRoutines;
     }
 
 
