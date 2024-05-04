@@ -1,16 +1,11 @@
-package com.intouch.aligooligo.Target.Repository;
+package com.intouch.aligooligo.seed.repository;
 
-import com.intouch.aligooligo.Target.Entity.Target;
+import com.intouch.aligooligo.seed.domain.Seed;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
-
-public interface TargetRepository extends JpaRepository<Target, Integer> {
-    Page<Target> findByUserIdOrderByIdDesc(Integer userId, Pageable pageable);
-
-    Integer countByUserId(Integer userId);
-
+public interface SeedRepository extends JpaRepository<Seed, Integer> {
+    Page<Seed> findByUserIdOrderByIdDesc(Integer userId, Pageable pageable);
     boolean existsById(Integer targetId);
 }

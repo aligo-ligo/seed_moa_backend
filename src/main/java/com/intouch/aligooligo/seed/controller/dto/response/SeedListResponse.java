@@ -1,4 +1,4 @@
-package com.intouch.aligooligo.seed.controller.Dto;
+package com.intouch.aligooligo.seed.controller.dto.response;
 
 
 import com.intouch.aligooligo.seed.domain.Seed;
@@ -26,12 +26,12 @@ public class SeedListResponse {
     @Getter
     @AllArgsConstructor
     private static class SeedInfo {
-        private Integer id;
+        private Long id;
         private String startDate;
         private String endDate;
         private String seed;
         private Integer routineCount;
-        private
+        private String seedState;
     }
     @Getter
     @AllArgsConstructor
@@ -44,8 +44,21 @@ public class SeedListResponse {
         private Boolean hasNext;
     }
 
-    public void updateSeedList() {
+    public void updateSeedList(Page<Seed> seedList, List<Integer> completedRoutineCountList) {
+        int i = 0;
 
+        for (Seed seed : seedList) {
+            String seedStartDate = seed.getStartDate().toString();
+            String seedEndDate = seed.getEndDate().toString();
+            Integer completedRoutineCount = completedRoutineCountList.get(i);
+
+            SeedInfo newSeedInfo = new SeedInfo(
+                    seed.getId(), seedStartDate, seedEndDate,
+                    seed.getSeed(), completedRoutineCount,seed.getState());
+
+            this.seedInfo.add(newSeedInfo);
+            i++;
+        }
     }
 
     public void updatePages (Page<Seed> page) {

@@ -1,104 +1,105 @@
-package com.intouch.aligooligo.Target.Controller;
+package com.intouch.aligooligo.seed.controller;
 
 
 import com.intouch.aligooligo.Jwt.JwtTokenProvider;
-import com.intouch.aligooligo.Target.Controller.Dto.TargetDTO;
-import com.intouch.aligooligo.Target.Service.TargetService;
-import com.intouch.aligooligo.Target.Controller.Dto.TargetListResponse;
-import com.intouch.aligooligo.Target.Controller.Dto.TargetUpdateReq;
+import com.intouch.aligooligo.auth.dto.TokenInfo;
+import com.intouch.aligooligo.exception.ErrorMessage;
+import com.intouch.aligooligo.seed.service.SeedService;
+import com.intouch.aligooligo.seed.controller.dto.response.SeedListResponse;
+import io.jsonwebtoken.Claims;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @AllArgsConstructor
-@RequestMapping(value="/target")
+@RequestMapping(value="/api/seed")
 @RestController
-@Slf4j
-public class TargetController {
+@Tag(name = "seed", description = "시드 관련 API")
+public class SeedController {
     private final JwtTokenProvider jwtTokenProvider;
-    private final TargetService targetService;
+    private final SeedService seedService;
 
-    @GetMapping("/list")
-    public ResponseEntity<TargetListResponse> getTargetList(
+    @GetMapping("/")
+    @Operation(summary = "시드 리스트 조회", description = "시드 리스트 조회 API, 인증된 사용자만 접근 가능")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = TokenInfo.class))),
+            @ApiResponse(responseCode = "401", description = "1. 헤더에 refresh token이 없을 때\t\n 2. refresh token이 일치하지 않을 때",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorMessage.class)))
+    })
+    public ResponseEntity<SeedListResponse> getTargetList(
             HttpServletRequest request,
             @RequestParam Integer page,
             @RequestParam Integer size){
         try{
-            log.info("타겟리스트 컨트롤러 시작");
-            TargetListResponse response = targetService.getTargetList(ExtractEmail(request), page, size);
-            log.info("타겟리스트 컨트롤러 끝");
+            SeedListResponse response = seedService.getSeedList(getUserEmail(request), page, size);
             return ResponseEntity.ok().body(response);
         }catch(Exception e){
-            log.error(e.getMessage());
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<HttpStatus> createTarget(HttpServletRequest request, @RequestBody TargetDTO req) {
-        try {
-            if(targetService.createTarget(ExtractEmail(request), req))
-                return ResponseEntity.ok().build();//ok
-            return ResponseEntity.internalServerError().build();//server error
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();//server error
-        }
+    private String getUserEmail(HttpServletRequest request){
+        String accessToken = jwtTokenProvider.resolveAccessToken(request);
+        Claims claims = jwtTokenProvider.parseClaims(accessToken);
+        return claims.getSubject();
     }
 
-    @DeleteMapping("/delete")
-    public ResponseEntity<HttpStatus> deleteTarget(@RequestParam Integer id){
-        targetService.deleteTarget(id);
-        return ResponseEntity.ok().build();
-    }
-
-    public String ExtractEmail(HttpServletRequest request){
-        return jwtTokenProvider.getAuthentication(
-                request.getHeader("Authorization").
-                        substring(7)).getName();
-    }
-
-    @GetMapping("/detail")
-    public ResponseEntity<TargetDTO> detailTarget(@RequestParam Integer id){
-        try{
-            TargetDTO targetDTO = targetService.getDetailTarget(id);
-            if(targetDTO==null)
-                return ResponseEntity.internalServerError().build();
-            return ResponseEntity.ok().body(targetDTO);
-        }catch (Exception e){
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    @PostMapping("/update")
-    public ResponseEntity<TargetDTO> updateTarget(@RequestBody TargetUpdateReq req){
-        try{
-            if(req==null){return ResponseEntity.badRequest().build();}
-            TargetDTO targetDTO = targetService.updateTarget(req);
-            if(targetDTO==null){
-                return ResponseEntity.internalServerError().build();
-            }
-            return ResponseEntity.ok().body(targetDTO);
-        }catch(Exception e){
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-    @GetMapping("/vote")
-    public ResponseEntity<HttpStatus> voteTarget(@RequestParam(value = "id") Integer id, @RequestParam(value = "success") boolean success){
-        try{
-            if(targetService.voteTarget(id, success))
-                return ResponseEntity.ok().build();//ok
-            return ResponseEntity.internalServerError().build();//server error
-        }catch(Exception e){
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().build();//server error
-        }
-    }
+//    @PostMapping("/create")
+//    public ResponseEntity<HttpStatus> createTarget(HttpServletRequest request, @RequestBody TargetDTO req) {
+//        try {
+//            if(seedService.createTarget(ExtractEmail(request), req))
+//                return ResponseEntity.ok().build();//ok
+//            return ResponseEntity.internalServerError().build();//server error
+//        } catch (Exception e) {
+//            return ResponseEntity.internalServerError().build();//server error
+//        }
+//    }
+//
+//    @DeleteMapping("/delete")
+//    public ResponseEntity<HttpStatus> deleteTarget(@RequestParam Integer id){
+//        seedService.deleteTarget(id);
+//        return ResponseEntity.ok().build();
+//    }
+//
+//
+//
+//    @GetMapping("/detail")
+//    public ResponseEntity<TargetDTO> detailTarget(@RequestParam Integer id){
+//        try{
+//            TargetDTO targetDTO = seedService.getDetailTarget(id);
+//            if(targetDTO==null)
+//                return ResponseEntity.internalServerError().build();
+//            return ResponseEntity.ok().body(targetDTO);
+//        }catch (Exception e){
+//            e.printStackTrace();
+//            return ResponseEntity.internalServerError().build();
+//        }
+//    }
+//
+//    @PostMapping("/update")
+//    public ResponseEntity<TargetDTO> updateTarget(@RequestBody TargetUpdateReq req){
+//        try{
+//            if(req==null){return ResponseEntity.badRequest().build();}
+//            TargetDTO targetDTO = seedService.updateTarget(req);
+//            if(targetDTO==null){
+//                return ResponseEntity.internalServerError().build();
+//            }
+//            return ResponseEntity.ok().body(targetDTO);
+//        }catch(Exception e){
+//            e.printStackTrace();
+//            return ResponseEntity.internalServerError().build();
+//        }
+//    }
 }
