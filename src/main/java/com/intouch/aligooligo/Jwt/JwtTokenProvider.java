@@ -16,7 +16,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import java.util.Base64;
@@ -30,7 +29,6 @@ public class JwtTokenProvider {
     @Value("${secretKey}")
     private String secretKey;
 
-    private final UserDetailsService userDetailsService;
     private final RefreshTokenService refreshTokenService;
     private final static String AUTHORIZATION_HEADER = "Authorization";
     private final static String REFRESH_HEADER = "RefreshToken";
