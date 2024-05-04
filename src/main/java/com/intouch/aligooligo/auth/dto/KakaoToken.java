@@ -1,4 +1,4 @@
-package com.intouch.aligooligo.User.Controller.Dto;
+package com.intouch.aligooligo.auth.dto;
 
 import lombok.Data;
 

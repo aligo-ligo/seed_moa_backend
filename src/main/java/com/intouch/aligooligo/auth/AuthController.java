@@ -1,9 +1,9 @@
 package com.intouch.aligooligo.auth;
 
 import com.intouch.aligooligo.Jwt.JwtTokenProvider;
-import com.intouch.aligooligo.User.Controller.Dto.LoginResponseDto;
 import com.intouch.aligooligo.auth.dto.TokenInfo;
 import com.intouch.aligooligo.exception.ErrorMessage;
+import com.intouch.aligooligo.exception.SocialLoginFailedException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -13,14 +13,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "auth", description = "인증 관련 API")
@@ -37,14 +37,12 @@ public class AuthController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "로그인 성공",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = LoginResponseDto.class)),
-                    headers = @Header(name = "refresh Token", description = "리프레시 토큰, http-only설정, 헤더 속 쿠키로 반환")),
+                            schema = @Schema(implementation = TokenInfo.class))),
             @ApiResponse(responseCode = "401", description = "1. 헤더에 refresh token이 없을 때\t\n 2. refresh token이 일치하지 않을 때",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessage.class)))
     })
-    @Parameter(name = "refresh token", in = ParameterIn.HEADER)
-    public ResponseEntity<?> reissueToken(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<?> reissueToken(HttpServletRequest request) {
 
         String encryptedRefreshToken = jwtProvider.resolveRefreshToken(request);
         if (encryptedRefreshToken == null) {
@@ -55,19 +53,47 @@ public class AuthController {
         try {
             TokenInfo tokenInfo = authService.reIssueToken(encryptedRefreshToken);
 
-            Cookie cookie = new Cookie("refreshToken", tokenInfo.getRefreshToken());
-            cookie.setMaxAge(14*24*60*60);//expires in 2 weeks
-
-            cookie.setSecure(true);
-            cookie.setHttpOnly(true);
-
-            response.addCookie(cookie);
             String accessToken = tokenInfo.getAccessToken();
+            String refreshToken = tokenInfo.getRefreshToken();
+            Long accessTokenValidTime = tokenInfo.getAccessTokenValidTime();
 
-            return new ResponseEntity<>(new LoginResponseDto(accessToken, tokenInfo.getAccessTokenValidTime()), HttpStatus.OK);
+            return new ResponseEntity<>(new TokenInfo(accessToken, refreshToken, accessTokenValidTime), HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(new ErrorMessage(e.getMessage()),HttpStatus.UNAUTHORIZED);
         }
     }
+
+    @Operation(summary = "유저 소셜 로그인", description = "소셜 로그인 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "로그인 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = TokenInfo.class))),
+            @ApiResponse(responseCode = "401", description = "1. 카카오 엑세스 토큰을 가져오지 못했을 때 \t\n"
+                    + "2. 카카오 유저 정보를 가져오지 못했을 때 \t\n 3. 레디스에 연결되지 못했을 때",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorMessage.class))),
+            @ApiResponse(responseCode = "500", description = "서버 인증 에러",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorMessage.class)))
+    })
+    @PostMapping("/kakao")
+    public ResponseEntity<?> SignInKakao(@RequestParam String code) {
+        try {
+            TokenInfo tokenInfo = authService.kakaoLogin(code);
+
+            String accessToken = tokenInfo.getAccessToken();
+            String refreshToken = tokenInfo.getRefreshToken();
+            Long accessTokenExpiredTime = tokenInfo.getAccessTokenValidTime();
+
+            return new ResponseEntity<>(
+                    new TokenInfo(accessToken, refreshToken, accessTokenExpiredTime), HttpStatus.OK);
+        } catch (SocialLoginFailedException e) {
+            return new ResponseEntity<>(new ErrorMessage(e.getMessage()),HttpStatus.UNAUTHORIZED);
+        } catch (RedisConnectionFailureException e) {
+            return new ResponseEntity<>(new ErrorMessage("unable to connect redis"), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
 
 }
