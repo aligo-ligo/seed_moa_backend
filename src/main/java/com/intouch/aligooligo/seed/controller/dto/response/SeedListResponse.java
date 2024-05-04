@@ -30,7 +30,7 @@ public class SeedListResponse {
         private String startDate;
         private String endDate;
         private String seed;
-        private Integer routineCount;
+        private Integer completedRoutineCount;
         private String seedState;
     }
     @Getter

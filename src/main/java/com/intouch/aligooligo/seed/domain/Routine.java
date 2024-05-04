@@ -3,6 +3,7 @@ package com.intouch.aligooligo.seed.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,16 +26,16 @@ public class Routine {
     @JoinColumn(name = "seed_id", nullable = false)
     private Seed seed;
 
+    public void updateRoutine(String routineTitle) {
+        this.title = routineTitle;
+    }
+
     @Builder
-    Routine(Long id, String title, Seed seed){
-        this.id = id;
+    public Routine (String title, Seed seed) {
         this.title = title;
         this.seed = seed;
     }
 
-    public Routine(String title, Seed seed){
-        this.title = title;
-        this.seed = seed;
-    }
+
 
 }

@@ -5,6 +5,8 @@ import com.intouch.aligooligo.Jwt.JwtTokenProvider;
 import com.intouch.aligooligo.auth.dto.TokenInfo;
 import com.intouch.aligooligo.exception.ErrorMessage;
 import com.intouch.aligooligo.seed.controller.dto.request.CreateSeedRequest;
+import com.intouch.aligooligo.seed.controller.dto.request.UpdateSeedRequest;
+import com.intouch.aligooligo.seed.controller.dto.response.SeedDetailResponse;
 import com.intouch.aligooligo.seed.service.SeedService;
 import com.intouch.aligooligo.seed.controller.dto.response.SeedListResponse;
 import io.jsonwebtoken.Claims;
@@ -108,18 +110,21 @@ public class SeedController {
 //        }
 //    }
 //
-//    @PostMapping("/update")
-//    public ResponseEntity<TargetDTO> updateTarget(@RequestBody TargetUpdateReq req){
-//        try{
-//            if(req==null){return ResponseEntity.badRequest().build();}
-//            TargetDTO targetDTO = seedService.updateTarget(req);
-//            if(targetDTO==null){
-//                return ResponseEntity.internalServerError().build();
-//            }
-//            return ResponseEntity.ok().body(targetDTO);
-//        }catch(Exception e){
-//            e.printStackTrace();
-//            return ResponseEntity.internalServerError().build();
-//        }
-//    }
+    @PatchMapping("/{id}")
+    @Operation(summary = "시드 수정", description = "시드 수정 API, 인증된 사용자만 접근 가능")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "수정 성공"),
+            @ApiResponse(responseCode = "500", description = "기타 서버 에러",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorMessage.class)))
+    })
+    public ResponseEntity<?> updateTarget(@PathVariable("id") Long seedId,
+            @RequestBody UpdateSeedRequest updateSeedRequest) {
+        try{
+            seedService.updateSeed(seedId, updateSeedRequest);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }catch(Exception e){
+            return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

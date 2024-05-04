@@ -1,6 +1,8 @@
 package com.intouch.aligooligo.seed.service;
 
 import com.intouch.aligooligo.seed.controller.dto.request.CreateSeedRequest;
+import com.intouch.aligooligo.seed.controller.dto.request.UpdateSeedRequest;
+import com.intouch.aligooligo.seed.controller.dto.response.SeedDetailResponse;
 import com.intouch.aligooligo.seed.controller.dto.response.SeedListResponse;
 import com.intouch.aligooligo.seed.domain.Routine;
 import com.intouch.aligooligo.seed.domain.Seed;
@@ -74,6 +76,17 @@ public class SeedService {
 
         for (String routineTitle : createSeedRequest.getRoutines()) {
             routineRepository.save(Routine.builder().title(routineTitle).seed(seed).build());
+        }
+    }
+
+    @Transactional
+    public void updateSeed(Long seedId, UpdateSeedRequest updateSeedRequest) {
+        List<Routine> routines = routineRepository.findBySeedId(seedId);
+
+        for (Routine routine : routines) {
+            if (routine.getTitle().equals(updateSeedRequest.getOldRoutineTitle())) {
+                routine.updateRoutine(updateSeedRequest.getNewRoutineTitle());
+            }
         }
     }
 
