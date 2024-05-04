@@ -11,6 +11,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "seed")
@@ -29,9 +30,6 @@ public class Seed {
     @Column(name = "seed", nullable = false, length = 100)
     private String seed;
 
-    @Column(name = "url", length = 50)
-    private String url;
-
     @Column(name = "state", length = 10, nullable = false)
     private String state;
 
@@ -40,10 +38,6 @@ public class Seed {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToMany(mappedBy = "seed", cascade = CascadeType.ALL)
-    @Column(name = "routines")
-    private List<Routine> routine;
-
     @Builder
     public Seed(Long id, LocalDate startDate, LocalDate endDate, String seed, User user, List<Routine> routine){
         this.id = id;
@@ -51,13 +45,5 @@ public class Seed {
         this.endDate = endDate;
         this.seed = seed;
         this.user = user;
-        this.routine = routine;
-    }
-    public void updateUrl(String url){
-        this.url = url;
-    }
-
-    public void updateRoutine(List<Routine> routines){
-        this.routine = routines;
     }
 }

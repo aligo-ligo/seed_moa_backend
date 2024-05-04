@@ -4,6 +4,7 @@ package com.intouch.aligooligo.seed.controller;
 import com.intouch.aligooligo.Jwt.JwtTokenProvider;
 import com.intouch.aligooligo.auth.dto.TokenInfo;
 import com.intouch.aligooligo.exception.ErrorMessage;
+import com.intouch.aligooligo.seed.controller.dto.request.CreateSeedRequest;
 import com.intouch.aligooligo.seed.service.SeedService;
 import com.intouch.aligooligo.seed.controller.dto.response.SeedListResponse;
 import io.jsonwebtoken.Claims;
@@ -17,6 +18,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 @AllArgsConstructor
@@ -32,21 +34,20 @@ public class SeedController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "조회 성공",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = TokenInfo.class))),
-            @ApiResponse(responseCode = "401", description = "1. 헤더에 refresh token이 없을 때\t\n 2. refresh token이 일치하지 않을 때",
+                            schema = @Schema(implementation = SeedListResponse.class))),
+            @ApiResponse(responseCode = "500", description = "유저 정보를 찾을 수 없을 때",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessage.class)))
     })
-    public ResponseEntity<SeedListResponse> getTargetList(
+    public ResponseEntity<?> getSeedList(
             HttpServletRequest request,
             @RequestParam Integer page,
             @RequestParam Integer size){
         try{
             SeedListResponse response = seedService.getSeedList(getUserEmail(request), page, size);
             return ResponseEntity.ok().body(response);
-        }catch(Exception e){
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().build();
+        } catch (UsernameNotFoundException e) {
+            return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -56,16 +57,23 @@ public class SeedController {
         return claims.getSubject();
     }
 
-//    @PostMapping("/create")
-//    public ResponseEntity<HttpStatus> createTarget(HttpServletRequest request, @RequestBody TargetDTO req) {
-//        try {
-//            if(seedService.createTarget(ExtractEmail(request), req))
-//                return ResponseEntity.ok().build();//ok
-//            return ResponseEntity.internalServerError().build();//server error
-//        } catch (Exception e) {
-//            return ResponseEntity.internalServerError().build();//server error
-//        }
-//    }
+
+    @PostMapping("/create")
+    @Operation(summary = "시드 리스트 생성", description = "시드 리스트 생성 API, 인증된 사용자만 접근 가능")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "생성 성공"),
+            @ApiResponse(responseCode = "500", description = "유저 정보를 찾을 수 없을 때",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorMessage.class)))
+    })
+    public ResponseEntity<?> createTarget(HttpServletRequest request, @RequestBody CreateSeedRequest createSeedRequest) {
+        try {
+            seedService.createSeed(getUserEmail(request), createSeedRequest);
+            return ResponseEntity.ok().build();//ok
+        } catch (UsernameNotFoundException e) {
+            return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 //
 //    @DeleteMapping("/delete")
 //    public ResponseEntity<HttpStatus> deleteTarget(@RequestParam Integer id){
