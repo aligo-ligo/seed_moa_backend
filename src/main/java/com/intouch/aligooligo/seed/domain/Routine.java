@@ -3,13 +3,14 @@ package com.intouch.aligooligo.seed.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Builder
+@NoArgsConstructor
 @Table(name = "routine")
 public class Routine {
     @Id
@@ -27,6 +28,12 @@ public class Routine {
 
     public void updateRoutine(String routineTitle) {
         this.title = routineTitle;
+    }
+
+    @Builder
+    public Routine (String title, Seed seed) {
+        this.title = title;
+        this.seed = seed;
     }
 
 
