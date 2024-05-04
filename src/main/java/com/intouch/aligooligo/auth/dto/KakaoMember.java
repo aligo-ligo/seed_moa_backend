@@ -1,4 +1,4 @@
-package com.intouch.aligooligo.User.Controller.Dto;
+package com.intouch.aligooligo.auth.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
