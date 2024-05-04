@@ -46,7 +46,7 @@ dependencies {
 tasks.withType(JavaCompile){
 	options.encoding = "UTF-8"
 }
-
+/*
 processResources.dependsOn('copySecret')
 
 task copySecret(type: Copy) {
@@ -59,7 +59,7 @@ task copySecret(type: Copy) {
 	from 'backend_env/keystore.p12'
 	into 'src/main/resources'
 
-}
+}*/
 
 tasks.named('test') {
 	useJUnitPlatform()
