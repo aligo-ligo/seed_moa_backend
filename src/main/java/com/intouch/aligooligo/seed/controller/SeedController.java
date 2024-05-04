@@ -74,12 +74,24 @@ public class SeedController {
             return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-//
-//    @DeleteMapping("/delete")
-//    public ResponseEntity<HttpStatus> deleteTarget(@RequestParam Integer id){
-//        seedService.deleteTarget(id);
-//        return ResponseEntity.ok().build();
-//    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "시드 삭제", description = "시드 삭제 API, 인증된 사용자만 접근 가능")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "삭제 성공"),
+            @ApiResponse(responseCode = "500", description = "기타 서버 에러",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorMessage.class)))
+    })
+    public ResponseEntity<?> deleteSeed(@PathVariable("id") Long seedId){
+        try {
+            seedService.deleteSeed(seedId);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
 //
 //
 //

@@ -20,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -61,6 +62,7 @@ public class SeedService {
         return completedRoutineCount;
     }
 
+    @Transactional
     public void createSeed(String userEmail, CreateSeedRequest createSeedRequest) {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new UsernameNotFoundException("can't get seedList : can't find userEmail"));
@@ -73,6 +75,16 @@ public class SeedService {
         for (String routineTitle : createSeedRequest.getRoutines()) {
             routineRepository.save(Routine.builder().title(routineTitle).seed(seed).build());
         }
+    }
+
+    @Transactional
+    public void deleteSeed(Long seedId) {
+        List<Routine> routines = routineRepository.findBySeedId(seedId);
+        for (Routine routine : routines) {
+            routineTimestampRepository.deleteByRoutineId(routine.getId());
+        }
+        routineRepository.deleteBySeedId(seedId);
+        seedRepository.deleteById(seedId);
     }
 
 
