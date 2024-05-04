@@ -13,6 +13,6 @@ public class SeedDetailResponse {
     private String startDate;
     private String endDate;
     private Integer completedRoutineCount;
-    private Map<String, Boolean> routines;
+    private Map<String, Boolean> completedTodayRoutines;
     private String state;
 }

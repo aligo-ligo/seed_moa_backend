@@ -113,7 +113,7 @@ public class SeedService {
 
         return SeedDetailResponse.builder().seed(seed.getSeed()).startDate(String.valueOf(seed.getStartDate()))
                 .endDate(String.valueOf(seed.getEndDate())).completedRoutineCount(completedRoutineCount)
-                .routines(responseRoutines).state(seed.getState()).build();
+                .completedTodayRoutines(responseRoutines).state(seed.getState()).build();
     }
 
     private Map<String, Boolean> completedTodayRoutines(List<Routine> routines, LocalDate today) {
