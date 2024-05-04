@@ -121,8 +121,8 @@ public class SeedController {
     public ResponseEntity<?> updateTarget(@PathVariable("id") Long seedId,
             @RequestBody UpdateSeedRequest updateSeedRequest) {
         try{
-            SeedDetailResponse detailResponse = seedService.updateSeed(seedId, updateSeedRequest);
-            return new ResponseEntity<>(detailResponse, HttpStatus.OK);
+            seedService.updateSeed(seedId, updateSeedRequest);
+            return new ResponseEntity<>(HttpStatus.OK);
         }catch(Exception e){
             return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }

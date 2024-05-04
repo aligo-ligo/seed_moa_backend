@@ -80,7 +80,7 @@ public class SeedService {
     }
 
     @Transactional
-    public SeedDetailResponse updateSeed(Long seedId, UpdateSeedRequest updateSeedRequest) {
+    public void updateSeed(Long seedId, UpdateSeedRequest updateSeedRequest) {
         List<Routine> routines = routineRepository.findBySeedId(seedId);
 
         for (Routine routine : routines) {
@@ -88,7 +88,6 @@ public class SeedService {
                 routine.updateRoutine(updateSeedRequest.getRoutineTitle());
             }
         }
-        return new SeedDetailResponse();//////시드 디테일 응답 구조 작성할 것
     }
 
     @Transactional
