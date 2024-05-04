@@ -5,10 +5,16 @@ import com.intouch.aligooligo.auth.dto.TokenInfo;
 import io.jsonwebtoken.*;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
@@ -28,7 +34,7 @@ public class JwtTokenProvider {
     private final RefreshTokenService refreshTokenService;
     private final static String AUTHORIZATION_HEADER = "Authorization";
     private final static String REFRESH_HEADER = "RefreshToken";
-    private final static String BEARER_TYPE = "bearer";
+    private final static String BEARER_TYPE = "Bearer";
 
 
     @PostConstruct
@@ -65,8 +71,22 @@ public class JwtTokenProvider {
 
     // JWT 토큰에서 인증 정보 조회
     public Authentication getAuthentication(String token) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(this.parseClaims(token).getSubject());
-        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+
+        Claims claims = parseClaims(token);
+
+        if (claims.get("roles") == null) {
+            //TODO:: Change Custom Exception
+            throw new RuntimeException("권한 정보가 없는 토큰입니다.");
+        }
+
+        //클레임에서 권한 정보 가져오기
+        Collection<? extends GrantedAuthority> authorities =
+                Arrays.stream(claims.get("roles").toString().split(","))
+                        .map(SimpleGrantedAuthority::new)
+                        .toList();
+
+        UserDetails principal = new User(claims.getSubject(), "", authorities);
+        return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
 
     // 토큰에서 회원 정보 추출
