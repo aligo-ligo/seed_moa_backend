@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@NoArgsConstructor
+@Builder
 @Table(name = "routine")
 public class Routine {
     @Id
@@ -25,16 +25,10 @@ public class Routine {
     @JoinColumn(name = "seed_id", nullable = false)
     private Seed seed;
 
-    @Builder
-    Routine(Long id, String title, Seed seed){
-        this.id = id;
-        this.title = title;
-        this.seed = seed;
+    public void updateRoutine(String routineTitle) {
+        this.title = routineTitle;
     }
 
-    public Routine(String title, Seed seed){
-        this.title = title;
-        this.seed = seed;
-    }
+
 
 }
