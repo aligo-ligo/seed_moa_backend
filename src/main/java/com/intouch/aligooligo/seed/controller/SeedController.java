@@ -94,22 +94,27 @@ public class SeedController {
         }
 
     }
-//
-//
-//
-//    @GetMapping("/detail")
-//    public ResponseEntity<TargetDTO> detailTarget(@RequestParam Integer id){
-//        try{
-//            TargetDTO targetDTO = seedService.getDetailTarget(id);
-//            if(targetDTO==null)
-//                return ResponseEntity.internalServerError().build();
-//            return ResponseEntity.ok().body(targetDTO);
-//        }catch (Exception e){
-//            e.printStackTrace();
-//            return ResponseEntity.internalServerError().build();
-//        }
-//    }
-//
+
+    @GetMapping("/{id}")
+    @Operation(summary = "시드 디테일 조회", description = "시드 디테일 조회 API, 인증된 사용자만 접근 가능")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = SeedDetailResponse.class))),
+            @ApiResponse(responseCode = "500", description = "기타 서버 에러",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorMessage.class)))
+    })
+    public ResponseEntity<?> detailTarget(@PathVariable("id") Long seedId){
+        try {
+            SeedDetailResponse detailResponse = seedService.getDetailSeed(seedId);
+            return new ResponseEntity<>(detailResponse, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
     @PatchMapping("/{id}")
     @Operation(summary = "시드 수정", description = "시드 수정 API, 인증된 사용자만 접근 가능")
     @ApiResponses(value = {
