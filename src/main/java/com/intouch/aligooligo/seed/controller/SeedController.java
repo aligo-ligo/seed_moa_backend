@@ -29,7 +29,7 @@ public class SeedController {
     private final JwtTokenProvider jwtTokenProvider;
     private final SeedService seedService;
 
-    @GetMapping("/")
+    @GetMapping
     @Operation(summary = "시드 리스트 조회", description = "시드 리스트 조회 API, 인증된 사용자만 접근 가능")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "조회 성공",
@@ -58,7 +58,7 @@ public class SeedController {
     }
 
 
-    @PostMapping("/create")
+    @PostMapping
     @Operation(summary = "시드 리스트 생성", description = "시드 리스트 생성 API, 인증된 사용자만 접근 가능")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "생성 성공"),
