@@ -1,16 +1,18 @@
 package com.intouch.aligooligo.seed.service;
 
+import com.intouch.aligooligo.seed.controller.dto.request.CreateSeedRequest;
 import com.intouch.aligooligo.seed.controller.dto.response.SeedListResponse;
 import com.intouch.aligooligo.seed.domain.Routine;
 import com.intouch.aligooligo.seed.domain.Seed;
+import com.intouch.aligooligo.seed.domain.SeedState;
 import com.intouch.aligooligo.seed.repository.RoutineRepository;
 import com.intouch.aligooligo.seed.repository.RoutineTimestampRepository;
 import com.intouch.aligooligo.seed.repository.SeedRepository;
 import com.intouch.aligooligo.User.Entity.User;
 import com.intouch.aligooligo.User.Repository.UserRepository;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,7 +35,7 @@ public class SeedService {
 
     public SeedListResponse getSeedList(String email, Integer page, Integer size){
         User user = userRepository.findByEmail(email)
-                .orElseThrow(()->new UsernameNotFoundException("can't get targetList : can't find userEmail"));
+                .orElseThrow(()->new UsernameNotFoundException("can't get seedList : can't find userEmail"));
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Seed> seedList = seedRepository.findByUserIdOrderByIdDesc(user.getId(), pageRequest);
         List<Integer> completedRoutineCountList = new ArrayList<>();
@@ -57,6 +59,20 @@ public class SeedService {
             completedRoutineCount += routineTimestampRepository.countByRoutineId(routine.getId());
         }
         return completedRoutineCount;
+    }
+
+    public void createSeed(String userEmail, CreateSeedRequest createSeedRequest) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new UsernameNotFoundException("can't get seedList : can't find userEmail"));
+
+        LocalDate startDate = LocalDate.now();
+        LocalDate endDate = LocalDate.parse(createSeedRequest.getEndDate());
+        Seed seed = seedRepository.save(Seed.builder().startDate(startDate).endDate(endDate)
+                .seed(createSeedRequest.getSeed()).state(SeedState.SEED.name()).user(user).build());
+
+        for (String routineTitle : createSeedRequest.getRoutines()) {
+            routineRepository.save(Routine.builder().title(routineTitle).seed(seed).build());
+        }
     }
 
 
