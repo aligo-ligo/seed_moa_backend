@@ -7,5 +7,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class UpdateSeedRequest {
-    private String routineTitle;
+    private String oldRoutineTitle;
+    private String newRoutineTitle;
 }

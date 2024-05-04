@@ -84,8 +84,8 @@ public class SeedService {
         List<Routine> routines = routineRepository.findBySeedId(seedId);
 
         for (Routine routine : routines) {
-            if (routine.getTitle().equals(updateSeedRequest.getRoutineTitle())) {
-                routine.updateRoutine(updateSeedRequest.getRoutineTitle());
+            if (routine.getTitle().equals(updateSeedRequest.getOldRoutineTitle())) {
+                routine.updateRoutine(updateSeedRequest.getNewRoutineTitle());
             }
         }
     }
