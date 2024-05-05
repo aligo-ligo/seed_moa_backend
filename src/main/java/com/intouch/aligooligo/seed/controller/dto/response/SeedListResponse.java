@@ -1,6 +1,7 @@
 package com.intouch.aligooligo.seed.controller.dto.response;
 
 
+import com.intouch.aligooligo.seed.domain.Routine;
 import com.intouch.aligooligo.seed.domain.Seed;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,9 +31,17 @@ public class SeedListResponse {
         private String startDate;
         private String endDate;
         private String seed;
+        private List<RoutineInfo> routineInfos;
         private Integer completedRoutineCount;
         private String seedState;
     }
+
+    @Getter
+    @AllArgsConstructor
+    private static class RoutineInfo {
+        private String value;
+    }
+
     @Getter
     @AllArgsConstructor
     @NoArgsConstructor
@@ -44,20 +53,30 @@ public class SeedListResponse {
         private Boolean hasNext;
     }
 
-    public void updateSeedList(Page<Seed> seedList, List<Integer> completedRoutineCountList) {
-        int i = 0;
+    private List<RoutineInfo> convertToRoutineInfo(List<Routine> routines) {
+        List<RoutineInfo> routineInfos = new ArrayList<>();
 
-        for (Seed seed : seedList) {
-            String seedStartDate = seed.getStartDate().toString();
-            String seedEndDate = seed.getEndDate().toString();
+        for (Routine routine : routines) {
+            routineInfos.add(new RoutineInfo(routine.getTitle()));
+        }
+
+        return routineInfos;
+    }
+
+    public void updateSeedList(Page<Seed> seedList, List<List<Routine>> routinesList, List<Integer> completedRoutineCountList) {
+        List<Seed> seeds = seedList.getContent();
+        for (int i = 0; i < seeds.size(); i++) {
+            String seedStartDate = seeds.get(i).getStartDate().toString();
+            String seedEndDate = seeds.get(i).getEndDate().toString();
             Integer completedRoutineCount = completedRoutineCountList.get(i);
 
+            List<Routine> routines = routinesList.get(i);
+
             SeedInfo newSeedInfo = new SeedInfo(
-                    seed.getId(), seedStartDate, seedEndDate,
-                    seed.getSeed(), completedRoutineCount,seed.getState());
+                    seeds.get(i).getId(), seedStartDate, seedEndDate,
+                    seeds.get(i).getSeed(), convertToRoutineInfo(routines),completedRoutineCount,seeds.get(i).getState());
 
             this.seedInfo.add(newSeedInfo);
-            i++;
         }
     }
 

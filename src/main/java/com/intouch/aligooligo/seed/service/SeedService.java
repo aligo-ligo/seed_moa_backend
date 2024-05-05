@@ -45,15 +45,18 @@ public class SeedService {
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Seed> seedList = seedRepository.findByUserIdOrderByIdDesc(user.getId(), pageRequest);
         List<Integer> completedRoutineCountList = new ArrayList<>();
+        List<List<Routine>> routinesList = new ArrayList<>();
+
 
         for (Seed seed : seedList) {
             List<Routine> routines = routineRepository.findBySeedId(seed.getId());
             Integer completedRoutineCount = getCompletedRoutineCount(routines);
+            routinesList.add(routines);
             completedRoutineCountList.add(completedRoutineCount);
         }
 
         SeedListResponse listResponse = new SeedListResponse();
-        listResponse.updateSeedList(seedList, completedRoutineCountList);
+        listResponse.updateSeedList(seedList, routinesList, completedRoutineCountList);
         listResponse.updatePages(seedList);
 
         return listResponse;

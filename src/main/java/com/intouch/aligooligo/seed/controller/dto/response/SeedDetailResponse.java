@@ -21,7 +21,7 @@ public class SeedDetailResponse {
     @Getter
     @Builder
     @AllArgsConstructor
-    public class RoutineDetail {
+    public static class RoutineDetail {
         private Long routineId;
         private String routineTitle;
         private Boolean completedRoutineToday;
