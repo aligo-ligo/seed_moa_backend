@@ -44,4 +44,21 @@ public class RoutineController {
             return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @PatchMapping("/end/{id}")
+    @Operation(summary = "오늘 루틴 완료", description = "루틴 완료 API, 루틴 한 날짜 저장, 인증된 사용자만 접근 가능")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "수정 성공"),
+            @ApiResponse(responseCode = "500", description = "기타 서버 에러",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorMessage.class)))
+    })
+    public ResponseEntity<?> completeTodayRoutine(@PathVariable("id") Long routineId) {
+        try{
+            routineService.completeTodayRoutine(routineId);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }catch(Exception e){
+            return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

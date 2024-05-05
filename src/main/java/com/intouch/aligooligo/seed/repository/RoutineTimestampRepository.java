@@ -9,7 +9,6 @@ public interface RoutineTimestampRepository extends JpaRepository<RoutineTimesta
     Integer countByRoutineId(Long routineId);
 
     Boolean existsByRoutineIdAndTimestamp(Long routineId, LocalDate today);
-
     @Transactional
     void deleteByRoutineId(Long routineId);
 }

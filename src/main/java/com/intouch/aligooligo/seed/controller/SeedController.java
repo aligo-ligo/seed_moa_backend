@@ -74,7 +74,7 @@ public class SeedController {
         try {
             seedService.createSeed(getUserEmail(request), createSeedRequest);
             return ResponseEntity.ok().build();//ok
-        } catch (UsernameNotFoundException e) {
+        } catch (Exception e) {
             return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
