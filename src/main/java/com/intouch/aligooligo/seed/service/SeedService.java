@@ -2,6 +2,8 @@ package com.intouch.aligooligo.seed.service;
 
 import com.intouch.aligooligo.seed.controller.dto.request.CreateSeedRequest;
 import com.intouch.aligooligo.seed.controller.dto.request.UpdateSeedRequest;
+import com.intouch.aligooligo.seed.controller.dto.response.MySeedDataResponse;
+import com.intouch.aligooligo.seed.controller.dto.response.MySeedDataResponse.StateStatistics;
 import com.intouch.aligooligo.seed.controller.dto.response.SeedDetailResponse;
 import com.intouch.aligooligo.seed.controller.dto.response.SeedDetailResponse.RoutineDetail;
 import com.intouch.aligooligo.seed.controller.dto.response.SeedListResponse;
@@ -18,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -137,6 +140,29 @@ public class SeedService {
         }
 
         return routineDetails;
+    }
+
+    public MySeedDataResponse getMyData(String userEmail) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new UsernameNotFoundException("can't get myData : can't find userEmail"));
+        List<Seed> seeds = seedRepository.findByUserId(user.getId());
+        Map<String, Long> seedStateCount = seeds.stream().collect(
+                Collectors.groupingBy(Seed::getState, Collectors.counting()));
+
+        return convertToMySeedDataResponse(user, seedStateCount);
+    }
+
+    private MySeedDataResponse convertToMySeedDataResponse(User user, Map<String, Long> seedStateCount) {
+        String email = user.getEmail();
+        String name = user.getNickName();
+        List<StateStatistics> stateStatisticsList = new ArrayList<>();
+
+        for (String seedState : seedStateCount.keySet()) {
+            StateStatistics stateStatistics = new StateStatistics(seedState, seedStateCount.get(seedState));
+            stateStatisticsList.add(stateStatistics);
+        }
+
+        return new MySeedDataResponse(email, name, stateStatisticsList);
     }
 
 

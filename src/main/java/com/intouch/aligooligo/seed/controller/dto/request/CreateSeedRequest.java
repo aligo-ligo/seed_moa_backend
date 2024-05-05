@@ -1,5 +1,6 @@
 package com.intouch.aligooligo.seed.controller.dto.request;
 
+import com.intouch.aligooligo.seed.controller.dto.RoutineInfo;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,5 +10,5 @@ import lombok.Getter;
 public class CreateSeedRequest {
     private String endDate;
     private String seed;
-    private List<String> routines;
+    private List<RoutineInfo> routines;
 }

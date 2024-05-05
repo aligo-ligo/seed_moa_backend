@@ -1,6 +1,7 @@
 package com.intouch.aligooligo.seed.controller.dto.response;
 
 
+import com.intouch.aligooligo.seed.controller.dto.RoutineInfo;
 import com.intouch.aligooligo.seed.domain.Routine;
 import com.intouch.aligooligo.seed.domain.Seed;
 import java.util.ArrayList;
@@ -34,12 +35,6 @@ public class SeedListResponse {
         private List<RoutineInfo> routineInfos;
         private Integer completedRoutineCount;
         private String seedState;
-    }
-
-    @Getter
-    @AllArgsConstructor
-    private static class RoutineInfo {
-        private String value;
     }
 
     @Getter

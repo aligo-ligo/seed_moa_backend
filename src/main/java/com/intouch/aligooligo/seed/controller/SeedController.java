@@ -6,6 +6,7 @@ import com.intouch.aligooligo.auth.dto.TokenInfo;
 import com.intouch.aligooligo.exception.ErrorMessage;
 import com.intouch.aligooligo.seed.controller.dto.request.CreateSeedRequest;
 import com.intouch.aligooligo.seed.controller.dto.request.UpdateSeedRequest;
+import com.intouch.aligooligo.seed.controller.dto.response.MySeedDataResponse;
 import com.intouch.aligooligo.seed.controller.dto.response.SeedDetailResponse;
 import com.intouch.aligooligo.seed.service.SeedService;
 import com.intouch.aligooligo.seed.controller.dto.response.SeedListResponse;
@@ -129,6 +130,25 @@ public class SeedController {
             seedService.updateSeed(seedId, updateSeedRequest);
             return new ResponseEntity<>(HttpStatus.OK);
         }catch(Exception e){
+            return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/my")
+    @Operation(summary = "마이 페이지 조회", description = "유저 이름과 이름, 스테이트 통계를 볼 수 있다. , 인증된 사용자만 접근 가능")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = MySeedDataResponse.class))),
+            @ApiResponse(responseCode = "500", description = "기타 서버 에러",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorMessage.class)))
+    })
+    public ResponseEntity<?> getMyData(HttpServletRequest request) {
+        try {
+            MySeedDataResponse mySeedDataResponse = seedService.getMyData(getUserEmail(request));
+            return new ResponseEntity<>(mySeedDataResponse, HttpStatus.OK);
+        } catch (Exception e) {
             return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
