@@ -3,6 +3,7 @@ package com.intouch.aligooligo.seed.service;
 import com.intouch.aligooligo.seed.controller.dto.request.CreateSeedRequest;
 import com.intouch.aligooligo.seed.controller.dto.request.UpdateSeedRequest;
 import com.intouch.aligooligo.seed.controller.dto.response.SeedDetailResponse;
+import com.intouch.aligooligo.seed.controller.dto.response.SeedDetailResponse.RoutineDetail;
 import com.intouch.aligooligo.seed.controller.dto.response.SeedListResponse;
 import com.intouch.aligooligo.seed.domain.Routine;
 import com.intouch.aligooligo.seed.domain.Seed;
@@ -108,27 +109,31 @@ public class SeedService {
         List<Routine> routines = routineRepository.findBySeedId(seedId);
         LocalDate today = LocalDate.now();
 
-        Map<String, Boolean> responseRoutines = completedTodayRoutines(routines, today);
+        List<RoutineDetail> routineDetails = getRoutineDetails(routines, today);
+
         Integer completedRoutineCount = getCompletedRoutineCount(routines);
 
         return SeedDetailResponse.builder().seed(seed.getSeed()).startDate(String.valueOf(seed.getStartDate()))
                 .endDate(String.valueOf(seed.getEndDate())).completedRoutineCount(completedRoutineCount)
-                .completedTodayRoutines(responseRoutines).state(seed.getState()).build();
+                .routineDetails(routineDetails).state(seed.getState()).build();
     }
 
-    private Map<String, Boolean> completedTodayRoutines(List<Routine> routines, LocalDate today) {
-        Map<String, Boolean> responseRoutines = new HashMap<>();
-
+    private List<RoutineDetail> getRoutineDetails(List<Routine> routines, LocalDate today) {
+        List<RoutineDetail> routineDetails = new ArrayList<>();
+        RoutineDetail routineDetail;
         for (Routine routine : routines) {
             if (routineTimestampRepository.existsByRoutineIdAndTimestamp(routine.getId(), today)) {
-                responseRoutines.put(routine.getTitle(), true);
+                routineDetail = RoutineDetail.builder().routineId(routine.getId())
+                        .routineTitle(routine.getTitle()).completedRoutineToday(true).build();
             }
             else {
-                responseRoutines.put(routine.getTitle(), false);
+                routineDetail = RoutineDetail.builder().routineId(routine.getId())
+                        .routineTitle(routine.getTitle()).completedRoutineToday(false).build();
             }
+            routineDetails.add(routineDetail);
         }
 
-        return responseRoutines;
+        return routineDetails;
     }
 
 
