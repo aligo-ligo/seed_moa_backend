@@ -25,7 +25,16 @@ public class RoutineService {
                 .orElseThrow(() -> new DataNotFoundException("can't find routine"));
 
         routines.updateRoutine(updateSeedRequest.getRoutineTitle());
-        routineTimestampRepository.save(new RoutineTimestamp(LocalDate.now(), routines));
+    }
+
+    @Transactional
+    public void completeTodayRoutine(Long routineId) {
+        Routine routines = routineRepository.findById(routineId)
+                .orElseThrow(() -> new DataNotFoundException("can't find routine"));
+
+        if (!routineTimestampRepository.existsByRoutineIdAndTimestamp(routineId, LocalDate.now())) {
+            routineTimestampRepository.save(new RoutineTimestamp(LocalDate.now(), routines));
+        }
     }
 
 }
