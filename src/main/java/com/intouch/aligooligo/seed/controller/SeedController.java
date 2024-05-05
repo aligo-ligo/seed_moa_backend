@@ -3,6 +3,7 @@ package com.intouch.aligooligo.seed.controller;
 
 import com.intouch.aligooligo.Jwt.JwtTokenProvider;
 import com.intouch.aligooligo.auth.dto.TokenInfo;
+import com.intouch.aligooligo.exception.DataNotFoundException;
 import com.intouch.aligooligo.exception.ErrorMessage;
 import com.intouch.aligooligo.seed.controller.dto.request.CreateSeedRequest;
 import com.intouch.aligooligo.seed.controller.dto.request.UpdateSeedRequest;
@@ -102,7 +103,7 @@ public class SeedController {
             @ApiResponse(responseCode = "200", description = "조회 성공",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = SeedDetailResponse.class))),
-            @ApiResponse(responseCode = "500", description = "기타 서버 에러",
+            @ApiResponse(responseCode = "500", description = "db data 조회 실패",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessage.class)))
     })
@@ -110,28 +111,10 @@ public class SeedController {
         try {
             SeedDetailResponse detailResponse = seedService.getDetailSeed(seedId);
             return new ResponseEntity<>(detailResponse, HttpStatus.OK);
-        } catch (Exception e) {
+        } catch (DataNotFoundException e) {
             return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-    }
-
-    @PatchMapping("/{id}")
-    @Operation(summary = "시드 수정", description = "시드 수정 API, 인증된 사용자만 접근 가능")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "수정 성공"),
-            @ApiResponse(responseCode = "500", description = "기타 서버 에러",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorMessage.class)))
-    })
-    public ResponseEntity<?> updateTarget(@PathVariable("id") Long seedId,
-            @RequestBody UpdateSeedRequest updateSeedRequest) {
-        try{
-            seedService.updateSeed(seedId, updateSeedRequest);
-            return new ResponseEntity<>(HttpStatus.OK);
-        }catch(Exception e){
-            return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 
     @GetMapping("/my")

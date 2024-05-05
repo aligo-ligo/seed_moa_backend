@@ -27,4 +27,9 @@ public class RoutineTimestamp {
     @ManyToOne
     @JoinColumn(name = "routine_id", nullable = false)
     private Routine routine;
+
+    public RoutineTimestamp(LocalDate timestamp, Routine routine) {
+        this.timestamp = timestamp;
+        this.routine = routine;
+    }
 }

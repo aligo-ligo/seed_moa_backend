@@ -1,5 +1,6 @@
 package com.intouch.aligooligo.seed.service;
 
+import com.intouch.aligooligo.exception.DataNotFoundException;
 import com.intouch.aligooligo.seed.controller.dto.RoutineInfo;
 import com.intouch.aligooligo.seed.controller.dto.request.CreateSeedRequest;
 import com.intouch.aligooligo.seed.controller.dto.request.UpdateSeedRequest;
@@ -90,17 +91,6 @@ public class SeedService {
     }
 
     @Transactional
-    public void updateSeed(Long seedId, UpdateSeedRequest updateSeedRequest) {
-        List<Routine> routines = routineRepository.findBySeedId(seedId);
-
-        for (Routine routine : routines) {
-            if (routine.getTitle().equals(updateSeedRequest.getOldRoutineTitle())) {
-                routine.updateRoutine(updateSeedRequest.getNewRoutineTitle());
-            }
-        }
-    }
-
-    @Transactional
     public void deleteSeed(Long seedId) {
         List<Routine> routines = routineRepository.findBySeedId(seedId);
         for (Routine routine : routines) {
@@ -112,7 +102,7 @@ public class SeedService {
 
     public SeedDetailResponse getDetailSeed(Long seedId) {
         Seed seed = seedRepository.findById(seedId)
-                .orElseThrow(() -> new IllegalArgumentException("doesn't find seed"));
+                .orElseThrow(() -> new DataNotFoundException("doesn't find seed"));
         List<Routine> routines = routineRepository.findBySeedId(seedId);
         LocalDate today = LocalDate.now();
 
