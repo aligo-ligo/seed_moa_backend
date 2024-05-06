@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface RoutineRepository extends JpaRepository<Routine, Long> {
     List<Routine> findBySeedId(Long seedId);
+    Integer countBySeedId(Long seedId);
     @Transactional
     void deleteBySeedId(Long seedId);
 }

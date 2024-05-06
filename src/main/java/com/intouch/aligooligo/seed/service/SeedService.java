@@ -112,7 +112,7 @@ public class SeedService {
 
         return SeedDetailResponse.builder().seed(seed.getSeed()).startDate(String.valueOf(seed.getStartDate()))
                 .endDate(String.valueOf(seed.getEndDate())).completedRoutineCount(completedRoutineCount)
-                .routineDetails(routineDetails).state(seed.getState()).build();
+                .routineDetails(routineDetails).seedState(seed.getState()).build();
     }
 
     private List<RoutineDetail> getRoutineDetails(List<Routine> routines, LocalDate today) {
@@ -156,5 +156,20 @@ public class SeedService {
         return new MySeedDataResponse(email, name, stateStatisticsList);
     }
 
+    public void updateSeedState(Integer routinesTotalCount, Seed seed) {
+        List<Routine> routines = routineRepository.findBySeedId(seed.getId());
+        Integer routinesCompletedCount = getCompletedRoutineCount(routines);
+        List<Integer> statusBoundaries = new ArrayList<>();
+        for (int i = 1; i <= SeedState.values().length; i++) {
+            statusBoundaries.add(i * routinesTotalCount / SeedState.values().length);
+        }
+
+        for (int i= 0; i < statusBoundaries.size(); i++) {
+            if (routinesCompletedCount < statusBoundaries.get(i)) {
+                seed.updateSeedState(SeedState.values()[i].name());
+                break;
+            }
+        }
+    }
 
 }
