@@ -160,12 +160,17 @@ public class SeedService {
         List<Routine> routines = routineRepository.findBySeedId(seed.getId());
         Integer routinesCompletedCount = getCompletedRoutineCount(routines);
         List<Integer> statusBoundaries = new ArrayList<>();
+        log.info(String.format("%s = %d", "routinesTotalCount", routinesTotalCount));
+        log.info(String.format("%s = %d", "routinesCompletedCount", routinesCompletedCount));
         for (int i = 1; i <= SeedState.values().length; i++) {
             statusBoundaries.add(i * routinesTotalCount / SeedState.values().length);
+            log.info(String.format("%s = %s", "statusboundaries = ", String.valueOf(statusBoundaries.get(i-1))));
         }
+
 
         for (int i= 0; i < statusBoundaries.size(); i++) {
             if (routinesCompletedCount < statusBoundaries.get(i)) {
+                log.info(SeedState.values()[i].name());
                 seed.updateSeedState(SeedState.values()[i].name());
                 break;
             }
