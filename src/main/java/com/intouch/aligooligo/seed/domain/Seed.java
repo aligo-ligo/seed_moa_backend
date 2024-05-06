@@ -46,4 +46,8 @@ public class Seed {
         this.seed = seed;
         this.user = user;
     }
+
+    public void updateSeedState(String state) {
+        this.state = state;
+    }
 }
