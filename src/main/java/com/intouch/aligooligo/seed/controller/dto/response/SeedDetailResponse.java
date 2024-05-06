@@ -15,7 +15,7 @@ public class SeedDetailResponse {
     private String startDate;
     private String endDate;
     private Integer completedRoutineCount;
-    private String state;
+    private String seedState;
     private List<RoutineDetail> routineDetails;
 
     @Getter
