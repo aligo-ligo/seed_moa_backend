@@ -140,6 +140,10 @@ public class SeedService {
         Map<String, Long> seedStateCount = seeds.stream().collect(
                 Collectors.groupingBy(Seed::getState, Collectors.counting()));
 
+        for (SeedState seedState : SeedState.values()) {
+            seedStateCount.putIfAbsent(seedState.name(), 0L);
+        }
+
         return convertToMySeedDataResponse(user, seedStateCount);
     }
 
