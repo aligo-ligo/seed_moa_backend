@@ -1,4 +1,4 @@
-# Aligo-Oligo-FE
+# Aligo-Oligo-BE
 
   <div align="center">
   <img src="https://github.com/aligo-ligo/aligo-oligo-frontend-latest/assets/93697790/53eb0e8e-b873-493e-9387-4468f4cfc7a7" alt="logo_img"/>
