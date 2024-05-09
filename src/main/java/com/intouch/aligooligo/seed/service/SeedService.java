@@ -173,7 +173,7 @@ public class SeedService {
 
 
         for (int i= 0; i < statusBoundaries.size(); i++) {
-            if (routinesCompletedCount < statusBoundaries.get(i)) {
+            if (routinesCompletedCount <= statusBoundaries.get(i)) {
                 log.info(SeedState.values()[i].name());
                 seed.updateSeedState(SeedState.values()[i].name());
                 break;
