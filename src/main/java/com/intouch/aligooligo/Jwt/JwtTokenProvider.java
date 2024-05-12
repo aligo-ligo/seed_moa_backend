@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,6 +25,7 @@ import java.util.List;
 import org.springframework.util.StringUtils;
 
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class JwtTokenProvider {
     @Value("${secretKey}")
@@ -114,8 +116,12 @@ public class JwtTokenProvider {
         try {
             Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(jwtToken);
             return !claims.getBody().getExpiration().before(new Date());
+        } catch (ExpiredJwtException e) {
+            log.error("JwtTokenProvider - validateToken() : 액세스 토큰이 만료되었습니다.");
+            throw new JwtException("액세스 토큰이 만료되었습니다.");
         } catch (JwtException | IllegalArgumentException e) {
-            throw new JwtException(e.getMessage());
+            log.error(String.format("JwtTokenProvider - validateToken() : %s", e.getMessage()));
+            throw new JwtException("알 수 없는 오류가 발생했습니다.");
         }
     }
 }

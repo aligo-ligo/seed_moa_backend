@@ -46,7 +46,7 @@ public class AuthController {
 
         String encryptedRefreshToken = jwtProvider.resolveRefreshToken(request);
         if (encryptedRefreshToken == null) {
-            return new ResponseEntity<>(new ErrorMessage("헤더에 refresh token이 없습니다. 다시 로그인해주세요."),
+            return new ResponseEntity<>(new ErrorMessage("리프레시 토큰이 올바르지 않습니다. 다시 로그인해주세요."),
                     HttpStatus.UNAUTHORIZED);
         }
 
@@ -59,7 +59,9 @@ public class AuthController {
 
             return new ResponseEntity<>(new TokenInfo(accessToken, refreshToken, accessTokenValidTime), HttpStatus.OK);
         } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(new ErrorMessage(e.getMessage()),HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ErrorMessage("알 수 없는 오류가 발생했습니다."), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -89,8 +91,8 @@ public class AuthController {
                     new TokenInfo(accessToken, refreshToken, accessTokenExpiredTime), HttpStatus.OK);
         } catch (SocialLoginFailedException e) {
             return new ResponseEntity<>(new ErrorMessage(e.getMessage()),HttpStatus.UNAUTHORIZED);
-        } catch (RedisConnectionFailureException e) {
-            return new ResponseEntity<>(new ErrorMessage("unable to connect redis"), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ErrorMessage("알 수 없는 오류가 발생했습니다."), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

@@ -58,12 +58,15 @@ public class AuthService {
         }
 
         refreshTokenService.deleteById(user.getEmail());
-        log.error("리프레시 토큰이 일치하지 않아요.");
-        throw new IllegalArgumentException("리프레시 토큰이 일치하지 않아요.");
+        log.error("AuthService - reIssueToken : 리프레시 토큰이 일치하지 않아요.");
+        throw new IllegalArgumentException("리프레시 토큰이 올바르지 않습니다. 다시 로그인해주세요.");
     }
 
     public User findByUserEmail(String email){
-        return userRepository.findByEmail(email).orElseThrow(()-> new IllegalArgumentException("don't exist user"));
+        return userRepository.findByEmail(email).orElseThrow(()-> {
+            log.error("AuthService - findByUserEmail : don't exist user");
+            return new IllegalArgumentException("알 수 없는 오류가 발생했습니다.");
+        });
     }
     public boolean existByUserEmail(String email){
         return userRepository.existsByEmail(email);
@@ -79,8 +82,8 @@ public class AuthService {
             JsonObject jsonObject = JsonParser.parseString(msg).getAsJsonObject();
             String errorDescription = jsonObject.get("error_description").getAsString();
 
-            log.error(errorDescription);
-            throw new SocialLoginFailedException(errorDescription);
+            log.error(String.format("AuthService - kakaoLogin : %s",errorDescription));
+            throw new SocialLoginFailedException("알 수 없는 오류가 발생했습니다.");
         }
     }
 
@@ -100,9 +103,7 @@ public class AuthService {
         HttpEntity<MultiValueMap<String, String>> tokenRequest = new HttpEntity<>(body, headers);
         KakaoToken kakaoToken = restTemplate.postForObject("https://kauth.kakao.com/oauth/token",tokenRequest, KakaoToken.class);
 
-        log.info("카카오 엑세스 토큰 받아옴");
         if (kakaoToken == null) {
-            log.error("카카오 토큰 에러");
             return null;
         }
         return kakaoToken.getAccess_token();
@@ -127,12 +128,10 @@ public class AuthService {
                 userRepository.save(User.builder().email(email)
                         .nickName(name).roles(Collections.singletonList("ROLE_USER")).build());
             }
-            log.info("createKakaoUser success");
 
             return jwtProvider.createToken(email, findByUserEmail(email).getRoles());
 
         }
-        log.error("createKakaoUser error");
-        throw new SocialLoginFailedException("failed getting kakao user info");
+        throw new SocialLoginFailedException("알 수 없는 오류가 발생했습니다.");
     }
 }
