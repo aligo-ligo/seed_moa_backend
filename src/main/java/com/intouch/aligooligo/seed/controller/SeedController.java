@@ -5,6 +5,7 @@ import com.intouch.aligooligo.Jwt.JwtTokenProvider;
 import com.intouch.aligooligo.auth.dto.TokenInfo;
 import com.intouch.aligooligo.exception.DataNotFoundException;
 import com.intouch.aligooligo.exception.ErrorMessage;
+import com.intouch.aligooligo.exception.ErrorMessageDescription;
 import com.intouch.aligooligo.seed.controller.dto.request.CreateSeedRequest;
 import com.intouch.aligooligo.seed.controller.dto.request.UpdateSeedRequest;
 import com.intouch.aligooligo.seed.controller.dto.response.MySeedDataResponse;
@@ -52,6 +53,8 @@ public class SeedController {
             return ResponseEntity.ok().body(response);
         } catch (UsernameNotFoundException e) {
             return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ErrorMessage(ErrorMessageDescription.UNKNOWN.getDescription()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -73,9 +76,11 @@ public class SeedController {
     public ResponseEntity<?> createTarget(HttpServletRequest request, @RequestBody CreateSeedRequest createSeedRequest) {
         try {
             seedService.createSeed(getUserEmail(request), createSeedRequest);
-            return ResponseEntity.ok().build();//ok
-        } catch (Exception e) {
+            return ResponseEntity.ok().build();
+        } catch (UsernameNotFoundException e) {
             return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ErrorMessage(ErrorMessageDescription.UNKNOWN.getDescription()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -88,13 +93,8 @@ public class SeedController {
                             schema = @Schema(implementation = ErrorMessage.class)))
     })
     public ResponseEntity<?> deleteSeed(@PathVariable("id") Long seedId){
-        try {
-            seedService.deleteSeed(seedId);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
+        seedService.deleteSeed(seedId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -113,8 +113,9 @@ public class SeedController {
             return new ResponseEntity<>(detailResponse, HttpStatus.OK);
         } catch (DataNotFoundException e) {
             return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ErrorMessage(ErrorMessageDescription.UNKNOWN.getDescription()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
     }
 
     @GetMapping("/my")
@@ -131,8 +132,10 @@ public class SeedController {
         try {
             MySeedDataResponse mySeedDataResponse = seedService.getMyData(getUserEmail(request));
             return new ResponseEntity<>(mySeedDataResponse, HttpStatus.OK);
-        } catch (Exception e) {
+        } catch (UsernameNotFoundException e) {
             return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ErrorMessage(ErrorMessageDescription.UNKNOWN.getDescription()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

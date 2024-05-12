@@ -1,7 +1,9 @@
 package com.intouch.aligooligo.seed.controller;
 
 
+import com.intouch.aligooligo.exception.DataNotFoundException;
 import com.intouch.aligooligo.exception.ErrorMessage;
+import com.intouch.aligooligo.exception.ErrorMessageDescription;
 import com.intouch.aligooligo.seed.controller.dto.request.UpdateSeedRequest;
 import com.intouch.aligooligo.seed.service.RoutineService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,8 +42,10 @@ public class RoutineController {
         try{
             routineService.updateSeed(routineId, updateSeedRequest);
             return new ResponseEntity<>(HttpStatus.OK);
-        }catch(Exception e){
+        } catch (DataNotFoundException e) {
             return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch(Exception e) {
+            return new ResponseEntity<>(new ErrorMessage(ErrorMessageDescription.UNKNOWN.getDescription()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -57,8 +61,10 @@ public class RoutineController {
         try{
             routineService.completeTodayRoutine(routineId);
             return new ResponseEntity<>(HttpStatus.OK);
-        }catch(Exception e){
+        } catch (DataNotFoundException e) {
             return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch(Exception e) {
+            return new ResponseEntity<>(new ErrorMessage(ErrorMessageDescription.UNKNOWN.getDescription()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

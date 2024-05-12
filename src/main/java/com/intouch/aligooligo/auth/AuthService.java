@@ -8,6 +8,7 @@ import com.intouch.aligooligo.auth.dto.KakaoToken;
 import com.intouch.aligooligo.User.Entity.User;
 import com.intouch.aligooligo.User.Repository.UserRepository;
 import com.intouch.aligooligo.auth.dto.TokenInfo;
+import com.intouch.aligooligo.exception.ErrorMessageDescription;
 import com.intouch.aligooligo.exception.SocialLoginFailedException;
 import io.jsonwebtoken.Claims;
 import java.util.Collections;
@@ -59,13 +60,13 @@ public class AuthService {
 
         refreshTokenService.deleteById(user.getEmail());
         log.error("AuthService - reIssueToken : 리프레시 토큰이 일치하지 않아요.");
-        throw new IllegalArgumentException("리프레시 토큰이 올바르지 않습니다. 다시 로그인해주세요.");
+        throw new IllegalArgumentException(ErrorMessageDescription.REISSUEFAILED.getDescription());
     }
 
     public User findByUserEmail(String email){
         return userRepository.findByEmail(email).orElseThrow(()-> {
             log.error("AuthService - findByUserEmail : don't exist user");
-            return new IllegalArgumentException("알 수 없는 오류가 발생했습니다.");
+            return new IllegalArgumentException(ErrorMessageDescription.UNKNOWN.getDescription());
         });
     }
     public boolean existByUserEmail(String email){
@@ -83,7 +84,7 @@ public class AuthService {
             String errorDescription = jsonObject.get("error_description").getAsString();
 
             log.error(String.format("AuthService - kakaoLogin : %s",errorDescription));
-            throw new SocialLoginFailedException("알 수 없는 오류가 발생했습니다.");
+            throw new SocialLoginFailedException(ErrorMessageDescription.UNKNOWN.getDescription());
         }
     }
 
@@ -132,6 +133,6 @@ public class AuthService {
             return jwtProvider.createToken(email, findByUserEmail(email).getRoles());
 
         }
-        throw new SocialLoginFailedException("알 수 없는 오류가 발생했습니다.");
+        throw new SocialLoginFailedException(ErrorMessageDescription.UNKNOWN.getDescription());
     }
 }
