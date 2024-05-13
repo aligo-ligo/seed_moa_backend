@@ -2,6 +2,8 @@ package com.intouch.aligooligo.security;
 
 import com.intouch.aligooligo.Jwt.JwtAuthenticationFilter;
 import com.intouch.aligooligo.Jwt.JwtTokenProvider;
+import com.intouch.aligooligo.handler.CustomAccessDeniedHandler;
+import com.intouch.aligooligo.handler.CustomAuthenticationEntryPoint;
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 public class WebSecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     // 암호화에 필요한 PasswordEncoder 를 Bean 등록합니다.
     @Bean
@@ -57,6 +61,12 @@ public class WebSecurityConfig {
                 .requestMatchers("/user/**").hasRole("USER")//USER역할은 /user/만 접근가능
                 .anyRequest().permitAll()); // 그외 나머지 요청은 누구나 접근 가능
 
+
+        http
+                .exceptionHandling(e -> {
+                    e.accessDeniedHandler(customAccessDeniedHandler);
+                    e.authenticationEntryPoint(customAuthenticationEntryPoint);
+                });
 
         // JwtAuthenticationFilter를 UsernamePasswordAuthenticationFilter 전에 넣는다
         http
