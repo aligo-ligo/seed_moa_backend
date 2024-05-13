@@ -111,7 +111,7 @@ public class SeedService {
         Seed seed = seedRepository.findById(seedId)
                 .orElseThrow(() -> {
                     log.error("SeedService - getDetailSeed : can't find seed");
-                    return new DataNotFoundException(ErrorMessageDescription.UNKNOWN.getDescription());
+                    return new DataNotFoundException(ErrorMessageDescription.SEED_NOT_FOUND.getDescription());
                 });
         List<Routine> routines = routineRepository.findBySeedId(seedId);
         LocalDate today = LocalDate.now();

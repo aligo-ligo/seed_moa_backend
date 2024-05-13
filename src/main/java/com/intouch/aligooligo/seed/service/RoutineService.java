@@ -44,7 +44,7 @@ public class RoutineService {
         Routine routines = routineRepository.findById(routineId)
                 .orElseThrow(() -> {
                     log.error("RoutineService - completeTodayRoutine : can't find routine");
-                    return new DataNotFoundException(ErrorMessageDescription.UNKNOWN.getDescription());
+                    return new DataNotFoundException(ErrorMessageDescription.ROUTINE_NO_EXISTED.getDescription());
                 });
 
         if (!routineTimestampRepository.existsByRoutineIdAndTimestamp(routineId, LocalDate.now())) {

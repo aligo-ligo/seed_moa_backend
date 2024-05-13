@@ -128,8 +128,6 @@ public class SeedController {
         try {
             MySeedDataResponse mySeedDataResponse = seedService.getMyData(getUserEmail(request));
             return new ResponseEntity<>(mySeedDataResponse, HttpStatus.OK);
-        } catch (UsernameNotFoundException e) {
-            return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
             return new ResponseEntity<>(new ErrorMessage(ErrorMessageDescription.UNKNOWN.getDescription()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
