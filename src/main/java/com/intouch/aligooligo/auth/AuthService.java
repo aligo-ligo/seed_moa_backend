@@ -19,6 +19,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -49,25 +50,28 @@ public class AuthService {
     private String kakaoUserInfo;
 
     public TokenInfo reIssueToken(String refreshToken) {
-        Claims claims = jwtProvider.parseClaims(refreshToken);
-        User user = findByUserEmail(claims.getSubject());
+        try {
+            Claims claims = jwtProvider.parseClaims(refreshToken);
+            User user = findByUserEmail(claims.getSubject());
 
-        RefreshToken findRefreshToken = refreshTokenService.findById(claims.getSubject());
+            RefreshToken findRefreshToken = refreshTokenService.findById(claims.getSubject());
 
-        if (refreshToken.equals(findRefreshToken.getRefreshToken())) {
-            return jwtProvider.createToken(user.getEmail(), user.getRoles());
+            if (refreshToken.equals(findRefreshToken.getRefreshToken())) {
+                return jwtProvider.createToken(user.getEmail(), user.getRoles());
+            }
+
+            refreshTokenService.deleteById(user.getEmail());
+            log.error("AuthService - reIssueToken : 리프레시 토큰이 일치하지 않아요.");
+            throw new IllegalArgumentException(ErrorMessageDescription.REISSUE_FAILED.getDescription());
+        } catch (IllegalArgumentException e) {
+            log.info(e.getMessage());
+            throw new IllegalArgumentException(ErrorMessageDescription.REISSUE_FAILED.getDescription());
         }
-
-        refreshTokenService.deleteById(user.getEmail());
-        log.error("AuthService - reIssueToken : 리프레시 토큰이 일치하지 않아요.");
-        throw new IllegalArgumentException(ErrorMessageDescription.REISSUEFAILED.getDescription());
     }
 
     public User findByUserEmail(String email){
-        return userRepository.findByEmail(email).orElseThrow(()-> {
-            log.error("AuthService - findByUserEmail : don't exist user");
-            return new IllegalArgumentException(ErrorMessageDescription.UNKNOWN.getDescription());
-        });
+        return userRepository.findByEmail(email).orElseThrow(()->
+            new IllegalArgumentException("AuthService - findByUserEmail : 유저를 찾을 수 없습니다."));
     }
     public boolean existByUserEmail(String email){
         return userRepository.existsByEmail(email);

@@ -1,5 +1,6 @@
 package com.intouch.aligooligo.auth;
 
+import com.intouch.aligooligo.exception.ErrorMessageDescription;
 import com.intouch.aligooligo.exception.SocialLoginFailedException;
 import io.lettuce.core.RedisConnectionException;
 import lombok.RequiredArgsConstructor;
@@ -20,13 +21,14 @@ public class RefreshTokenService {
             refreshTokenRepository.save(new RefreshToken(userEmail, refreshToken));
         } catch (RedisConnectionFailureException e) {
             log.error("RefreshTokenService - saveTokenInfo : redis에 연결할 수 없습니다.");
-            throw new SocialLoginFailedException("알 수 없는 오류가 발생했습니다.");
+            throw new SocialLoginFailedException("RefreshTokenService - saveTokenInfo : redis에 연결할 수 없습니다.");
         }
     }
     @Transactional(readOnly = true)
     public RefreshToken findById(String userEmail) {
         return refreshTokenRepository.findById(userEmail)
-                .orElseThrow(() -> new IllegalArgumentException("리프레시 토큰이 올바르지 않습니다. 다시 로그인해주세요."));
+                .orElseThrow(() -> new IllegalArgumentException(
+                            "RefreshTokenService - findById : email을 찾을 수 없습니다."));
     }
 
     @Transactional
