@@ -51,8 +51,6 @@ public class SeedController {
         try{
             SeedListResponse response = seedService.getSeedList(getUserEmail(request), page, size);
             return ResponseEntity.ok().body(response);
-        } catch (UsernameNotFoundException e) {
-            return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
             return new ResponseEntity<>(new ErrorMessage(ErrorMessageDescription.UNKNOWN.getDescription()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -77,8 +75,6 @@ public class SeedController {
         try {
             seedService.createSeed(getUserEmail(request), createSeedRequest);
             return ResponseEntity.ok().build();
-        } catch (UsernameNotFoundException e) {
-            return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
             return new ResponseEntity<>(new ErrorMessage(ErrorMessageDescription.UNKNOWN.getDescription()), HttpStatus.INTERNAL_SERVER_ERROR);
         }

@@ -59,10 +59,8 @@ public class AuthController {
             Long accessTokenValidTime = tokenInfo.getAccessTokenValidTime();
 
             return new ResponseEntity<>(new TokenInfo(accessToken, refreshToken, accessTokenValidTime), HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(new ErrorMessage(ErrorMessageDescription.REISSUE_FAILED.getDescription()), HttpStatus.UNAUTHORIZED);
         } catch (Exception e) {
-            return new ResponseEntity<>(new ErrorMessage(ErrorMessageDescription.UNKNOWN.getDescription()), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new ErrorMessage(ErrorMessageDescription.REISSUE_FAILED.getDescription()), HttpStatus.UNAUTHORIZED);
         }
     }
 
@@ -90,8 +88,6 @@ public class AuthController {
 
             return new ResponseEntity<>(
                     new TokenInfo(accessToken, refreshToken, accessTokenExpiredTime), HttpStatus.OK);
-        } catch (SocialLoginFailedException e) {
-            return new ResponseEntity<>(new ErrorMessage(ErrorMessageDescription.UNKNOWN.getDescription()),HttpStatus.UNAUTHORIZED);
         } catch (Exception e) {
             return new ResponseEntity<>(new ErrorMessage(ErrorMessageDescription.UNKNOWN.getDescription()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
