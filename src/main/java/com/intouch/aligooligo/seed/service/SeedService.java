@@ -20,6 +20,7 @@ import com.intouch.aligooligo.User.Entity.User;
 import com.intouch.aligooligo.User.Repository.UserRepository;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,7 @@ public class SeedService {
     private final UserRepository userRepository;
     private final RoutineRepository routineRepository;
     private final RoutineTimestampRepository routineTimestampRepository;
+    private final static Integer PERCENT = 100;
 
     @Value("${urlPrefix}")
     private String urlPrefix;
@@ -178,8 +180,8 @@ public class SeedService {
         Integer routinesCompletedCount = getCompletedRoutineCount(routines);
         List<Integer> statusBoundaries = new ArrayList<>();
 
-        for (int i = 1; i <= SeedState.values().length; i++) {
-            statusBoundaries.add(i * routinesTotalCount / SeedState.values().length);
+        for (SeedState seedState : SeedState.values()) {
+            statusBoundaries.add(seedState.getBoundary() * routinesTotalCount / PERCENT);
         }
 
         for (int i= 0; i < statusBoundaries.size(); i++) {
