@@ -58,7 +58,7 @@ public class AuthService {
             RefreshToken findRefreshToken = refreshTokenService.findById(claims.getSubject());
 
             if (refreshToken.equals(findRefreshToken.getRefreshToken())) {
-                return jwtProvider.createToken(user.getEmail(), user.getRole());
+                return jwtProvider.createToken(user.getEmail(), user.getRole().toString());
             }
 
             refreshTokenService.deleteById(user.getEmail());
@@ -135,7 +135,7 @@ public class AuthService {
                         .nickName(name).role(Role.USER).build());
             }
 
-            return jwtProvider.createToken(email, findByUserEmail(email).getRole());
+            return jwtProvider.createToken(email, findByUserEmail(email).getRole().toString());
 
         }
         throw new SocialLoginFailedException(ErrorMessageDescription.UNKNOWN.getDescription());

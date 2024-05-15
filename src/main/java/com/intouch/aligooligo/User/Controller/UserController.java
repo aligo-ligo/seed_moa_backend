@@ -24,7 +24,7 @@ public class UserController {
         User user = userRepository.findByEmail(admin).get();
         TokenInfo tokenInfo = null;
         if(user.getEmail().equals(admin)) {
-            tokenInfo = jwtProvider.createToken(admin, Role.USER);
+            tokenInfo = jwtProvider.createToken(admin, Role.USER.toString());
         }
         return new ResponseEntity<>(tokenInfo, HttpStatus.OK);
     }
