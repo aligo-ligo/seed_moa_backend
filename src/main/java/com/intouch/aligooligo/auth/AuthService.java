@@ -58,7 +58,7 @@ public class AuthService {
             RefreshToken findRefreshToken = refreshTokenService.findById(claims.getSubject());
 
             if (refreshToken.equals(findRefreshToken.getRefreshToken())) {
-                return jwtProvider.createToken(user.getEmail(), user.getRole().toString());
+                return jwtProvider.createToken(user.getEmail(), user.getRole().name());
             }
 
             refreshTokenService.deleteById(user.getEmail());
@@ -139,7 +139,7 @@ public class AuthService {
             }
 
             log.info("getKakaoUserInfo 끝");
-            return jwtProvider.createToken(email, findByUserEmail(email).getRole().toString());
+            return jwtProvider.createToken(email, findByUserEmail(email).getRole().name());
 
         }
         throw new SocialLoginFailedException(ErrorMessageDescription.UNKNOWN.getDescription());
