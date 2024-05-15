@@ -38,7 +38,7 @@ public class User {
 
     public User(String email, Role roles) {
         this.email = email;
-        this.role = roles;
+        this.roles = roles;
     }
 
     public User(Long id, String email, String nickName){
