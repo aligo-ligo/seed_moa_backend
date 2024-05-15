@@ -1,13 +1,11 @@
 package com.intouch.aligooligo.User.Entity;
 
-
 public enum Role {
-    USER("회원"), GUEST("비회원");
+    USER("유저"), GUEST("비회원");
 
-    private String name;
+    private String value;
 
-    Role(String name) {
-        this.name = name;
+    Role(String value) {
+        this.value = value;
     }
-
 }

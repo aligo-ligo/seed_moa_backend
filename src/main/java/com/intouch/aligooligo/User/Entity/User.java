@@ -28,8 +28,13 @@ public class User {
     private String nickName;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "roles", nullable = false)
-    private Role role;
+
+    @Column(name = "roles")
+    private Role roles;
+
+    @OneToMany
+    @JoinColumn(name = "seed_id")
+    private List<Seed> seedList;
 
     public User(String email, Role roles) {
         this.email = email;

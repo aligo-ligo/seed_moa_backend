@@ -95,6 +95,7 @@ public class AuthService {
 
 
     public String getKakaoAccessToken(String code) {
+        log.info("getKakaoAccessToken");
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
@@ -116,6 +117,7 @@ public class AuthService {
     }
 
     public TokenInfo getKakaoUserInfo(String accessToken) {
+        log.info("getKakaoUserInfo");
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
@@ -132,7 +134,7 @@ public class AuthService {
 
             if(!existByUserEmail(email)) {
                 userRepository.save(User.builder().email(email)
-                        .nickName(name).role(Role.USER).build());
+                        .nickName(name).roles(Role.USER).build());
             }
 
             return jwtProvider.createToken(email, findByUserEmail(email).getRole());
