@@ -3,6 +3,7 @@ package com.intouch.aligooligo.User.Entity;
 
 import com.intouch.aligooligo.seed.domain.Seed;
 import jakarta.persistence.*;
+import java.util.Collection;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ public class User {
     private String nickName;
 
     @Enumerated(EnumType.STRING)
+
     @Column(name = "roles")
     private Role roles;
 
