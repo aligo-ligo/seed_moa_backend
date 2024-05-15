@@ -26,17 +26,15 @@ public class User {
     @Column(name = "nickname", length = 10, nullable = false)
     private String nickName;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @Builder.Default
-    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "id"))
+    @Enumerated(EnumType.STRING)
     @Column(name = "roles")
-    private List<String> roles = new ArrayList<>();
+    private Role roles;
 
     @OneToMany
-    @JoinColumn(name = "target_id")
+    @JoinColumn(name = "seed_id")
     private List<Seed> seedList;
 
-    public User(String email, List<String> roles) {
+    public User(String email, Role roles) {
         this.email = email;
         this.roles = roles;
     }

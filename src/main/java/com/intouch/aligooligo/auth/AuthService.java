@@ -3,6 +3,7 @@ package com.intouch.aligooligo.auth;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.intouch.aligooligo.Jwt.JwtTokenProvider;
+import com.intouch.aligooligo.User.Entity.Role;
 import com.intouch.aligooligo.auth.dto.KakaoMember;
 import com.intouch.aligooligo.auth.dto.KakaoToken;
 import com.intouch.aligooligo.User.Entity.User;
@@ -94,6 +95,7 @@ public class AuthService {
 
 
     public String getKakaoAccessToken(String code) {
+        log.info("getKakaoAccessToken");
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
@@ -115,6 +117,7 @@ public class AuthService {
     }
 
     public TokenInfo getKakaoUserInfo(String accessToken) {
+        log.info("getKakaoUserInfo");
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
@@ -131,7 +134,7 @@ public class AuthService {
 
             if(!existByUserEmail(email)) {
                 userRepository.save(User.builder().email(email)
-                        .nickName(name).roles(Collections.singletonList("ROLE_USER")).build());
+                        .nickName(name).roles(Role.USER).build());
             }
 
             return jwtProvider.createToken(email, findByUserEmail(email).getRoles());
