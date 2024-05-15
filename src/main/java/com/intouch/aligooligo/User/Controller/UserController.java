@@ -1,6 +1,7 @@
 package com.intouch.aligooligo.User.Controller;
 
 import com.intouch.aligooligo.Jwt.JwtTokenProvider;
+import com.intouch.aligooligo.User.Entity.Role;
 import com.intouch.aligooligo.User.Entity.User;
 import com.intouch.aligooligo.User.Repository.UserRepository;
 import com.intouch.aligooligo.auth.dto.TokenInfo;
@@ -21,10 +22,9 @@ public class UserController {
     @PostMapping
     public ResponseEntity<?> login(@RequestParam("email") String admin) {
         User user = userRepository.findByEmail(admin).get();
-        List<String> roles = new ArrayList<>();
         TokenInfo tokenInfo = null;
         if(user.getEmail().equals(admin)) {
-            tokenInfo = jwtProvider.createToken(admin, roles);
+            tokenInfo = jwtProvider.createToken(admin, Role.USER);
         }
         return new ResponseEntity<>(tokenInfo, HttpStatus.OK);
     }

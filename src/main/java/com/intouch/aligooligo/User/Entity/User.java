@@ -3,6 +3,7 @@ package com.intouch.aligooligo.User.Entity;
 
 import com.intouch.aligooligo.seed.domain.Seed;
 import jakarta.persistence.*;
+import java.util.Collection;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -26,19 +27,13 @@ public class User {
     @Column(name = "nickname", length = 10, nullable = false)
     private String nickName;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @Builder.Default
-    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "id"))
-    @Column(name = "roles")
-    private List<String> roles = new ArrayList<>();
+    @Enumerated(EnumType.STRING)
+    @Column(name = "roles", nullable = false)
+    private Role role;
 
-    @OneToMany
-    @JoinColumn(name = "target_id")
-    private List<Seed> seedList;
-
-    public User(String email, List<String> roles) {
+    public User(String email, Role roles) {
         this.email = email;
-        this.roles = roles;
+        this.role = roles;
     }
 
     public User(Long id, String email, String nickName){

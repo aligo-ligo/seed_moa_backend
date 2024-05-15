@@ -1,6 +1,7 @@
 package com.intouch.aligooligo.seed.service;
 
 import com.intouch.aligooligo.exception.DataNotFoundException;
+import com.intouch.aligooligo.exception.ErrorMessageDescription;
 import com.intouch.aligooligo.seed.controller.dto.request.UpdateSeedRequest;
 import com.intouch.aligooligo.seed.domain.Routine;
 import com.intouch.aligooligo.seed.domain.RoutineTimestamp;
@@ -13,10 +14,12 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.time.temporal.ChronoUnit;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Slf4j
 @AllArgsConstructor
 public class RoutineService {
 
@@ -28,7 +31,10 @@ public class RoutineService {
     @Transactional
     public void updateSeed(Long routineId, UpdateSeedRequest updateSeedRequest) {
         Routine routines = routineRepository.findById(routineId)
-                .orElseThrow(() -> new DataNotFoundException("can't find routine"));
+                .orElseThrow(() -> {
+                    log.error("RoutineService - updateSeed : can't find routine");
+                    return new DataNotFoundException(ErrorMessageDescription.UNKNOWN.getDescription());
+                });
 
         routines.updateRoutine(updateSeedRequest.getRoutineTitle());
     }
@@ -36,13 +42,19 @@ public class RoutineService {
     @Transactional
     public void completeTodayRoutine(Long routineId) {
         Routine routines = routineRepository.findById(routineId)
-                .orElseThrow(() -> new DataNotFoundException("can't find routine"));
+                .orElseThrow(() -> {
+                    log.error("RoutineService - completeTodayRoutine : can't find routine");
+                    return new DataNotFoundException(ErrorMessageDescription.ROUTINE_NO_EXISTED.getDescription());
+                });
 
         if (!routineTimestampRepository.existsByRoutineIdAndTimestamp(routineId, LocalDate.now())) {
             routineTimestampRepository.save(new RoutineTimestamp(LocalDate.now(), routines));
 
             Seed seed = seedRepository.findById(routines.getSeed().getId())
-                    .orElseThrow(() -> new DataNotFoundException("can't find seed"));
+                    .orElseThrow(() -> {
+                        log.error("RoutineService - completeTodayRoutine : can't find seed");
+                        return new DataNotFoundException(ErrorMessageDescription.UNKNOWN.getDescription());
+                    });
 
             Integer diffDays = Long.valueOf(ChronoUnit.DAYS.between(seed.getStartDate(), seed.getEndDate())).intValue();
             Integer routinesTotalCount = routineRepository.countBySeedId(seed.getId()) * diffDays;

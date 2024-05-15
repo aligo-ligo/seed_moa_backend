@@ -3,6 +3,7 @@ package com.intouch.aligooligo.auth;
 import com.intouch.aligooligo.Jwt.JwtTokenProvider;
 import com.intouch.aligooligo.auth.dto.TokenInfo;
 import com.intouch.aligooligo.exception.ErrorMessage;
+import com.intouch.aligooligo.exception.ErrorMessageDescription;
 import com.intouch.aligooligo.exception.SocialLoginFailedException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -46,7 +47,7 @@ public class AuthController {
 
         String encryptedRefreshToken = jwtProvider.resolveRefreshToken(request);
         if (encryptedRefreshToken == null) {
-            return new ResponseEntity<>(new ErrorMessage("헤더에 refresh token이 없습니다. 다시 로그인해주세요."),
+            return new ResponseEntity<>(new ErrorMessage(ErrorMessageDescription.REISSUE_FAILED.getDescription()),
                     HttpStatus.UNAUTHORIZED);
         }
 
@@ -58,8 +59,8 @@ public class AuthController {
             Long accessTokenValidTime = tokenInfo.getAccessTokenValidTime();
 
             return new ResponseEntity<>(new TokenInfo(accessToken, refreshToken, accessTokenValidTime), HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(new ErrorMessage(e.getMessage()),HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ErrorMessage(ErrorMessageDescription.REISSUE_FAILED.getDescription()), HttpStatus.UNAUTHORIZED);
         }
     }
 
@@ -87,10 +88,8 @@ public class AuthController {
 
             return new ResponseEntity<>(
                     new TokenInfo(accessToken, refreshToken, accessTokenExpiredTime), HttpStatus.OK);
-        } catch (SocialLoginFailedException e) {
-            return new ResponseEntity<>(new ErrorMessage(e.getMessage()),HttpStatus.UNAUTHORIZED);
-        } catch (RedisConnectionFailureException e) {
-            return new ResponseEntity<>(new ErrorMessage("unable to connect redis"), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ErrorMessage(ErrorMessageDescription.UNKNOWN.getDescription()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

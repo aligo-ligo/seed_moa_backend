@@ -1,5 +1,6 @@
 package com.intouch.aligooligo.Jwt;
 
+import com.intouch.aligooligo.User.Entity.Role;
 import com.intouch.aligooligo.auth.RefreshTokenService;
 import com.intouch.aligooligo.auth.dto.TokenInfo;
 import io.jsonwebtoken.*;
@@ -9,6 +10,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,6 +26,7 @@ import java.util.List;
 import org.springframework.util.StringUtils;
 
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class JwtTokenProvider {
     @Value("${secretKey}")
@@ -40,9 +43,9 @@ public class JwtTokenProvider {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
     // JWT 토큰 생성
-    public TokenInfo createToken(String userPk, List<String> roles) {
+    public TokenInfo createToken(String userPk, Role role) {
         Claims claims = Jwts.claims().setSubject(userPk); // JWT payload 에 저장되는 정보단위
-        claims.put("roles", roles); // 정보는 key / value 쌍으로 저장된다.
+        claims.put("roles", role); // 정보는 key / value 쌍으로 저장된다.
         Date now = new Date();
         long accessTokenValidTime = now.getTime() + 180 * 60 * 1000L;
         long refreshTokenValidTime = now.getTime() + 14 * 24 * 60 * 60 * 1000L;
@@ -112,10 +115,17 @@ public class JwtTokenProvider {
     // 토큰의 유효성 + 만료일자 확인
     public boolean validateToken(String jwtToken) {
         try {
+            if (jwtToken == null) {
+                log.info("jwtToken is null");
+            }
             Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(jwtToken);
             return !claims.getBody().getExpiration().before(new Date());
+        } catch (ExpiredJwtException e) {
+            log.error("JwtTokenProvider - validateToken() : 액세스 토큰이 만료되었습니다.");
+            throw new JwtException("액세스 토큰이 만료되었습니다.");
         } catch (JwtException | IllegalArgumentException e) {
-            throw new JwtException(e.getMessage());
+            log.error(String.format("JwtTokenProvider - validateToken() : %s", e.getMessage()));
+            throw new JwtException("알 수 없는 오류가 발생했습니다.");
         }
     }
 }

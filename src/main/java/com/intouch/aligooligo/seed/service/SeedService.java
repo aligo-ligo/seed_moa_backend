@@ -1,6 +1,7 @@
 package com.intouch.aligooligo.seed.service;
 
 import com.intouch.aligooligo.exception.DataNotFoundException;
+import com.intouch.aligooligo.exception.ErrorMessageDescription;
 import com.intouch.aligooligo.seed.controller.dto.RoutineInfo;
 import com.intouch.aligooligo.seed.controller.dto.request.CreateSeedRequest;
 import com.intouch.aligooligo.seed.controller.dto.request.UpdateSeedRequest;
@@ -19,6 +20,7 @@ import com.intouch.aligooligo.User.Entity.User;
 import com.intouch.aligooligo.User.Repository.UserRepository;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,13 +42,17 @@ public class SeedService {
     private final UserRepository userRepository;
     private final RoutineRepository routineRepository;
     private final RoutineTimestampRepository routineTimestampRepository;
+    private final static Integer PERCENT = 100;
 
     @Value("${urlPrefix}")
     private String urlPrefix;
 
     public SeedListResponse getSeedList(String email, Integer page, Integer size){
         User user = userRepository.findByEmail(email)
-                .orElseThrow(()->new UsernameNotFoundException("can't get seedList : can't find userEmail"));
+                .orElseThrow(()-> {
+                    log.error("SeedService - getSeedList : can't find userEmail");
+                    return new UsernameNotFoundException(ErrorMessageDescription.UNKNOWN.getDescription());
+                });
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Seed> seedList = seedRepository.findByUserIdOrderByIdDesc(user.getId(), pageRequest);
         List<Integer> completedRoutineCountList = new ArrayList<>();
@@ -78,7 +84,10 @@ public class SeedService {
     @Transactional
     public void createSeed(String userEmail, CreateSeedRequest createSeedRequest) {
         User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new UsernameNotFoundException("can't get seedList : can't find userEmail"));
+                .orElseThrow(() -> {
+                    log.error("SeedService - createSeed : can't find userEmail");
+                    return new UsernameNotFoundException(ErrorMessageDescription.UNKNOWN.getDescription());
+                });
 
         LocalDate startDate = LocalDate.now();
         LocalDate endDate = LocalDate.parse(createSeedRequest.getEndDate());
@@ -102,7 +111,10 @@ public class SeedService {
 
     public SeedDetailResponse getDetailSeed(Long seedId) {
         Seed seed = seedRepository.findById(seedId)
-                .orElseThrow(() -> new DataNotFoundException("doesn't find seed"));
+                .orElseThrow(() -> {
+                    log.error("SeedService - getDetailSeed : can't find seed");
+                    return new DataNotFoundException(ErrorMessageDescription.SEED_NOT_FOUND.getDescription());
+                });
         List<Routine> routines = routineRepository.findBySeedId(seedId);
         LocalDate today = LocalDate.now();
 
@@ -135,7 +147,10 @@ public class SeedService {
 
     public MySeedDataResponse getMyData(String userEmail) {
         User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new UsernameNotFoundException("can't get myData : can't find userEmail"));
+                .orElseThrow(() -> {
+                    log.error("SeedService - getMyData : can't find userEmail");
+                    return new UsernameNotFoundException(ErrorMessageDescription.UNKNOWN.getDescription());
+                });
         List<Seed> seeds = seedRepository.findByUserId(user.getId());
         Map<String, Long> seedStateCount = seeds.stream().collect(
                 Collectors.groupingBy(Seed::getState, Collectors.counting()));
@@ -164,17 +179,13 @@ public class SeedService {
         List<Routine> routines = routineRepository.findBySeedId(seed.getId());
         Integer routinesCompletedCount = getCompletedRoutineCount(routines);
         List<Integer> statusBoundaries = new ArrayList<>();
-        log.info(String.format("%s = %d", "routinesTotalCount", routinesTotalCount));
-        log.info(String.format("%s = %d", "routinesCompletedCount", routinesCompletedCount));
-        for (int i = 1; i <= SeedState.values().length; i++) {
-            statusBoundaries.add(i * routinesTotalCount / SeedState.values().length);
-            log.info(String.format("%s = %s", "statusboundaries = ", String.valueOf(statusBoundaries.get(i-1))));
-        }
 
+        for (SeedState seedState : SeedState.values()) {
+            statusBoundaries.add(seedState.getBoundary() * routinesTotalCount / PERCENT);
+        }
 
         for (int i= 0; i < statusBoundaries.size(); i++) {
             if (routinesCompletedCount <= statusBoundaries.get(i)) {
-                log.info(SeedState.values()[i].name());
                 seed.updateSeedState(SeedState.values()[i].name());
                 break;
             }
