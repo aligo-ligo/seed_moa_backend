@@ -58,7 +58,7 @@ public class WebSecurityConfig {
         http
                 .authorizeHttpRequests(authorize -> authorize // 요청에 대한 사용권한 체크
                 .requestMatchers("/admin/**").hasRole("ADMIN")//ADMIN 역할은 /admin/만 접근가능
-                .requestMatchers("/user/**").hasRole("USER")//USER역할은 /user/만 접근가능
+                .requestMatchers("/api/seed/**").hasRole("USER")//USER역할은 /user/만 접근가능
                 .anyRequest().permitAll()); // 그외 나머지 요청은 누구나 접근 가능
 
 
