@@ -1,5 +1,6 @@
 package com.intouch.aligooligo.Jwt;
 
+import com.intouch.aligooligo.User.Entity.Role;
 import com.intouch.aligooligo.auth.RefreshTokenService;
 import com.intouch.aligooligo.auth.dto.TokenInfo;
 import io.jsonwebtoken.*;
@@ -42,9 +43,9 @@ public class JwtTokenProvider {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
     // JWT 토큰 생성
-    public TokenInfo createToken(String userPk, List<String> roles) {
+    public TokenInfo createToken(String userPk, Role role) {
         Claims claims = Jwts.claims().setSubject(userPk); // JWT payload 에 저장되는 정보단위
-        claims.put("roles", roles); // 정보는 key / value 쌍으로 저장된다.
+        claims.put("roles", role); // 정보는 key / value 쌍으로 저장된다.
         Date now = new Date();
         long accessTokenValidTime = now.getTime() + 180 * 60 * 1000L;
         long refreshTokenValidTime = now.getTime() + 14 * 24 * 60 * 60 * 1000L;

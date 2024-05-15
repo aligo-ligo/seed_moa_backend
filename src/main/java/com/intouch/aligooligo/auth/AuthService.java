@@ -3,6 +3,7 @@ package com.intouch.aligooligo.auth;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.intouch.aligooligo.Jwt.JwtTokenProvider;
+import com.intouch.aligooligo.User.Entity.Role;
 import com.intouch.aligooligo.auth.dto.KakaoMember;
 import com.intouch.aligooligo.auth.dto.KakaoToken;
 import com.intouch.aligooligo.User.Entity.User;
@@ -57,7 +58,7 @@ public class AuthService {
             RefreshToken findRefreshToken = refreshTokenService.findById(claims.getSubject());
 
             if (refreshToken.equals(findRefreshToken.getRefreshToken())) {
-                return jwtProvider.createToken(user.getEmail(), user.getRoles());
+                return jwtProvider.createToken(user.getEmail(), user.getRole());
             }
 
             refreshTokenService.deleteById(user.getEmail());
@@ -131,10 +132,10 @@ public class AuthService {
 
             if(!existByUserEmail(email)) {
                 userRepository.save(User.builder().email(email)
-                        .nickName(name).roles(Collections.singletonList("ROLE_USER")).build());
+                        .nickName(name).role(Role.USER).build());
             }
 
-            return jwtProvider.createToken(email, findByUserEmail(email).getRoles());
+            return jwtProvider.createToken(email, findByUserEmail(email).getRole());
 
         }
         throw new SocialLoginFailedException(ErrorMessageDescription.UNKNOWN.getDescription());
