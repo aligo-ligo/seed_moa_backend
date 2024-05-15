@@ -95,6 +95,7 @@ public class AuthService {
 
 
     public String getKakaoAccessToken(String code) {
+        log.info("getKakaoAccessToken 시작");
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
@@ -112,10 +113,12 @@ public class AuthService {
         if (kakaoToken == null) {
             return null;
         }
+        log.info("getKakaoAccessToken 끝");
         return kakaoToken.getAccess_token();
     }
 
     public TokenInfo getKakaoUserInfo(String accessToken) {
+        log.info("getKakaoUserInfo 시작");
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
@@ -135,6 +138,7 @@ public class AuthService {
                         .nickName(name).role(Role.USER).build());
             }
 
+            log.info("getKakaoUserInfo 끝");
             return jwtProvider.createToken(email, findByUserEmail(email).getRole().toString());
 
         }
