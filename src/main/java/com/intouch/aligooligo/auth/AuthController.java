@@ -1,5 +1,7 @@
 package com.intouch.aligooligo.auth;
 
+import static com.intouch.aligooligo.auth.AuthService.getClientIP;
+
 import com.intouch.aligooligo.Jwt.JwtTokenProvider;
 import com.intouch.aligooligo.auth.dto.TokenInfo;
 import com.intouch.aligooligo.exception.ErrorMessage;
@@ -78,8 +80,9 @@ public class AuthController {
                             schema = @Schema(implementation = ErrorMessage.class)))
     })
     @PostMapping("/kakao")
-    public ResponseEntity<?> SignInKakao(@RequestParam String code) {
+    public ResponseEntity<?> SignInKakao(HttpServletRequest request, @RequestParam String code) {
         try {
+            getClientIP(request);
             TokenInfo tokenInfo = authService.kakaoLogin(code);
 
             String accessToken = tokenInfo.getAccessToken();
@@ -92,7 +95,4 @@ public class AuthController {
             return new ResponseEntity<>(new ErrorMessage(ErrorMessageDescription.UNKNOWN.getDescription()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-
-
 }
