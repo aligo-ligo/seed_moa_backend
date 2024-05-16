@@ -81,8 +81,8 @@ public class AuthService {
 
     public TokenInfo kakaoLogin(HttpServletRequest request, String code) {
         try {
-            log.info(request.getRequestURI());
-            String kakaoAccessToken = getKakaoAccessToken(request.getRequestURI(), code);
+            log.info(request.getRemoteHost());
+            String kakaoAccessToken = getKakaoAccessToken(request.getRemoteHost(), code);
             return getKakaoUserInfo(kakaoAccessToken);
         } catch (BadRequest e) {
             String msg = e.getMessage().split(": \"")[1];
