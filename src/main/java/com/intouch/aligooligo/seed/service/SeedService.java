@@ -10,9 +10,11 @@ import com.intouch.aligooligo.seed.controller.dto.response.MySeedDataResponse.St
 import com.intouch.aligooligo.seed.controller.dto.response.SeedDetailResponse;
 import com.intouch.aligooligo.seed.controller.dto.response.SeedDetailResponse.RoutineDetail;
 import com.intouch.aligooligo.seed.controller.dto.response.SeedListResponse;
+import com.intouch.aligooligo.seed.domain.Like;
 import com.intouch.aligooligo.seed.domain.Routine;
 import com.intouch.aligooligo.seed.domain.Seed;
 import com.intouch.aligooligo.seed.domain.SeedState;
+import com.intouch.aligooligo.seed.repository.LikeRepository;
 import com.intouch.aligooligo.seed.repository.RoutineRepository;
 import com.intouch.aligooligo.seed.repository.RoutineTimestampRepository;
 import com.intouch.aligooligo.seed.repository.SeedRepository;
@@ -42,6 +44,7 @@ public class SeedService {
     private final UserRepository userRepository;
     private final RoutineRepository routineRepository;
     private final RoutineTimestampRepository routineTimestampRepository;
+    private final LikeRepository likeRepository;
     private final static Integer PERCENT = 100;
 
     @Value("${urlPrefix}")
@@ -192,4 +195,18 @@ public class SeedService {
         }
     }
 
+    public void increaseLike(Long seedId) {
+        Seed seed = seedRepository.findById(seedId)
+                .orElseThrow(() -> new IllegalArgumentException(ErrorMessageDescription.SEED_NOT_FOUND.getDescription()));
+        if (likeRepository.existsBySeedIdAndUserId(seedId, seed.getUser().getId())) {
+            throw new IllegalArgumentException("이미 응원중인 씨앗입니다.");
+        }
+        likeRepository.save(new Like(seedId, seed.getUser().getId()));
+    }
+
+    public void decreaseLike(Long seedId) {
+        Seed seed = seedRepository.findById(seedId)
+                .orElseThrow(() -> new IllegalArgumentException(ErrorMessageDescription.SEED_NOT_FOUND.getDescription()));
+        likeRepository.deleteBySeedIdAndUserId(seedId, seed.getUser().getId());
+    }
 }

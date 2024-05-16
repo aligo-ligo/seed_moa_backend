@@ -31,4 +31,9 @@ public class Like {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private Long userId;
+
+    public Like(Long seedId, Long userId) {
+        this.seedId = seedId;
+        this.userId = userId;
+    }
 }
