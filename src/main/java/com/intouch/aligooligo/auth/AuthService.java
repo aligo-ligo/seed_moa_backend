@@ -79,10 +79,9 @@ public class AuthService {
         return userRepository.existsByEmail(email);
     }
 
-    public TokenInfo kakaoLogin(HttpServletRequest request, String code) {
+    public TokenInfo kakaoLogin(String code) {
         try {
-            log.info(request.getRemoteHost());
-            String kakaoAccessToken = getKakaoAccessToken("http://" + request.getRemoteHost() + "/kakao", code);
+            String kakaoAccessToken = getKakaoAccessToken(code);
             return getKakaoUserInfo(kakaoAccessToken);
         } catch (BadRequest e) {
             String msg = e.getMessage().split(": \"")[1];
@@ -96,7 +95,7 @@ public class AuthService {
     }
 
 
-    public String getKakaoAccessToken(String dynamicRedirectUri, String code) {
+    public String getKakaoAccessToken(String code) {
         log.info("getKakaoAccessToken");
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -106,7 +105,8 @@ public class AuthService {
         body.add("grant_type","authorization_code");
         body.add("client_id", clientId);
         body.add("client_secret", clientSecret);
-        body.add("redirect_uri", dynamicRedirectUri);
+        body.add("redirect_uri", "http://192.168.45.196:5173/");
+        //body.add("redirect_uri", redirectUrl);
         body.add("code",code);
 
         HttpEntity<MultiValueMap<String, String>> tokenRequest = new HttpEntity<>(body, headers);
