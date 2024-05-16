@@ -12,6 +12,7 @@ import com.intouch.aligooligo.auth.dto.TokenInfo;
 import com.intouch.aligooligo.exception.ErrorMessageDescription;
 import com.intouch.aligooligo.exception.SocialLoginFailedException;
 import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -78,9 +79,10 @@ public class AuthService {
         return userRepository.existsByEmail(email);
     }
 
-    public TokenInfo kakaoLogin(String code) {
+    public TokenInfo kakaoLogin(HttpServletRequest request, String code) {
         try {
-            String kakaoAccessToken = getKakaoAccessToken(code);
+            log.info(request.getRequestURI());
+            String kakaoAccessToken = getKakaoAccessToken(request.getRequestURI(), code);
             return getKakaoUserInfo(kakaoAccessToken);
         } catch (BadRequest e) {
             String msg = e.getMessage().split(": \"")[1];
@@ -94,7 +96,7 @@ public class AuthService {
     }
 
 
-    public String getKakaoAccessToken(String code) {
+    public String getKakaoAccessToken(String dynamicRedirectUri, String code) {
         log.info("getKakaoAccessToken");
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -104,7 +106,7 @@ public class AuthService {
         body.add("grant_type","authorization_code");
         body.add("client_id", clientId);
         body.add("client_secret", clientSecret);
-        body.add("redirect_uri", redirectUrl);
+        body.add("redirect_uri", dynamicRedirectUri);
         body.add("code",code);
 
         HttpEntity<MultiValueMap<String, String>> tokenRequest = new HttpEntity<>(body, headers);

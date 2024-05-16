@@ -78,9 +78,9 @@ public class AuthController {
                             schema = @Schema(implementation = ErrorMessage.class)))
     })
     @PostMapping("/kakao")
-    public ResponseEntity<?> SignInKakao(@RequestParam String code) {
+    public ResponseEntity<?> SignInKakao(HttpServletRequest request, @RequestParam String code) {
         try {
-            TokenInfo tokenInfo = authService.kakaoLogin(code);
+            TokenInfo tokenInfo = authService.kakaoLogin(request, code);
 
             String accessToken = tokenInfo.getAccessToken();
             String refreshToken = tokenInfo.getRefreshToken();
