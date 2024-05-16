@@ -104,7 +104,8 @@ public class AuthService {
         body.add("grant_type","authorization_code");
         body.add("client_id", clientId);
         body.add("client_secret", clientSecret);
-        body.add("redirect_uri", redirectUrl);
+        body.add("redirect_uri", "http://192.168.45.196:5173/kakao");
+        //body.add("redirect_uri", redirectUrl);
         body.add("code",code);
 
         HttpEntity<MultiValueMap<String, String>> tokenRequest = new HttpEntity<>(body, headers);
