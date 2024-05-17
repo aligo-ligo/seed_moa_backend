@@ -4,10 +4,10 @@ import com.intouch.aligooligo.exception.DataNotFoundException;
 import com.intouch.aligooligo.exception.ErrorMessageDescription;
 import com.intouch.aligooligo.seed.controller.dto.RoutineInfo;
 import com.intouch.aligooligo.seed.controller.dto.request.CreateSeedRequest;
+import com.intouch.aligooligo.seed.controller.dto.response.CheeringUser;
 import com.intouch.aligooligo.seed.controller.dto.response.MySeedDataResponse;
 import com.intouch.aligooligo.seed.controller.dto.response.MySeedDataResponse.StateStatistics;
 import com.intouch.aligooligo.seed.controller.dto.response.SeedDetailResponse;
-import com.intouch.aligooligo.seed.controller.dto.response.SeedDetailResponse.CheeringUserName;
 import com.intouch.aligooligo.seed.controller.dto.response.SeedDetailResponse.RoutineDetail;
 import com.intouch.aligooligo.seed.controller.dto.response.SeedListResponse;
 import com.intouch.aligooligo.seed.domain.Cheering;
@@ -121,8 +121,8 @@ public class SeedService {
                     return new DataNotFoundException(ErrorMessageDescription.SEED_NOT_FOUND.getDescription());
                 });
         List<Routine> routines = routineRepository.findBySeedId(seedId);
-        List<CheeringUserName> cheeringUserNameList = cheeringRepository.findBySeedId(seedId).stream()
-                .map(cheering -> new CheeringUserName(cheering.getUser().getNickName()))
+        List<CheeringUser> cheeringUserNameList = cheeringRepository.findBySeedId(seedId).stream()
+                .map(cheering -> new CheeringUser(cheering.getUser().getNickName()))
                 .toList();
         LocalDate today = LocalDate.now();
 
@@ -132,7 +132,7 @@ public class SeedService {
 
         return SeedDetailResponse.builder().id(seed.getId()).startDate(String.valueOf(seed.getStartDate()))
                 .endDate(String.valueOf(seed.getEndDate())).completedRoutineCount(completedRoutineCount)
-                .routineDetails(routineDetails).seedState(seed.getState()).cheeringList(cheeringUserNameList).build();
+                .routineDetails(routineDetails).seedState(seed.getState()).cheeringUserList(cheeringUserNameList).build();
     }
 
     public SeedSharedResponse getSharedSeed(Long seedId) {
@@ -142,6 +142,9 @@ public class SeedService {
                     return new DataNotFoundException(ErrorMessageDescription.SEED_NOT_FOUND.getDescription());
                 });
         List<Routine> routines = routineRepository.findBySeedId(seedId);
+        List<CheeringUser> cheeringUserNameList = cheeringRepository.findBySeedId(seedId).stream()
+                .map(cheering -> new CheeringUser(cheering.getUser().getNickName()))
+                .toList();
         LocalDate today = LocalDate.now();
 
         List<SharedRoutineDetail> sharedRoutineDetails = getSharedRoutineDetails(routines, today);
@@ -150,7 +153,7 @@ public class SeedService {
 
         return SeedSharedResponse.builder().seed(seed.getSeed()).startDate(String.valueOf(seed.getStartDate()))
                 .endDate(String.valueOf(seed.getEndDate())).completedRoutineCount(completedRoutineCount)
-                .routineDetails(sharedRoutineDetails).seedState(seed.getState()).build();
+                .routineDetails(sharedRoutineDetails).seedState(seed.getState()).cheeringUserList(cheeringUserNameList).build();
     }
 
     private List<RoutineDetail> getRoutineDetails(List<Routine> routines, LocalDate today) {

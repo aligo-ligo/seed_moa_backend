@@ -19,7 +19,7 @@ public class SeedDetailResponse {
     private Integer completedRoutineCount;
     private String seedState;
     private List<RoutineDetail> routineDetails;
-    private List<CheeringUserName> cheeringList;
+    private List<CheeringUser> cheeringUserList;
 
     @Getter
     @Builder
@@ -29,13 +29,4 @@ public class SeedDetailResponse {
         private String routineTitle;
         private Boolean completedRoutineToday;
     }
-
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class CheeringUserName {
-        private String userName;
-    }
-
-
 }

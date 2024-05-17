@@ -116,7 +116,7 @@ public class SeedController {
     }
 
     @GetMapping("/share/{id}")
-    @Operation(summary = "시드 디테일 조회", description = "시드 디테일 조회 API, 인증된 사용자만 접근 가능")
+    @Operation(summary = "시드 공유 페이지 정보 조회", description = "시드 공유 페이지 정보 조회 API")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "조회 성공",
                     content = @Content(mediaType = "application/json",
