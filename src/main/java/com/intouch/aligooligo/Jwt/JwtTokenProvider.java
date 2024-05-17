@@ -47,7 +47,7 @@ public class JwtTokenProvider {
         Claims claims = Jwts.claims().setSubject(userPk); // JWT payload 에 저장되는 정보단위
         claims.put("roles", "ROLE_" + roles.name()); // 정보는 key / value 쌍으로 저장된다.
         Date now = new Date();
-        long accessTokenValidTime = now.getTime() + 180 * 60 * 1000L;
+        long accessTokenValidTime = now.getTime() + 30 * 60 * 1000L;
         long refreshTokenValidTime = now.getTime() + 14 * 24 * 60 * 60 * 1000L;
 
         String accessToken = Jwts.builder()
