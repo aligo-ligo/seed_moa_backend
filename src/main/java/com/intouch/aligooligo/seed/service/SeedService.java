@@ -7,6 +7,7 @@ import com.intouch.aligooligo.seed.controller.dto.request.CreateSeedRequest;
 import com.intouch.aligooligo.seed.controller.dto.response.MySeedDataResponse;
 import com.intouch.aligooligo.seed.controller.dto.response.MySeedDataResponse.StateStatistics;
 import com.intouch.aligooligo.seed.controller.dto.response.SeedDetailResponse;
+import com.intouch.aligooligo.seed.controller.dto.response.SeedDetailResponse.CheeringUserName;
 import com.intouch.aligooligo.seed.controller.dto.response.SeedDetailResponse.RoutineDetail;
 import com.intouch.aligooligo.seed.controller.dto.response.SeedListResponse;
 import com.intouch.aligooligo.seed.domain.Cheering;
@@ -118,15 +119,18 @@ public class SeedService {
                     return new DataNotFoundException(ErrorMessageDescription.SEED_NOT_FOUND.getDescription());
                 });
         List<Routine> routines = routineRepository.findBySeedId(seedId);
+        List<CheeringUserName> cheeringUserNameList = cheeringRepository.findBySeedId(seedId).stream()
+                .map(cheering -> new CheeringUserName(cheering.getUser().getNickName()))
+                .toList();
         LocalDate today = LocalDate.now();
 
         List<RoutineDetail> routineDetails = getRoutineDetails(routines, today);
 
         Integer completedRoutineCount = getCompletedRoutineCount(routines);
 
-        return SeedDetailResponse.builder().seed(seed.getSeed()).startDate(String.valueOf(seed.getStartDate()))
+        return SeedDetailResponse.builder().id(seed.getId()).startDate(String.valueOf(seed.getStartDate()))
                 .endDate(String.valueOf(seed.getEndDate())).completedRoutineCount(completedRoutineCount)
-                .routineDetails(routineDetails).seedState(seed.getState()).build();
+                .routineDetails(routineDetails).seedState(seed.getState()).cheeringList(cheeringUserNameList).build();
     }
 
     private List<RoutineDetail> getRoutineDetails(List<Routine> routines, LocalDate today) {

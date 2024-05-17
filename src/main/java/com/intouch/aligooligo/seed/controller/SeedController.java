@@ -134,7 +134,7 @@ public class SeedController {
     }
 
     @PatchMapping("/{id}/like")
-    @Operation(summary = "응원하기(좋아요) 증가", description = "특정 seed의 좋아요를 증가/감소시킨다. 응원중인 씨앗에"
+    @Operation(summary = "응원하기(좋아요) 증가/감소", description = "특정 seed의 좋아요를 증가/감소시킨다. 응원중인 씨앗에"
             + "재 요청이 왔을 때는 Http 200과 message로 \"이미 응원중인 씨앗입니다\" 문구가 출력. "
             + "이에 따라 재 요청 시 감소하도록 프론트 로직을 처리할 수 있다. , 인증된 사용자만 접근 가능")
     @ApiResponses(value = {
