@@ -10,6 +10,7 @@ import com.intouch.aligooligo.seed.controller.dto.request.CreateSeedRequest;
 import com.intouch.aligooligo.seed.controller.dto.request.UpdateSeedRequest;
 import com.intouch.aligooligo.seed.controller.dto.response.MySeedDataResponse;
 import com.intouch.aligooligo.seed.controller.dto.response.SeedDetailResponse;
+import com.intouch.aligooligo.seed.controller.dto.response.SeedSharedResponse;
 import com.intouch.aligooligo.seed.service.SeedService;
 import com.intouch.aligooligo.seed.controller.dto.response.SeedListResponse;
 import io.jsonwebtoken.Claims;
@@ -107,6 +108,27 @@ public class SeedController {
         try {
             SeedDetailResponse detailResponse = seedService.getDetailSeed(seedId);
             return new ResponseEntity<>(detailResponse, HttpStatus.OK);
+        } catch (DataNotFoundException e) {
+            return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ErrorMessage(ErrorMessageDescription.UNKNOWN.getDescription()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/share/{id}")
+    @Operation(summary = "시드 디테일 조회", description = "시드 디테일 조회 API, 인증된 사용자만 접근 가능")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = SeedDetailResponse.class))),
+            @ApiResponse(responseCode = "500", description = "db data 조회 실패",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorMessage.class)))
+    })
+    public ResponseEntity<?> sharedTarget(@PathVariable("id") Long seedId){
+        try {
+            SeedSharedResponse sharedResponse = seedService.getSharedSeed(seedId);
+            return new ResponseEntity<>(sharedResponse, HttpStatus.OK);
         } catch (DataNotFoundException e) {
             return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
