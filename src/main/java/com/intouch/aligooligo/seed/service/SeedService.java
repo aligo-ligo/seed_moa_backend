@@ -4,17 +4,16 @@ import com.intouch.aligooligo.exception.DataNotFoundException;
 import com.intouch.aligooligo.exception.ErrorMessageDescription;
 import com.intouch.aligooligo.seed.controller.dto.RoutineInfo;
 import com.intouch.aligooligo.seed.controller.dto.request.CreateSeedRequest;
-import com.intouch.aligooligo.seed.controller.dto.request.UpdateSeedRequest;
 import com.intouch.aligooligo.seed.controller.dto.response.MySeedDataResponse;
 import com.intouch.aligooligo.seed.controller.dto.response.MySeedDataResponse.StateStatistics;
 import com.intouch.aligooligo.seed.controller.dto.response.SeedDetailResponse;
 import com.intouch.aligooligo.seed.controller.dto.response.SeedDetailResponse.RoutineDetail;
 import com.intouch.aligooligo.seed.controller.dto.response.SeedListResponse;
-import com.intouch.aligooligo.seed.domain.Like;
+import com.intouch.aligooligo.seed.domain.Cheering;
 import com.intouch.aligooligo.seed.domain.Routine;
 import com.intouch.aligooligo.seed.domain.Seed;
 import com.intouch.aligooligo.seed.domain.SeedState;
-import com.intouch.aligooligo.seed.repository.LikeRepository;
+import com.intouch.aligooligo.seed.repository.CheeringRepository;
 import com.intouch.aligooligo.seed.repository.RoutineRepository;
 import com.intouch.aligooligo.seed.repository.RoutineTimestampRepository;
 import com.intouch.aligooligo.seed.repository.SeedRepository;
@@ -22,8 +21,6 @@ import com.intouch.aligooligo.User.Entity.User;
 import com.intouch.aligooligo.User.Repository.UserRepository;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -44,7 +41,7 @@ public class SeedService {
     private final UserRepository userRepository;
     private final RoutineRepository routineRepository;
     private final RoutineTimestampRepository routineTimestampRepository;
-    private final LikeRepository likeRepository;
+    private final CheeringRepository cheeringRepository;
     private final static Integer PERCENT = 100;
 
     @Value("${urlPrefix}")
@@ -195,18 +192,20 @@ public class SeedService {
         }
     }
 
+    @Transactional
     public void increaseLike(Long seedId) {
         Seed seed = seedRepository.findById(seedId)
                 .orElseThrow(() -> new IllegalArgumentException(ErrorMessageDescription.SEED_NOT_FOUND.getDescription()));
-        if (likeRepository.existsBySeedIdAndUserId(seedId, seed.getUser().getId())) {
+        if (cheeringRepository.existsBySeedAndUser(seed, seed.getUser())) {
             throw new IllegalArgumentException("이미 응원중인 씨앗입니다.");
         }
-        likeRepository.save(new Like(seedId, seed.getUser().getId()));
+        cheeringRepository.save(new Cheering(seed, seed.getUser()));
     }
 
+    @Transactional
     public void decreaseLike(Long seedId) {
         Seed seed = seedRepository.findById(seedId)
                 .orElseThrow(() -> new IllegalArgumentException(ErrorMessageDescription.SEED_NOT_FOUND.getDescription()));
-        likeRepository.deleteBySeedIdAndUserId(seedId, seed.getUser().getId());
+        cheeringRepository.deleteBySeedAndUser(seed, seed.getUser());
     }
 }

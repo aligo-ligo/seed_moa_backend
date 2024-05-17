@@ -1,5 +1,6 @@
 package com.intouch.aligooligo.seed.domain;
 
+import com.intouch.aligooligo.User.Entity.User;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -17,8 +18,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "like")
-public class Like {
+@Table(name = "cheering")
+public class Cheering {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,14 +27,14 @@ public class Like {
 
     @ManyToOne
     @JoinColumn(name = "seed_id", nullable = false)
-    private Long seedId;
+    private Seed seed;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private Long userId;
+    private User user;
 
-    public Like(Long seedId, Long userId) {
-        this.seedId = seedId;
-        this.userId = userId;
+    public Cheering(Seed seed, User user) {
+        this.seed = seed;
+        this.user = user;
     }
 }
