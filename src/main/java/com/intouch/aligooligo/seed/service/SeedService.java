@@ -55,19 +55,21 @@ public class SeedService {
                 });
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Seed> seedList = seedRepository.findByUserIdOrderByIdDesc(user.getId(), pageRequest);
+
         List<Integer> completedRoutineCountList = new ArrayList<>();
         List<List<Routine>> routinesList = new ArrayList<>();
-
+        long cheeringCount = 0;
 
         for (Seed seed : seedList) {
             List<Routine> routines = routineRepository.findBySeedId(seed.getId());
+            cheeringCount = cheeringRepository.countBySeedId(seed.getId());
             Integer completedRoutineCount = getCompletedRoutineCount(routines);
             routinesList.add(routines);
             completedRoutineCountList.add(completedRoutineCount);
         }
 
         SeedListResponse listResponse = new SeedListResponse();
-        listResponse.updateSeedList(seedList, routinesList, completedRoutineCountList);
+        listResponse.updateSeedList(seedList, routinesList, cheeringCount, completedRoutineCountList);
         listResponse.updatePages(seedList);
 
         return listResponse;
@@ -196,7 +198,7 @@ public class SeedService {
     public void increaseLike(Long seedId) {
         Seed seed = seedRepository.findById(seedId)
                 .orElseThrow(() -> new IllegalArgumentException(ErrorMessageDescription.SEED_NOT_FOUND.getDescription()));
-        if (cheeringRepository.existsBySeedAndUser(seed, seed.getUser())) {
+        if (cheeringRepository.existsBySeedIdAndUserId(seed.getId(), seed.getUser().getId())) {
             throw new IllegalArgumentException("이미 응원중인 씨앗입니다.");
         }
         cheeringRepository.save(new Cheering(seed, seed.getUser()));
@@ -206,6 +208,6 @@ public class SeedService {
     public void decreaseLike(Long seedId) {
         Seed seed = seedRepository.findById(seedId)
                 .orElseThrow(() -> new IllegalArgumentException(ErrorMessageDescription.SEED_NOT_FOUND.getDescription()));
-        cheeringRepository.deleteBySeedAndUser(seed, seed.getUser());
+        cheeringRepository.deleteBySeedIdAndUserId(seed.getId(), seed.getUser().getId());
     }
 }
