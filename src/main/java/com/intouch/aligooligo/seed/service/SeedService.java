@@ -11,6 +11,8 @@ import com.intouch.aligooligo.seed.controller.dto.response.SeedDetailResponse.Ch
 import com.intouch.aligooligo.seed.controller.dto.response.SeedDetailResponse.RoutineDetail;
 import com.intouch.aligooligo.seed.controller.dto.response.SeedListResponse;
 import com.intouch.aligooligo.seed.domain.Cheering;
+import com.intouch.aligooligo.seed.controller.dto.response.SeedSharedResponse;
+import com.intouch.aligooligo.seed.controller.dto.response.SeedSharedResponse.SharedRoutineDetail;
 import com.intouch.aligooligo.seed.domain.Routine;
 import com.intouch.aligooligo.seed.domain.Seed;
 import com.intouch.aligooligo.seed.domain.SeedState;
@@ -133,6 +135,24 @@ public class SeedService {
                 .routineDetails(routineDetails).seedState(seed.getState()).cheeringList(cheeringUserNameList).build();
     }
 
+    public SeedSharedResponse getSharedSeed(Long seedId) {
+        Seed seed = seedRepository.findById(seedId)
+                .orElseThrow(() -> {
+                    log.error("SeedService - getDetailSeed : can't find seed");
+                    return new DataNotFoundException(ErrorMessageDescription.SEED_NOT_FOUND.getDescription());
+                });
+        List<Routine> routines = routineRepository.findBySeedId(seedId);
+        LocalDate today = LocalDate.now();
+
+        List<SharedRoutineDetail> sharedRoutineDetails = getSharedRoutineDetails(routines, today);
+
+        Integer completedRoutineCount = getCompletedRoutineCount(routines);
+
+        return SeedSharedResponse.builder().seed(seed.getSeed()).startDate(String.valueOf(seed.getStartDate()))
+                .endDate(String.valueOf(seed.getEndDate())).completedRoutineCount(completedRoutineCount)
+                .routineDetails(sharedRoutineDetails).seedState(seed.getState()).build();
+    }
+
     private List<RoutineDetail> getRoutineDetails(List<Routine> routines, LocalDate today) {
         List<RoutineDetail> routineDetails = new ArrayList<>();
         RoutineDetail routineDetail;
@@ -149,6 +169,24 @@ public class SeedService {
         }
 
         return routineDetails;
+    }
+
+    private List<SharedRoutineDetail> getSharedRoutineDetails(List<Routine> routines, LocalDate today) {
+        List<SharedRoutineDetail> sharedRoutineDetails = new ArrayList<>();
+        SharedRoutineDetail sharedRoutineDetail;
+        for (Routine routine : routines) {
+            if (routineTimestampRepository.existsByRoutineIdAndTimestamp(routine.getId(), today)) {
+                sharedRoutineDetail = SharedRoutineDetail.builder().routineId(routine.getId())
+                        .routineTitle(routine.getTitle()).build();
+            }
+            else {
+                sharedRoutineDetail = SharedRoutineDetail.builder().routineId(routine.getId())
+                        .routineTitle(routine.getTitle()).build();
+            }
+            sharedRoutineDetails.add(sharedRoutineDetail);
+        }
+
+        return sharedRoutineDetails;
     }
 
     public MySeedDataResponse getMyData(String userEmail) {
