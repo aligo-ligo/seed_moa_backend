@@ -43,7 +43,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json;charset=UTF-8");
         PrintWriter writer = response.getWriter();
-        writer.write("{\"error\":\"" + msg + "\"}");
+        writer.write("{\"message\":\"" + msg + "\"}");
         writer.flush();
         writer.close();
     }
