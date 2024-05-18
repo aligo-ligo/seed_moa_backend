@@ -14,6 +14,7 @@ import lombok.ToString;
 @Builder
 public class SeedDetailResponse {
     private Long id;
+    private String seedName;
     private String startDate;
     private String endDate;
     private Integer completedRoutineCount;
