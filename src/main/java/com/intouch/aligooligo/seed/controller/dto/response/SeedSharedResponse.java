@@ -9,7 +9,8 @@ import lombok.Getter;
 @AllArgsConstructor
 @Builder
 public class SeedSharedResponse {
-    private String seed;
+    private Long id;
+    private String seedName;
     private String startDate;
     private String endDate;
     private Integer completedRoutineCount;

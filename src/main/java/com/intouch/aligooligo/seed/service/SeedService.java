@@ -130,9 +130,10 @@ public class SeedService {
 
         Integer completedRoutineCount = getCompletedRoutineCount(routines);
 
-        return SeedDetailResponse.builder().id(seed.getId()).startDate(String.valueOf(seed.getStartDate()))
-                .endDate(String.valueOf(seed.getEndDate())).completedRoutineCount(completedRoutineCount)
-                .routineDetails(routineDetails).seedState(seed.getState()).cheeringUserList(cheeringUserNameList).build();
+        return SeedDetailResponse.builder().id(seed.getId()).seedName(seed.getSeed())
+                .startDate(String.valueOf(seed.getStartDate())).endDate(String.valueOf(seed.getEndDate()))
+                .completedRoutineCount(completedRoutineCount).routineDetails(routineDetails)
+                .seedState(seed.getState()).cheeringUserList(cheeringUserNameList).build();
     }
 
     public SeedSharedResponse getSharedSeed(Long seedId) {
@@ -151,9 +152,10 @@ public class SeedService {
 
         Integer completedRoutineCount = getCompletedRoutineCount(routines);
 
-        return SeedSharedResponse.builder().seed(seed.getSeed()).startDate(String.valueOf(seed.getStartDate()))
-                .endDate(String.valueOf(seed.getEndDate())).completedRoutineCount(completedRoutineCount)
-                .routineDetails(sharedRoutineDetails).seedState(seed.getState()).cheeringUserList(cheeringUserNameList).build();
+        return SeedSharedResponse.builder().id(seedId).seedName(seed.getSeed())
+                .startDate(String.valueOf(seed.getStartDate())).endDate(String.valueOf(seed.getEndDate()))
+                .completedRoutineCount(completedRoutineCount).routineDetails(sharedRoutineDetails)
+                .seedState(seed.getState()).cheeringUserList(cheeringUserNameList).build();
     }
 
     private List<RoutineDetail> getRoutineDetails(List<Routine> routines, LocalDate today) {
