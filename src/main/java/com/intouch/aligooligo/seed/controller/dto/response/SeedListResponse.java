@@ -31,9 +31,10 @@ public class SeedListResponse {
         private Long id;
         private String startDate;
         private String endDate;
-        private String seed;
+        private String seedName;
         private List<RoutineInfo> routineInfos;
         private Integer completedRoutineCount;
+        private Long cheeringCount;
         private String seedState;
     }
 
@@ -58,7 +59,7 @@ public class SeedListResponse {
         return routineInfos;
     }
 
-    public void updateSeedList(Page<Seed> seedList, List<List<Routine>> routinesList, List<Integer> completedRoutineCountList) {
+    public void updateSeedList(Page<Seed> seedList, List<List<Routine>> routinesList, Long cheeringCount, List<Integer> completedRoutineCountList) {
         List<Seed> seeds = seedList.getContent();
         for (int i = 0; i < seeds.size(); i++) {
             String seedStartDate = seeds.get(i).getStartDate().toString();
@@ -69,7 +70,8 @@ public class SeedListResponse {
 
             SeedInfo newSeedInfo = new SeedInfo(
                     seeds.get(i).getId(), seedStartDate, seedEndDate,
-                    seeds.get(i).getSeed(), convertToRoutineInfo(routines),completedRoutineCount,seeds.get(i).getState());
+                    seeds.get(i).getSeed(), convertToRoutineInfo(routines),
+                    completedRoutineCount, cheeringCount, seeds.get(i).getState());
 
             this.seedInfo.add(newSeedInfo);
         }
