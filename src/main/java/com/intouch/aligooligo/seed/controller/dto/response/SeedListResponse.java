@@ -31,7 +31,7 @@ public class SeedListResponse {
         private Long id;
         private String startDate;
         private String endDate;
-        private String seed;
+        private String seedName;
         private List<RoutineInfo> routineInfos;
         private Integer completedRoutineCount;
         private Long cheeringCount;
