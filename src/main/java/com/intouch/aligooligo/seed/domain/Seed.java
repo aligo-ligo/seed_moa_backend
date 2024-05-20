@@ -4,9 +4,9 @@ package com.intouch.aligooligo.seed.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.intouch.aligooligo.User.Entity.User;
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -22,10 +22,10 @@ public class Seed {
     private Long id;
 
     @Column(name = "start_date", nullable = false)
-    private LocalDate startDate;
+    private LocalDateTime startDate;
 
     @Column(name = "end_date", nullable = false)
-    private LocalDate endDate;
+    private LocalDateTime endDate;
 
     @Column(name = "seed", nullable = false, length = 100)
     private String seed;
@@ -39,7 +39,7 @@ public class Seed {
     private User user;
 
     @Builder
-    public Seed(Long id, LocalDate startDate, LocalDate endDate, String seed, User user, List<Routine> routine){
+    public Seed(Long id, LocalDateTime startDate, LocalDateTime endDate, String seed, User user, List<Routine> routine){
         this.id = id;
         this.startDate = startDate;
         this.endDate = endDate;
