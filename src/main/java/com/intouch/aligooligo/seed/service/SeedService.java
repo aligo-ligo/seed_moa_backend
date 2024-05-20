@@ -4,6 +4,9 @@ import com.intouch.aligooligo.exception.DataNotFoundException;
 import com.intouch.aligooligo.exception.ErrorMessageDescription;
 import com.intouch.aligooligo.seed.controller.dto.RoutineInfo;
 import com.intouch.aligooligo.seed.controller.dto.request.CreateSeedRequest;
+import com.intouch.aligooligo.seed.controller.dto.response.CheerInfo;
+import com.intouch.aligooligo.seed.controller.dto.response.CheerInfo.CheerUser;
+import com.intouch.aligooligo.seed.controller.dto.response.CheerInfo.CheererInfo;
 import com.intouch.aligooligo.seed.controller.dto.response.MySeedDataResponse;
 import com.intouch.aligooligo.seed.controller.dto.response.MySeedDataResponse.StateStatistics;
 import com.intouch.aligooligo.seed.controller.dto.response.SeedDetailResponse;
@@ -252,5 +255,16 @@ public class SeedService {
         Seed seed = seedRepository.findById(seedId)
                 .orElseThrow(() -> new IllegalArgumentException(ErrorMessageDescription.SEED_NOT_FOUND.getDescription()));
         cheeringRepository.deleteBySeedIdAndUserId(seed.getId(), seed.getUser().getId());
+    }
+
+    public CheerInfo getCheeringInfo(Long seedId) {
+        Long cheerCount = cheeringRepository.countBySeedId(seedId);
+        List<User> cheerUserList = cheeringRepository.findBySeedId(seedId)
+                .stream().map(Cheering::getUser).toList();
+
+        List<CheerUser> cheerUsers = cheerUserList.stream().map(
+                cheer -> new CheerUser(cheer.getId(), new CheererInfo(cheer.getNickName()))).toList();
+
+        return new CheerInfo(cheerUsers, cheerCount);
     }
 }

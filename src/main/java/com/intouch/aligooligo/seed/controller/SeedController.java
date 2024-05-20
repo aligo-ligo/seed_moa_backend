@@ -8,6 +8,7 @@ import com.intouch.aligooligo.exception.ErrorMessage;
 import com.intouch.aligooligo.exception.ErrorMessageDescription;
 import com.intouch.aligooligo.seed.controller.dto.request.CreateSeedRequest;
 import com.intouch.aligooligo.seed.controller.dto.request.UpdateSeedRequest;
+import com.intouch.aligooligo.seed.controller.dto.response.CheerInfo;
 import com.intouch.aligooligo.seed.controller.dto.response.MySeedDataResponse;
 import com.intouch.aligooligo.seed.controller.dto.response.SeedDetailResponse;
 import com.intouch.aligooligo.seed.controller.dto.response.SeedSharedResponse;
@@ -155,7 +156,7 @@ public class SeedController {
         }
     }
 
-    @PatchMapping("/{id}/like")
+    @PatchMapping("/{id}/cheer")
     @Operation(summary = "응원하기(좋아요) 증가/감소", description = "특정 seed의 좋아요를 증가/감소시킨다. 응원중인 씨앗에"
             + "재 요청이 왔을 때는 Http 200과 message로 \"이미 응원중인 씨앗입니다\" 문구가 출력. "
             + "이에 따라 재 요청 시 감소하도록 프론트 로직을 처리할 수 있다. , 인증된 사용자만 접근 가능")
@@ -181,5 +182,23 @@ public class SeedController {
         }
     }
 
+    @GetMapping("/{id}/cheer")
+    @Operation(summary = "씨앗 응원 유저 조회", description = "씨앗 응원 유저 정보와 응원 총원을 볼 수 있다. , 인증된 사용자만 접근 가능")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = MySeedDataResponse.class))),
+            @ApiResponse(responseCode = "500", description = "기타 서버 에러",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorMessage.class)))
+    })
+    public ResponseEntity<?> getCheeringInfo(@PathVariable("id") Long seedId) {
+        try {
+            CheerInfo cheerInfo = seedService.getCheeringInfo(seedId);
+            return new ResponseEntity<>(cheerInfo, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ErrorMessage(ErrorMessageDescription.UNKNOWN.getDescription()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
+    }
 }
