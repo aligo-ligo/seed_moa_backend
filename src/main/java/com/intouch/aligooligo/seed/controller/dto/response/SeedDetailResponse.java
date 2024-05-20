@@ -20,7 +20,7 @@ public class SeedDetailResponse {
     private Integer completedRoutineCount;
     private String seedState;
     private List<RoutineDetail> routineDetails;
-    private List<CheeringUser> cheeringUserList;
+    private Long cheerUserCount;
 
     @Getter
     @Builder

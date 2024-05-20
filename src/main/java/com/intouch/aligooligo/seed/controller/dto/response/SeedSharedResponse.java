@@ -16,7 +16,7 @@ public class SeedSharedResponse {
     private Integer completedRoutineCount;
     private String seedState;
     private List<SharedRoutineDetail> routineDetails;
-    private List<CheeringUser> cheeringUserList;
+    private Long cheerUserCount;
 
     @Getter
     @Builder
