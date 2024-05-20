@@ -8,6 +8,7 @@ import com.intouch.aligooligo.auth.dto.KakaoMember;
 import com.intouch.aligooligo.auth.dto.KakaoToken;
 import com.intouch.aligooligo.User.Entity.User;
 import com.intouch.aligooligo.User.Repository.UserRepository;
+import com.intouch.aligooligo.auth.dto.SignInResponse;
 import com.intouch.aligooligo.auth.dto.TokenInfo;
 import com.intouch.aligooligo.exception.ErrorMessageDescription;
 import com.intouch.aligooligo.exception.SocialLoginFailedException;
@@ -79,7 +80,7 @@ public class AuthService {
         return userRepository.existsByEmail(email);
     }
 
-    public TokenInfo kakaoLogin(String code) {
+    public SignInResponse kakaoLogin(String code) {
         try {
             String kakaoAccessToken = getKakaoAccessToken(code);
             return getKakaoUserInfo(kakaoAccessToken);
@@ -118,7 +119,7 @@ public class AuthService {
         return kakaoToken.getAccess_token();
     }
 
-    public TokenInfo getKakaoUserInfo(String accessToken) {
+    public SignInResponse getKakaoUserInfo(String accessToken) {
         log.info("getKakaoUserInfo");
         RestTemplate restTemplate = new RestTemplate();
 
@@ -134,12 +135,14 @@ public class AuthService {
             String email = kakaoMember.getBody().getKakaoAccount().getEmail();
             String name = kakaoMember.getBody().getKakaoProperties().getNickName();
 
+            TokenInfo tokenInfo = jwtProvider.createToken(email, Role.USER);
             if(!existByUserEmail(email)) {
                 userRepository.save(User.builder().email(email)
                         .nickName(name).roles(Role.USER).build());
+                return new SignInResponse(tokenInfo, true);
             }
 
-            return jwtProvider.createToken(email, findByUserEmail(email).getRoles());
+            return new SignInResponse(tokenInfo, false);
 
         }
         throw new SocialLoginFailedException(ErrorMessageDescription.UNKNOWN.getDescription());
