@@ -22,7 +22,9 @@ import com.intouch.aligooligo.seed.repository.RoutineTimestampRepository;
 import com.intouch.aligooligo.seed.repository.SeedRepository;
 import com.intouch.aligooligo.User.Entity.User;
 import com.intouch.aligooligo.User.Repository.UserRepository;
+import java.time.Clock;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -94,8 +96,9 @@ public class SeedService {
                     return new UsernameNotFoundException(ErrorMessageDescription.UNKNOWN.getDescription());
                 });
 
-        LocalDate startDate = LocalDate.now();
-        LocalDate endDate = LocalDate.parse(createSeedRequest.getEndDate());
+        LocalDateTime startDate = LocalDateTime.now(Clock.systemDefaultZone());
+        LocalDateTime endDate = LocalDate.parse(createSeedRequest.getEndDate())
+                .plusDays(1).atStartOfDay().minusNanos(1);
         Seed seed = seedRepository.save(Seed.builder().startDate(startDate).endDate(endDate)
                 .seed(createSeedRequest.getSeed()).state(SeedState.SEED.name()).user(user).build());
 
@@ -124,9 +127,10 @@ public class SeedService {
         List<CheeringUser> cheeringUserNameList = cheeringRepository.findBySeedId(seedId).stream()
                 .map(cheering -> new CheeringUser(cheering.getUser().getNickName()))
                 .toList();
-        LocalDate today = LocalDate.now();
+        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+        LocalDateTime endOfDay = LocalDate.now().plusDays(1).atStartOfDay().minusNanos(1);
 
-        List<RoutineDetail> routineDetails = getRoutineDetails(routines, today);
+        List<RoutineDetail> routineDetails = getRoutineDetails(routines, startOfDay, endOfDay);
 
         Integer completedRoutineCount = getCompletedRoutineCount(routines);
 
@@ -146,10 +150,11 @@ public class SeedService {
         List<CheeringUser> cheeringUserNameList = cheeringRepository.findBySeedId(seedId).stream()
                 .map(cheering -> new CheeringUser(cheering.getUser().getNickName()))
                 .toList();
-        LocalDate today = LocalDate.now();
 
-        List<SharedRoutineDetail> sharedRoutineDetails = getSharedRoutineDetails(routines, today);
+        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+        LocalDateTime endOfDay = LocalDate.now().plusDays(1).atStartOfDay().minusNanos(1);
 
+        List<SharedRoutineDetail> sharedRoutineDetails = getSharedRoutineDetails(routines, startOfDay, endOfDay);
         Integer completedRoutineCount = getCompletedRoutineCount(routines);
 
         return SeedSharedResponse.builder().id(seedId).seedName(seed.getSeed())
@@ -158,11 +163,11 @@ public class SeedService {
                 .seedState(seed.getState()).cheeringUserList(cheeringUserNameList).build();
     }
 
-    private List<RoutineDetail> getRoutineDetails(List<Routine> routines, LocalDate today) {
+    private List<RoutineDetail> getRoutineDetails(List<Routine> routines, LocalDateTime startOfDay, LocalDateTime endOfDay) {
         List<RoutineDetail> routineDetails = new ArrayList<>();
         RoutineDetail routineDetail;
         for (Routine routine : routines) {
-            if (routineTimestampRepository.existsByRoutineIdAndTimestamp(routine.getId(), today)) {
+            if (routineTimestampRepository.existsByRoutineIdAndTimestampBetween(routine.getId(), startOfDay, endOfDay)) {
                 routineDetail = RoutineDetail.builder().routineId(routine.getId())
                         .routineTitle(routine.getTitle()).completedRoutineToday(true).build();
             }
@@ -176,18 +181,13 @@ public class SeedService {
         return routineDetails;
     }
 
-    private List<SharedRoutineDetail> getSharedRoutineDetails(List<Routine> routines, LocalDate today) {
+    private List<SharedRoutineDetail> getSharedRoutineDetails(
+            List<Routine> routines, LocalDateTime startOfDay, LocalDateTime endOfDay) {
         List<SharedRoutineDetail> sharedRoutineDetails = new ArrayList<>();
         SharedRoutineDetail sharedRoutineDetail;
         for (Routine routine : routines) {
-            if (routineTimestampRepository.existsByRoutineIdAndTimestamp(routine.getId(), today)) {
-                sharedRoutineDetail = SharedRoutineDetail.builder().routineId(routine.getId())
-                        .routineTitle(routine.getTitle()).build();
-            }
-            else {
-                sharedRoutineDetail = SharedRoutineDetail.builder().routineId(routine.getId())
-                        .routineTitle(routine.getTitle()).build();
-            }
+            sharedRoutineDetail = SharedRoutineDetail.builder().routineId(routine.getId())
+                    .routineTitle(routine.getTitle()).build();
             sharedRoutineDetails.add(sharedRoutineDetail);
         }
 
