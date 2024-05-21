@@ -187,7 +187,7 @@ public class SeedController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "조회 성공",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = MySeedDataResponse.class))),
+                            schema = @Schema(implementation = CheerInfo.class))),
             @ApiResponse(responseCode = "500", description = "기타 서버 에러",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessage.class)))
