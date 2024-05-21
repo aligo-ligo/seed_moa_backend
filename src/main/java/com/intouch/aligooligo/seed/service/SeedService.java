@@ -115,6 +115,7 @@ public class SeedService {
         for (Routine routine : routines) {
             routineTimestampRepository.deleteByRoutineId(routine.getId());
         }
+        cheeringRepository.deleteBySeedId(seedId);
         routineRepository.deleteBySeedId(seedId);
         seedRepository.deleteById(seedId);
     }
