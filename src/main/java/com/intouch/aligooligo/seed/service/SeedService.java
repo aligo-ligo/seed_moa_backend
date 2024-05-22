@@ -67,18 +67,19 @@ public class SeedService {
 
         List<Integer> completedRoutineCountList = new ArrayList<>();
         List<List<Routine>> routinesList = new ArrayList<>();
-        long cheeringCount = 0;
+        List<Long> cheeringCountList = new ArrayList<>();
 
         for (Seed seed : seedList) {
             List<Routine> routines = routineRepository.findBySeedId(seed.getId());
-            cheeringCount = cheeringRepository.countBySeedId(seed.getId());
+            long cheeringCount = cheeringRepository.countBySeedId(seed.getId());
             Integer completedRoutineCount = getCompletedRoutineCount(routines);
             routinesList.add(routines);
             completedRoutineCountList.add(completedRoutineCount);
+            cheeringCountList.add(cheeringCount);
         }
 
         SeedListResponse listResponse = new SeedListResponse();
-        listResponse.updateSeedList(seedList, routinesList, cheeringCount, completedRoutineCountList);
+        listResponse.updateSeedList(seedList, routinesList, cheeringCountList, completedRoutineCountList);
         listResponse.updatePages(seedList);
 
         return listResponse;
