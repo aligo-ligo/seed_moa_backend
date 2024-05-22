@@ -27,6 +27,8 @@ import com.intouch.aligooligo.User.Repository.UserRepository;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -99,7 +101,9 @@ public class SeedService {
                 });
 
         LocalDateTime startDate = LocalDateTime.now(Clock.systemDefaultZone());
-        LocalDateTime endDate = createSeedRequest.getEndDate().plusDays(1).minusNanos(1);
+        LocalDateTime endDate = createSeedRequest.getEndDate().toLocalDate()
+                .plusDays(1).atStartOfDay().minusSeconds(1);
+
         Seed seed = seedRepository.save(Seed.builder().startDate(startDate).endDate(endDate)
                 .seed(createSeedRequest.getSeed()).state(SeedState.SEED.name()).user(user).build());
 
