@@ -241,20 +241,15 @@ public class SeedService {
     }
 
     @Transactional
-    public void increaseLike(Long seedId) {
+    public void mediateCheer(Long seedId) {
         Seed seed = seedRepository.findById(seedId)
                 .orElseThrow(() -> new IllegalArgumentException(ErrorMessageDescription.SEED_NOT_FOUND.getDescription()));
         if (cheeringRepository.existsBySeedIdAndUserId(seed.getId(), seed.getUser().getId())) {
-            throw new IllegalArgumentException("이미 응원중인 씨앗입니다.");
+            cheeringRepository.deleteBySeedIdAndUserId(seed.getId(), seed.getUser().getId());
         }
-        cheeringRepository.save(new Cheering(seed, seed.getUser()));
-    }
-
-    @Transactional
-    public void decreaseLike(Long seedId) {
-        Seed seed = seedRepository.findById(seedId)
-                .orElseThrow(() -> new IllegalArgumentException(ErrorMessageDescription.SEED_NOT_FOUND.getDescription()));
-        cheeringRepository.deleteBySeedIdAndUserId(seed.getId(), seed.getUser().getId());
+        else {
+            cheeringRepository.save(new Cheering(seed, seed.getUser()));
+        }
     }
 
     public CheerInfo getCheeringInfo(Long seedId) {
