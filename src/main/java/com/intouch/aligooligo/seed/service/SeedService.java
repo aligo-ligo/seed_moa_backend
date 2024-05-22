@@ -99,8 +99,7 @@ public class SeedService {
                 });
 
         LocalDateTime startDate = LocalDateTime.now(Clock.systemDefaultZone());
-        LocalDateTime endDate = LocalDate.parse(createSeedRequest.getEndDate())
-                .plusDays(1).atStartOfDay().minusNanos(1);
+        LocalDateTime endDate = createSeedRequest.getEndDate().plusDays(1).minusNanos(1);
         Seed seed = seedRepository.save(Seed.builder().startDate(startDate).endDate(endDate)
                 .seed(createSeedRequest.getSeed()).state(SeedState.SEED.name()).user(user).build());
 
@@ -137,7 +136,7 @@ public class SeedService {
         Integer completedRoutineCount = getCompletedRoutineCount(routines);
 
         return SeedDetailResponse.builder().id(seed.getId()).seedName(seed.getSeed())
-                .startDate(String.valueOf(seed.getStartDate())).endDate(String.valueOf(seed.getEndDate()))
+                .startDate(seed.getStartDate()).endDate(seed.getEndDate())
                 .completedRoutineCount(completedRoutineCount).routineDetails(routineDetails)
                 .seedState(seed.getState()).cheerUserCount(cheerUserCount).build();
     }
@@ -158,7 +157,7 @@ public class SeedService {
         Integer completedRoutineCount = getCompletedRoutineCount(routines);
 
         return SeedSharedResponse.builder().id(seedId).seedName(seed.getSeed())
-                .startDate(String.valueOf(seed.getStartDate())).endDate(String.valueOf(seed.getEndDate()))
+                .startDate(seed.getStartDate()).endDate(seed.getEndDate())
                 .completedRoutineCount(completedRoutineCount).routineDetails(sharedRoutineDetails)
                 .seedState(seed.getState()).cheerUserCount(cheerUserCount).build();
     }
