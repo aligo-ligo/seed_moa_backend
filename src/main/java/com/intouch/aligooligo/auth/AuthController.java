@@ -22,6 +22,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -93,5 +94,31 @@ public class AuthController {
         } catch (Exception e) {
             return new ResponseEntity<>(new ErrorMessage(ErrorMessageDescription.UNKNOWN.getDescription()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @Operation(summary = "유저 회원 탈퇴", description = "회원 탈퇴 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "회원 탈퇴 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = SignInResponse.class))),
+            @ApiResponse(responseCode = "401", description = "1. 카카오 엑세스 토큰을 가져오지 못했을 때 \t\n"
+                    + "2. 카카오 유저 정보를 가져오지 못했을 때 \t\n 3. 레디스에 연결되지 못했을 때",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorMessage.class))),
+            @ApiResponse(responseCode = "500", description = "서버 인증 에러",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorMessage.class)))
+    })
+    @DeleteMapping
+    public ResponseEntity<?> withdrawalUser(HttpServletRequest request) {
+        try {
+            String token = jwtProvider.resolveAccessToken(request);
+            String userPk = jwtProvider.parseClaims(token).getSubject();
+            authService.withdrawalUser(userPk);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ErrorMessage(ErrorMessageDescription.UNKNOWN.getDescription()),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 }
