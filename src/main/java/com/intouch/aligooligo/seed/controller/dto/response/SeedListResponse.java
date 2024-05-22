@@ -4,6 +4,7 @@ package com.intouch.aligooligo.seed.controller.dto.response;
 import com.intouch.aligooligo.seed.controller.dto.RoutineInfo;
 import com.intouch.aligooligo.seed.domain.Routine;
 import com.intouch.aligooligo.seed.domain.Seed;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -29,8 +30,8 @@ public class SeedListResponse {
     @AllArgsConstructor
     private static class SeedInfo {
         private Long id;
-        private String startDate;
-        private String endDate;
+        private LocalDateTime startDate;
+        private LocalDateTime endDate;
         private String seedName;
         private List<RoutineInfo> routineInfos;
         private Integer completedRoutineCount;
@@ -62,8 +63,8 @@ public class SeedListResponse {
     public void updateSeedList(Page<Seed> seedList, List<List<Routine>> routinesList, Long cheeringCount, List<Integer> completedRoutineCountList) {
         List<Seed> seeds = seedList.getContent();
         for (int i = 0; i < seeds.size(); i++) {
-            String seedStartDate = seeds.get(i).getStartDate().toString();
-            String seedEndDate = seeds.get(i).getEndDate().toString();
+            LocalDateTime seedStartDate = seeds.get(i).getStartDate();
+            LocalDateTime seedEndDate = seeds.get(i).getEndDate();
             Integer completedRoutineCount = completedRoutineCountList.get(i);
 
             List<Routine> routines = routinesList.get(i);
