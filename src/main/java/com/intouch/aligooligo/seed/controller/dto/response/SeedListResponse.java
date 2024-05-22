@@ -60,13 +60,13 @@ public class SeedListResponse {
         return routineInfos;
     }
 
-    public void updateSeedList(Page<Seed> seedList, List<List<Routine>> routinesList, Long cheeringCount, List<Integer> completedRoutineCountList) {
+    public void updateSeedList(Page<Seed> seedList, List<List<Routine>> routinesList, List<Long> cheeringCountList, List<Integer> completedRoutineCountList) {
         List<Seed> seeds = seedList.getContent();
         for (int i = 0; i < seeds.size(); i++) {
             LocalDateTime seedStartDate = seeds.get(i).getStartDate();
             LocalDateTime seedEndDate = seeds.get(i).getEndDate();
             Integer completedRoutineCount = completedRoutineCountList.get(i);
-
+            Long cheeringCount = cheeringCountList.get(i);
             List<Routine> routines = routinesList.get(i);
 
             SeedInfo newSeedInfo = new SeedInfo(
