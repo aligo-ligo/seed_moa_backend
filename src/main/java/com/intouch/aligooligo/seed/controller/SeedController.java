@@ -9,6 +9,7 @@ import com.intouch.aligooligo.exception.ErrorMessageDescription;
 import com.intouch.aligooligo.seed.controller.dto.request.CreateSeedRequest;
 import com.intouch.aligooligo.seed.controller.dto.request.UpdateSeedRequest;
 import com.intouch.aligooligo.seed.controller.dto.response.CheerInfo;
+import com.intouch.aligooligo.seed.controller.dto.response.CheerMediateResponse;
 import com.intouch.aligooligo.seed.controller.dto.response.MySeedDataResponse;
 import com.intouch.aligooligo.seed.controller.dto.response.SeedDetailResponse;
 import com.intouch.aligooligo.seed.controller.dto.response.SeedSharedResponse;
@@ -23,6 +24,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
+import org.checkerframework.checker.units.qual.C;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -159,17 +161,24 @@ public class SeedController {
     @PatchMapping("/{id}/cheer")
     @Operation(summary = "응원하기(좋아요) 증가/감소", description = "특정 seed의 좋아요를 증가/감소시킨다, 인증된 사용자만 접근 가능")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "1. 증가 성공\t\n 2. 이미 응원중인 씨앗일 때"),
+            @ApiResponse(responseCode = "200", description = "1. 증가 성공\t\n 2. 이미 응원중인 씨앗일 때",
+            content = @Content(mediaType = "application/json",
+            schema = @Schema(implementation = CheerMediateResponse.class))),
             @ApiResponse(responseCode = "500", description = "기타 서버 에러",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessage.class)))
     })
     public ResponseEntity<?> increaseCheer(@PathVariable("id") Long seedId) {
         try{
-            seedService.mediateCheer(seedId);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(new ErrorMessage(ErrorMessageDescription.ALREADY_EXIST_LIKE.getDescription()), HttpStatus.OK);
+            Boolean isIncreased = seedService.increaseCheer(seedId);
+
+            if (isIncreased) {
+                return new ResponseEntity<>(new CheerMediateResponse("add"), HttpStatus.OK);
+            }
+            else {
+                return new ResponseEntity<>(new CheerMediateResponse("delete"),HttpStatus.OK);
+            }
+
         } catch (Exception e) {
             return new ResponseEntity<>(new ErrorMessage(ErrorMessageDescription.UNKNOWN.getDescription()), HttpStatus.INTERNAL_SERVER_ERROR);
         }

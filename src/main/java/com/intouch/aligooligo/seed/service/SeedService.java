@@ -241,14 +241,16 @@ public class SeedService {
     }
 
     @Transactional
-    public void mediateCheer(Long seedId) {
+    public Boolean increaseCheer(Long seedId) {
         Seed seed = seedRepository.findById(seedId)
                 .orElseThrow(() -> new IllegalArgumentException(ErrorMessageDescription.SEED_NOT_FOUND.getDescription()));
         if (cheeringRepository.existsBySeedIdAndUserId(seed.getId(), seed.getUser().getId())) {
             cheeringRepository.deleteBySeedIdAndUserId(seed.getId(), seed.getUser().getId());
+            return false;
         }
         else {
             cheeringRepository.save(new Cheering(seed, seed.getUser()));
+            return true;
         }
     }
 
