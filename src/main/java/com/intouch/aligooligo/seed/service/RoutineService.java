@@ -60,7 +60,7 @@ public class RoutineService {
                         return new DataNotFoundException(ErrorMessageDescription.UNKNOWN.getDescription());
                     });
 
-            Integer diffDays = Long.valueOf(ChronoUnit.DAYS.between(seed.getStartDate(), seed.getEndDate())).intValue();
+            Integer diffDays = Long.valueOf(ChronoUnit.DAYS.between(seed.getStartDate(), seed.getEndDate())).intValue() + 1;
             Integer routinesTotalCount = routineRepository.countBySeedId(seed.getId()) * diffDays;
             seedService.updateSeedState(routinesTotalCount, seed);
         }
