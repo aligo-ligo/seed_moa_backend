@@ -168,9 +168,10 @@ public class SeedController {
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessage.class)))
     })
-    public ResponseEntity<?> increaseCheer(@PathVariable("id") Long seedId) {
+    public ResponseEntity<?> increaseCheer(HttpServletRequest request, @PathVariable("id") Long seedId) {
         try{
-            Boolean isIncreased = seedService.increaseCheer(seedId);
+            String userEmail = getUserEmail(request);
+            Boolean isIncreased = seedService.increaseCheer(userEmail, seedId);
 
             if (isIncreased) {
                 return new ResponseEntity<>(new CheerMediateResponse("add"), HttpStatus.OK);

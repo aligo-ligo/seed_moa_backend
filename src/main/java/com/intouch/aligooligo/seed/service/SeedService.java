@@ -246,15 +246,17 @@ public class SeedService {
     }
 
     @Transactional
-    public Boolean increaseCheer(Long seedId) {
+    public Boolean increaseCheer(String userEmail, Long seedId) {
         Seed seed = seedRepository.findById(seedId)
                 .orElseThrow(() -> new IllegalArgumentException(ErrorMessageDescription.SEED_NOT_FOUND.getDescription()));
-        if (cheeringRepository.existsBySeedIdAndUserId(seed.getId(), seed.getUser().getId())) {
-            cheeringRepository.deleteBySeedIdAndUserId(seed.getId(), seed.getUser().getId());
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new IllegalArgumentException(ErrorMessageDescription.UNKNOWN.getDescription()));
+        if (cheeringRepository.existsBySeedIdAndUserId(seed.getId(), user.getId())) {
+            cheeringRepository.deleteBySeedIdAndUserId(seed.getId(), user.getId());
             return false;
         }
         else {
-            cheeringRepository.save(new Cheering(seed, seed.getUser()));
+            cheeringRepository.save(new Cheering(seed, user));
             return true;
         }
     }
