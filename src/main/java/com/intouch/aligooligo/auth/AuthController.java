@@ -3,6 +3,7 @@ package com.intouch.aligooligo.auth;
 import static com.intouch.aligooligo.auth.AuthService.getClientIP;
 
 import com.intouch.aligooligo.Jwt.JwtTokenProvider;
+import com.intouch.aligooligo.auth.dto.SignInResponse;
 import com.intouch.aligooligo.auth.dto.TokenInfo;
 import com.intouch.aligooligo.exception.ErrorMessage;
 import com.intouch.aligooligo.exception.ErrorMessageDescription;
@@ -21,6 +22,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -58,9 +60,8 @@ public class AuthController {
 
             String accessToken = tokenInfo.getAccessToken();
             String refreshToken = tokenInfo.getRefreshToken();
-            Long accessTokenValidTime = tokenInfo.getAccessTokenValidTime();
 
-            return new ResponseEntity<>(new TokenInfo(accessToken, refreshToken, accessTokenValidTime), HttpStatus.OK);
+            return new ResponseEntity<>(new TokenInfo(accessToken, refreshToken), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ErrorMessage(ErrorMessageDescription.REISSUE_FAILED.getDescription()), HttpStatus.UNAUTHORIZED);
         }
@@ -70,7 +71,7 @@ public class AuthController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "로그인 성공",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = TokenInfo.class))),
+                            schema = @Schema(implementation = SignInResponse.class))),
             @ApiResponse(responseCode = "401", description = "1. 카카오 엑세스 토큰을 가져오지 못했을 때 \t\n"
                     + "2. 카카오 유저 정보를 가져오지 못했을 때 \t\n 3. 레디스에 연결되지 못했을 때",
                     content = @Content(mediaType = "application/json",
@@ -83,16 +84,35 @@ public class AuthController {
     public ResponseEntity<?> SignInKakao(HttpServletRequest request, @RequestParam String code) {
         try {
             getClientIP(request);
-            TokenInfo tokenInfo = authService.kakaoLogin(code);
+            SignInResponse signInResponse = authService.kakaoLogin(code);
 
-            String accessToken = tokenInfo.getAccessToken();
-            String refreshToken = tokenInfo.getRefreshToken();
-            Long accessTokenExpiredTime = tokenInfo.getAccessTokenValidTime();
+            TokenInfo tokenInfo = signInResponse.getTokenInfo();
+            Boolean isFirst = signInResponse.getIsFirst();
 
             return new ResponseEntity<>(
-                    new TokenInfo(accessToken, refreshToken, accessTokenExpiredTime), HttpStatus.OK);
+                    new SignInResponse(tokenInfo, isFirst), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ErrorMessage(ErrorMessageDescription.UNKNOWN.getDescription()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @Operation(summary = "유저 회원 탈퇴", description = "회원 탈퇴 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "회원 탈퇴 성공"),
+            @ApiResponse(responseCode = "500", description = "기타 서버 에러",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorMessage.class)))
+    })
+    @DeleteMapping
+    public ResponseEntity<?> withdrawalUser(HttpServletRequest request) {
+        try {
+            String token = jwtProvider.resolveAccessToken(request);
+            String userPk = jwtProvider.parseClaims(token).getSubject();
+            authService.withdrawalUser(userPk);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ErrorMessage(ErrorMessageDescription.UNKNOWN.getDescription()),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 }

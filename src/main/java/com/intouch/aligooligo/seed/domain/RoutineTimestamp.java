@@ -9,6 +9,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -22,13 +23,13 @@ public class RoutineTimestamp {
     private Long id;
 
     @Column(name = "timestamp", nullable = false)
-    private LocalDate timestamp;
+    private LocalDateTime timestamp;
 
     @ManyToOne
     @JoinColumn(name = "routine_id", nullable = false)
     private Routine routine;
 
-    public RoutineTimestamp(LocalDate timestamp, Routine routine) {
+    public RoutineTimestamp(LocalDateTime timestamp, Routine routine) {
         this.timestamp = timestamp;
         this.routine = routine;
     }

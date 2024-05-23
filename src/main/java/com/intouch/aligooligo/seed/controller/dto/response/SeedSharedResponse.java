@@ -1,5 +1,6 @@
 package com.intouch.aligooligo.seed.controller.dto.response;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,12 +12,12 @@ import lombok.Getter;
 public class SeedSharedResponse {
     private Long id;
     private String seedName;
-    private String startDate;
-    private String endDate;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
     private Integer completedRoutineCount;
     private String seedState;
     private List<SharedRoutineDetail> routineDetails;
-    private List<CheeringUser> cheeringUserList;
+    private Long cheerUserCount;
 
     @Getter
     @Builder

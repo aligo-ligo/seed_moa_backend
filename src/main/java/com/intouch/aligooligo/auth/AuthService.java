@@ -8,12 +8,18 @@ import com.intouch.aligooligo.auth.dto.KakaoMember;
 import com.intouch.aligooligo.auth.dto.KakaoToken;
 import com.intouch.aligooligo.User.Entity.User;
 import com.intouch.aligooligo.User.Repository.UserRepository;
+import com.intouch.aligooligo.auth.dto.SignInResponse;
 import com.intouch.aligooligo.auth.dto.TokenInfo;
 import com.intouch.aligooligo.exception.ErrorMessageDescription;
 import com.intouch.aligooligo.exception.SocialLoginFailedException;
+import com.intouch.aligooligo.seed.domain.Routine;
+import com.intouch.aligooligo.seed.domain.Seed;
+import com.intouch.aligooligo.seed.repository.SeedRepository;
+import com.intouch.aligooligo.seed.service.SeedService;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Collections;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +29,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException.BadRequest;
@@ -35,6 +42,8 @@ public class AuthService {
     private final RefreshTokenService refreshTokenService;
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtProvider;
+    private final SeedService seedService;
+    private final SeedRepository seedRepository;
 
     @Value("${kakaoUrl}")
     private String kakaoUrl;
@@ -79,7 +88,7 @@ public class AuthService {
         return userRepository.existsByEmail(email);
     }
 
-    public TokenInfo kakaoLogin(String code) {
+    public SignInResponse kakaoLogin(String code) {
         try {
             String kakaoAccessToken = getKakaoAccessToken(code);
             return getKakaoUserInfo(kakaoAccessToken);
@@ -118,7 +127,7 @@ public class AuthService {
         return kakaoToken.getAccess_token();
     }
 
-    public TokenInfo getKakaoUserInfo(String accessToken) {
+    public SignInResponse getKakaoUserInfo(String accessToken) {
         log.info("getKakaoUserInfo");
         RestTemplate restTemplate = new RestTemplate();
 
@@ -134,15 +143,27 @@ public class AuthService {
             String email = kakaoMember.getBody().getKakaoAccount().getEmail();
             String name = kakaoMember.getBody().getKakaoProperties().getNickName();
 
+            TokenInfo tokenInfo = jwtProvider.createToken(email, Role.USER);
             if(!existByUserEmail(email)) {
                 userRepository.save(User.builder().email(email)
                         .nickName(name).roles(Role.USER).build());
+                return new SignInResponse(tokenInfo, true);
             }
 
-            return jwtProvider.createToken(email, findByUserEmail(email).getRoles());
+            return new SignInResponse(tokenInfo, false);
 
         }
         throw new SocialLoginFailedException(ErrorMessageDescription.UNKNOWN.getDescription());
+    }
+
+    @Transactional
+    public void withdrawalUser(String userPk) {
+        User user = findByUserEmail(userPk);
+        List<Seed> seedList = seedRepository.findByUserId(user.getId());
+        for (Seed seed : seedList) {
+            seedService.deleteSeed(seed.getId());
+        }
+        userRepository.deleteById(user.getId());
     }
 
     public static String getClientIP(HttpServletRequest request) {

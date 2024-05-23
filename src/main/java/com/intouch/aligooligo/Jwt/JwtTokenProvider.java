@@ -67,7 +67,7 @@ public class JwtTokenProvider {
 
         refreshTokenService.saveTokenInfo(userPk, refreshToken);
 
-        return new TokenInfo(accessToken, refreshToken, accessTokenValidTime);
+        return new TokenInfo(accessToken, refreshToken);
     }
 
     // JWT 토큰에서 인증 정보 조회

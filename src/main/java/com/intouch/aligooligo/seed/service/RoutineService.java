@@ -11,6 +11,7 @@ import com.intouch.aligooligo.seed.repository.RoutineTimestampRepository;
 import com.intouch.aligooligo.seed.repository.SeedRepository;
 import java.time.LocalDate;
 
+import java.time.LocalDateTime;
 import java.time.Period;
 import java.time.temporal.ChronoUnit;
 import lombok.AllArgsConstructor;
@@ -47,8 +48,11 @@ public class RoutineService {
                     return new DataNotFoundException(ErrorMessageDescription.ROUTINE_NO_EXISTED.getDescription());
                 });
 
-        if (!routineTimestampRepository.existsByRoutineIdAndTimestamp(routineId, LocalDate.now())) {
-            routineTimestampRepository.save(new RoutineTimestamp(LocalDate.now(), routines));
+        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+        LocalDateTime endOfDay = LocalDate.now().plusDays(1).atStartOfDay().minusNanos(1);
+
+        if (!routineTimestampRepository.existsByRoutineIdAndTimestampBetween(routineId, startOfDay, endOfDay)) {
+            routineTimestampRepository.save(new RoutineTimestamp(LocalDateTime.now(), routines));
 
             Seed seed = seedRepository.findById(routines.getSeed().getId())
                     .orElseThrow(() -> {
@@ -56,7 +60,7 @@ public class RoutineService {
                         return new DataNotFoundException(ErrorMessageDescription.UNKNOWN.getDescription());
                     });
 
-            Integer diffDays = Long.valueOf(ChronoUnit.DAYS.between(seed.getStartDate(), seed.getEndDate())).intValue();
+            Integer diffDays = Long.valueOf(ChronoUnit.DAYS.between(seed.getStartDate(), seed.getEndDate())).intValue() + 1;
             Integer routinesTotalCount = routineRepository.countBySeedId(seed.getId()) * diffDays;
             seedService.updateSeedState(routinesTotalCount, seed);
         }

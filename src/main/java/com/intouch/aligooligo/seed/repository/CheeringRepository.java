@@ -10,6 +10,7 @@ public interface CheeringRepository extends JpaRepository<Cheering, Long> {
     boolean existsBySeedIdAndUserId(Long seedId, Long userId);
     long countBySeedId(Long seedId);
     void deleteBySeedIdAndUserId(Long seedId, Long userId);
+    void deleteBySeedId(Long seedId);
     List<Cheering> findBySeedId(Long seedId);
 
 }

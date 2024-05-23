@@ -32,10 +32,6 @@ public class User {
     @Column(name = "roles")
     private Role roles;
 
-    @OneToMany
-    @JoinColumn(name = "seed_id")
-    private List<Seed> seedList;
-
     public User(String email, Role roles) {
         this.email = email;
         this.roles = roles;
