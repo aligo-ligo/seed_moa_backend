@@ -10,6 +10,8 @@ import static org.mockito.Mockito.when;
 import com.intouch.aligooligo.domain.auth.entity.RefreshToken;
 import com.intouch.aligooligo.domain.auth.repository.RefreshTokenRepository;
 import com.intouch.aligooligo.domain.auth.service.RefreshTokenService;
+import com.intouch.aligooligo.global.exception.SocialLoginFailedException;
+import io.lettuce.core.RedisConnectionException;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -41,6 +43,25 @@ public class RefreshTokenServiceTest {
         //then
         verify(refreshTokenRepository, times(1)).save(any(RefreshToken.class));
     }
+
+    @Test
+    @DisplayName("리프레시 토큰 저장 예외 테스트")
+    void saveTokenInfoTestException() {
+        //given
+        String userEmail = "test@test.com";
+        String refreshToken = "refreshToken";
+        when(refreshTokenRepository.save(any(RefreshToken.class)))
+                .thenThrow(new SocialLoginFailedException("RefreshTokenService - saveTokenInfo : redis에 연결할 수 없습니다."));
+
+        //when
+        final SocialLoginFailedException socialLoginFailedException
+                = assertThrows(SocialLoginFailedException.class, () -> refreshTokenService.saveTokenInfo(userEmail, refreshToken));
+
+        //then
+        assertThat(socialLoginFailedException.getMessage())
+                .isEqualTo("RefreshTokenService - saveTokenInfo : redis에 연결할 수 없습니다.");
+    }
+
 
     @Test
     @DisplayName("리프레시 토큰 id 기준 찾기")
