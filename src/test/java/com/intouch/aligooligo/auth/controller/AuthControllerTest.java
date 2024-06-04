@@ -4,6 +4,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -17,6 +19,8 @@ import com.intouch.aligooligo.domain.auth.dto.TokenInfo;
 import com.intouch.aligooligo.domain.auth.service.AuthService;
 import com.intouch.aligooligo.domain.user.entity.Role;
 import com.intouch.aligooligo.global.Jwt.JwtTokenProvider;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -81,22 +85,42 @@ public class AuthControllerTest {
     }
 
     @Test
+    @WithMockUser
     @DisplayName("유저 로그인 컨트롤러 테스트")
     void signInKakao() throws Exception {
         //given
         String code = "authorizeCode";
-        String kakaoToken = "kakaoAccessToken";
         tokenInfo = new TokenInfo("accessToken", "refreshToken");
-        given(authService.getKakaoAccessToken(code)).willReturn(kakaoToken);
-        given(authService.getKakaoUserInfo(kakaoToken)).willReturn(new SignInResponse(tokenInfo, true));
-        //given(authService.kakaoLogin(code)).willReturn(new SignInResponse(tokenInfo, true));
+        given(authService.kakaoLogin(code)).willReturn(new SignInResponse(tokenInfo, true));
 
         //when
         MockHttpServletRequestBuilder requestBuilder = post("/api/auth/kakao")
                 .param("code", code)
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON);
         ResultActions resultActions = mockMvc.perform(requestBuilder);
 
+        resultActions.andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("유저 회원 탈퇴 테스트")
+    @WithMockUser
+    void withdrawalUserTest() throws Exception{
+        //given
+        String accessToken = "accessToken";
+        String userPk = "test222@test.com";
+        Claims claims = Jwts.claims().setSubject(userPk);
+        given(jwtTokenProvider.resolveAccessToken(any(HttpServletRequest.class))).willReturn(accessToken);
+        given(jwtTokenProvider.parseClaims(accessToken)).willReturn(claims);
+
+        //when
+        MockHttpServletRequestBuilder requestBuilder = delete("/api/auth")
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON);
+        ResultActions resultActions = mockMvc.perform(requestBuilder);
+
+        //then
         resultActions.andExpect(status().isOk());
     }
 
