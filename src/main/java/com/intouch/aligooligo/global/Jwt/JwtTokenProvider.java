@@ -1,6 +1,6 @@
 package com.intouch.aligooligo.global.Jwt;
 
-import com.intouch.aligooligo.domain.user.entity.Role;
+import com.intouch.aligooligo.domain.member.entity.Role;
 import com.intouch.aligooligo.domain.auth.service.RefreshTokenService;
 import com.intouch.aligooligo.domain.auth.dto.TokenInfo;
 import io.jsonwebtoken.*;

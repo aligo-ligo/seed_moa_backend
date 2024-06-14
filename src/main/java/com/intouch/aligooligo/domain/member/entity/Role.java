@@ -1,7 +1,7 @@
-package com.intouch.aligooligo.domain.user.entity;
+package com.intouch.aligooligo.domain.member.entity;
 
 public enum Role {
-    USER("유저"), GUEST("비회원");
+    MEMBER("유저"), GUEST("비회원");
 
     private String value;
 

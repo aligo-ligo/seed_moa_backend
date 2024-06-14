@@ -7,9 +7,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.intouch.aligooligo.domain.user.entity.Role;
-import com.intouch.aligooligo.domain.user.entity.User;
-import com.intouch.aligooligo.domain.user.repository.UserRepository;
+import com.intouch.aligooligo.domain.member.entity.Member;
+import com.intouch.aligooligo.domain.member.entity.Role;
+import com.intouch.aligooligo.domain.member.repository.MemberRepository;
 import com.intouch.aligooligo.domain.auth.dto.TokenInfo;
 import com.intouch.aligooligo.domain.auth.entity.RefreshToken;
 import com.intouch.aligooligo.domain.auth.service.AuthService;
@@ -35,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 @ExtendWith(MockitoExtension.class)
 public class AuthServiceTest {
     @Mock
-    private UserRepository userRepository;
+    private MemberRepository memberRepository;
     @Mock
     private SeedRepository seedRepository;
     @Mock
@@ -54,13 +54,13 @@ public class AuthServiceTest {
         //given
         String email = "test@test.com";
         String name = "test";
-        Role role = Role.USER;
-        when(userRepository.findByEmail(email)).thenReturn(Optional.of(new User(email, name, role)));
+        Role role = Role.MEMBER;
+        when(memberRepository.findByEmail(email)).thenReturn(Optional.of(new Member(email, name, role)));
 
         //when
-        User user = authService.findByUserEmail(email);
+        Member member = authService.findByUserEmail(email);
 
-        assertThat(user.getEmail()).isEqualTo(email);
+        assertThat(member.getEmail()).isEqualTo(email);
     }
 
     @Test
@@ -84,8 +84,8 @@ public class AuthServiceTest {
         //given
         String email = "test@test.com";
         String notExistEmail = "test2@test.com";
-        when(userRepository.existsByEmail(email)).thenReturn(true);
-        when(userRepository.existsByEmail(notExistEmail)).thenReturn(false);
+        when(memberRepository.existsByEmail(email)).thenReturn(true);
+        when(memberRepository.existsByEmail(notExistEmail)).thenReturn(false);
 
         //when
         Boolean existUser = authService.existByUserEmail(email);
@@ -102,18 +102,18 @@ public class AuthServiceTest {
         //given
         String email = "test2@test.com";
         String name = "test";
-        Role role = Role.USER;
-        when(userRepository.findByEmail(email)).thenReturn(Optional.of(new User(email, name, role)));
-        when(seedRepository.findByUserId(any())).thenReturn(List.of(new Seed()));
+        Role role = Role.MEMBER;
+        when(memberRepository.findByEmail(email)).thenReturn(Optional.of(new Member(email, name, role)));
+        when(seedRepository.findByMemberId(any())).thenReturn(List.of(new Seed()));
 
         //when
         authService.withdrawalUser(email);
 
         //then
         verify(authService).findByUserEmail(email);
-        verify(seedRepository).findByUserId(any());
+        verify(seedRepository).findByMemberId(any());
         verify(seedService).deleteSeed(any());
-        verify(userRepository).deleteById(any());
+        verify(memberRepository).deleteById(any());
     }
 
     @Test
@@ -125,9 +125,9 @@ public class AuthServiceTest {
         String accessToken = "access1234";
         String refreshToken = "refresh1234";
         when(jwtTokenProvider.parseClaims(refreshToken)).thenReturn(Jwts.claims().setSubject(userPk));
-        when(userRepository.findByEmail(userPk)).thenReturn(Optional.of(new User(userPk, name, Role.USER)));
+        when(memberRepository.findByEmail(userPk)).thenReturn(Optional.of(new Member(userPk, name, Role.MEMBER)));
         when(refreshTokenService.findById(userPk)).thenReturn(new RefreshToken(userPk, refreshToken));
-        when(jwtTokenProvider.createToken(userPk, Role.USER)).thenReturn(new TokenInfo(accessToken, refreshToken));
+        when(jwtTokenProvider.createToken(userPk, Role.MEMBER)).thenReturn(new TokenInfo(accessToken, refreshToken));
 
         //when
         TokenInfo tokenInfo = authService.reIssueToken(refreshToken);
@@ -146,7 +146,7 @@ public class AuthServiceTest {
         String refreshToken = "refresh1234";
         String savedRefreshToken = "savedRefresh1234";
         when(jwtTokenProvider.parseClaims(refreshToken)).thenReturn(Jwts.claims().setSubject(userPk));
-        when(userRepository.findByEmail(userPk)).thenReturn(Optional.of(new User(userPk, name, Role.USER)));
+        when(memberRepository.findByEmail(userPk)).thenReturn(Optional.of(new Member(userPk, name, Role.MEMBER)));
         when(refreshTokenService.findById(userPk)).thenReturn(new RefreshToken(userPk, savedRefreshToken));
 
         //when

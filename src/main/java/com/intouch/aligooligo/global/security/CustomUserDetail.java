@@ -1,6 +1,6 @@
 package com.intouch.aligooligo.global.security;
 
-import com.intouch.aligooligo.domain.user.entity.User;
+import com.intouch.aligooligo.domain.member.entity.Member;
 import java.util.Collection;
 import java.util.Collections;
 import org.springframework.security.core.GrantedAuthority;
@@ -8,10 +8,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public class CustomUserDetail implements UserDetails {
 
-    private User user;
+    private Member member;
 
-    public CustomUserDetail(User user) {
-        this.user = user;
+    public CustomUserDetail(Member member) {
+        this.member = member;
     }
 
     @Override
@@ -26,7 +26,7 @@ public class CustomUserDetail implements UserDetails {
 
     @Override
     public String getUsername() {
-        return user.getEmail();
+        return member.getEmail();
     }
 
     @Override

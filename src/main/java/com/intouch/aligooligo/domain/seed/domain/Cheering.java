@@ -1,6 +1,6 @@
 package com.intouch.aligooligo.domain.seed.domain;
 
-import com.intouch.aligooligo.domain.user.entity.User;
+import com.intouch.aligooligo.domain.member.entity.Member;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -31,10 +31,10 @@ public class Cheering {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private Member member;
 
-    public Cheering(Seed seed, User user) {
+    public Cheering(Seed seed, Member member) {
         this.seed = seed;
-        this.user = user;
+        this.member = member;
     }
 }

@@ -2,7 +2,7 @@ package com.intouch.aligooligo.domain.seed.domain;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.intouch.aligooligo.domain.user.entity.User;
+import com.intouch.aligooligo.domain.member.entity.Member;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.*;
@@ -36,15 +36,15 @@ public class Seed {
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private Member member;
 
     @Builder
-    public Seed(Long id, LocalDateTime startDate, LocalDateTime endDate, String seed, User user, List<Routine> routine){
+    public Seed(Long id, LocalDateTime startDate, LocalDateTime endDate, String seed, Member member, List<Routine> routine){
         this.id = id;
         this.startDate = startDate;
         this.endDate = endDate;
         this.seed = seed;
-        this.user = user;
+        this.member = member;
     }
 
     public void updateSeedState(String state) {

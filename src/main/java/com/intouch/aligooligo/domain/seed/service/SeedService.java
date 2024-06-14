@@ -22,8 +22,8 @@ import com.intouch.aligooligo.global.exception.DataNotFoundException;
 import com.intouch.aligooligo.global.exception.ErrorMessageDescription;
 import com.intouch.aligooligo.domain.seed.domain.Cheering;
 import com.intouch.aligooligo.domain.seed.domain.Routine;
-import com.intouch.aligooligo.domain.user.entity.User;
-import com.intouch.aligooligo.domain.user.repository.UserRepository;
+import com.intouch.aligooligo.domain.member.entity.Member;
+import com.intouch.aligooligo.domain.member.repository.MemberRepository;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -45,7 +45,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class SeedService {
     private final SeedRepository seedRepository;
-    private final UserRepository userRepository;
+    private final MemberRepository memberRepository;
     private final RoutineRepository routineRepository;
     private final RoutineTimestampRepository routineTimestampRepository;
     private final CheeringRepository cheeringRepository;
@@ -55,13 +55,13 @@ public class SeedService {
     private String urlPrefix;
 
     public SeedListResponse getSeedList(String email, Integer page, Integer size){
-        User user = userRepository.findByEmail(email)
+        Member member = memberRepository.findByEmail(email)
                 .orElseThrow(()-> {
                     log.error("SeedService - getSeedList : can't find userEmail");
                     return new UsernameNotFoundException(ErrorMessageDescription.UNKNOWN.getDescription());
                 });
         PageRequest pageRequest = PageRequest.of(page, size);
-        Page<Seed> seedList = seedRepository.findByUserIdOrderByIdDesc(user.getId(), pageRequest);
+        Page<Seed> seedList = seedRepository.findByMemberIdOrderByIdDesc(member.getId(), pageRequest);
 
         List<Integer> completedRoutineCountList = new ArrayList<>();
         List<List<Routine>> routinesList = new ArrayList<>();
@@ -93,7 +93,7 @@ public class SeedService {
 
     @Transactional
     public void createSeed(String userEmail, CreateSeedRequest createSeedRequest) {
-        User user = userRepository.findByEmail(userEmail)
+        Member member = memberRepository.findByEmail(userEmail)
                 .orElseThrow(() -> {
                     log.error("SeedService - createSeed : can't find userEmail");
                     return new UsernameNotFoundException(ErrorMessageDescription.UNKNOWN.getDescription());
@@ -104,7 +104,7 @@ public class SeedService {
                 .plusDays(1).atStartOfDay().minusSeconds(1);
 
         Seed seed = seedRepository.save(Seed.builder().startDate(startDate).endDate(endDate)
-                .seed(createSeedRequest.getSeed()).state(SeedState.SEED.name()).user(user).build());
+                .seed(createSeedRequest.getSeed()).state(SeedState.SEED.name()).member(member).build());
 
         for (RoutineInfo routineTitle : createSeedRequest.getRoutines()) {
             routineRepository.save(Routine.builder().title(routineTitle.getValue()).seed(seed).build());
@@ -197,12 +197,12 @@ public class SeedService {
     }
 
     public MySeedDataResponse getMyData(String userEmail) {
-        User user = userRepository.findByEmail(userEmail)
+        Member member = memberRepository.findByEmail(userEmail)
                 .orElseThrow(() -> {
                     log.error("SeedService - getMyData : can't find userEmail");
                     return new UsernameNotFoundException(ErrorMessageDescription.UNKNOWN.getDescription());
                 });
-        List<Seed> seeds = seedRepository.findByUserId(user.getId());
+        List<Seed> seeds = seedRepository.findByMemberId(member.getId());
         Map<String, Long> seedStateCount = seeds.stream().collect(
                 Collectors.groupingBy(Seed::getState, Collectors.counting()));
 
@@ -210,12 +210,12 @@ public class SeedService {
             seedStateCount.putIfAbsent(seedState.name(), 0L);
         }
 
-        return convertToMySeedDataResponse(user, seedStateCount);
+        return convertToMySeedDataResponse(member, seedStateCount);
     }
 
-    private MySeedDataResponse convertToMySeedDataResponse(User user, Map<String, Long> seedStateCount) {
-        String email = user.getEmail();
-        String name = user.getNickName();
+    private MySeedDataResponse convertToMySeedDataResponse(Member member, Map<String, Long> seedStateCount) {
+        String email = member.getEmail();
+        String name = member.getNickName();
         List<StateStatistics> stateStatisticsList = new ArrayList<>();
 
         for (String seedState : seedStateCount.keySet()) {
@@ -247,24 +247,24 @@ public class SeedService {
     public Boolean increaseCheer(String userEmail, Long seedId) {
         Seed seed = seedRepository.findById(seedId)
                 .orElseThrow(() -> new IllegalArgumentException(ErrorMessageDescription.SEED_NOT_FOUND.getDescription()));
-        User user = userRepository.findByEmail(userEmail)
+        Member member = memberRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new IllegalArgumentException(ErrorMessageDescription.UNKNOWN.getDescription()));
-        if (cheeringRepository.existsBySeedIdAndUserId(seed.getId(), user.getId())) {
-            cheeringRepository.deleteBySeedIdAndUserId(seed.getId(), user.getId());
+        if (cheeringRepository.existsBySeedIdAndMemberId(seed.getId(), member.getId())) {
+            cheeringRepository.deleteBySeedIdAndMemberId(seed.getId(), member.getId());
             return false;
         }
         else {
-            cheeringRepository.save(new Cheering(seed, user));
+            cheeringRepository.save(new Cheering(seed, member));
             return true;
         }
     }
 
     public CheerInfo getCheeringInfo(Long seedId) {
         Long cheerCount = cheeringRepository.countBySeedId(seedId);
-        List<User> cheerUserList = cheeringRepository.findBySeedId(seedId)
-                .stream().map(Cheering::getUser).toList();
+        List<Member> cheerMemberList = cheeringRepository.findBySeedId(seedId)
+                .stream().map(Cheering::getMember).toList();
 
-        List<CheerUser> cheerUsers = cheerUserList.stream().map(
+        List<CheerUser> cheerUsers = cheerMemberList.stream().map(
                 cheer -> new CheerUser(cheer.getId(), new CheererInfo(cheer.getNickName()))).toList();
 
         return new CheerInfo(cheerUsers, cheerCount);

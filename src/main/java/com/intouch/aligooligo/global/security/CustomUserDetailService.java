@@ -1,6 +1,6 @@
 package com.intouch.aligooligo.global.security;
 
-import com.intouch.aligooligo.domain.user.repository.UserRepository;
+import com.intouch.aligooligo.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -11,11 +11,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class CustomUserDetailService implements UserDetailsService {
 
-    private final UserRepository userRepository;
+    private final MemberRepository memberRepository;
 
     @Override
     public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
-        return new CustomUserDetail(userRepository.findById(Long.valueOf(id))
+        return new CustomUserDetail(memberRepository.findById(Long.valueOf(id))
                 .orElseThrow(
                         () -> new UsernameNotFoundException("사용자를 찾을 수 없습니다.")
                 ));

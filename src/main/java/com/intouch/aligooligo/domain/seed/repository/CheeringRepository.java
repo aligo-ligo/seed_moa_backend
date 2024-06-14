@@ -7,9 +7,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CheeringRepository extends JpaRepository<Cheering, Long> {
-    boolean existsBySeedIdAndUserId(Long seedId, Long userId);
+    boolean existsBySeedIdAndMemberId(Long seedId, Long memberId);
     long countBySeedId(Long seedId);
-    void deleteBySeedIdAndUserId(Long seedId, Long userId);
+    void deleteBySeedIdAndMemberId(Long seedId, Long memberId);
     void deleteBySeedId(Long seedId);
     List<Cheering> findBySeedId(Long seedId);
 

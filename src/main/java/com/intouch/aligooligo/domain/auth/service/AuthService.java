@@ -4,11 +4,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.intouch.aligooligo.domain.auth.dto.KakaoMember;
 import com.intouch.aligooligo.domain.auth.entity.RefreshToken;
+import com.intouch.aligooligo.domain.member.entity.Member;
 import com.intouch.aligooligo.global.Jwt.JwtTokenProvider;
-import com.intouch.aligooligo.domain.user.entity.Role;
+import com.intouch.aligooligo.domain.member.entity.Role;
 import com.intouch.aligooligo.domain.auth.dto.KakaoToken;
-import com.intouch.aligooligo.domain.user.entity.User;
-import com.intouch.aligooligo.domain.user.repository.UserRepository;
+import com.intouch.aligooligo.domain.member.repository.MemberRepository;
 import com.intouch.aligooligo.domain.auth.dto.SignInResponse;
 import com.intouch.aligooligo.domain.auth.dto.TokenInfo;
 import com.intouch.aligooligo.global.exception.ErrorMessageDescription;
@@ -38,7 +38,7 @@ import org.springframework.web.client.RestTemplate;
 @Slf4j
 public class AuthService {
     private final RefreshTokenService refreshTokenService;
-    private final UserRepository userRepository;
+    private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtProvider;
     private final SeedService seedService;
     private final SeedRepository seedRepository;
@@ -61,15 +61,15 @@ public class AuthService {
     public TokenInfo reIssueToken(String refreshToken) {
         try {
             Claims claims = jwtProvider.parseClaims(refreshToken);
-            User user = findByUserEmail(claims.getSubject());
+            Member member = findByUserEmail(claims.getSubject());
 
             RefreshToken findRefreshToken = refreshTokenService.findById(claims.getSubject());
 
             if (refreshToken.equals(findRefreshToken.getRefreshToken())) {
-                return jwtProvider.createToken(user.getEmail(), user.getRoles());
+                return jwtProvider.createToken(member.getEmail(), member.getRoles());
             }
 
-            refreshTokenService.deleteById(user.getEmail());
+            refreshTokenService.deleteById(member.getEmail());
             log.error("AuthService - reIssueToken : 리프레시 토큰이 일치하지 않아요.");
             throw new IllegalArgumentException(ErrorMessageDescription.REISSUE_FAILED.getDescription());
         } catch (IllegalArgumentException e) {
@@ -78,12 +78,12 @@ public class AuthService {
         }
     }
 
-    public User findByUserEmail(String email){
-        return userRepository.findByEmail(email).orElseThrow(()->
+    public Member findByUserEmail(String email){
+        return memberRepository.findByEmail(email).orElseThrow(()->
             new IllegalArgumentException("AuthService - findByUserEmail : 유저를 찾을 수 없습니다."));
     }
     public boolean existByUserEmail(String email){
-        return userRepository.existsByEmail(email);
+        return memberRepository.existsByEmail(email);
     }
 
     public SignInResponse kakaoLogin(String code) {
@@ -141,10 +141,10 @@ public class AuthService {
             String email = kakaoMember.getBody().getKakaoAccount().getEmail();
             String name = kakaoMember.getBody().getKakaoProperties().getNickName();
 
-            TokenInfo tokenInfo = jwtProvider.createToken(email, Role.USER);
+            TokenInfo tokenInfo = jwtProvider.createToken(email, Role.MEMBER);
             if(!existByUserEmail(email)) {
-                userRepository.save(User.builder().email(email)
-                        .nickName(name).roles(Role.USER).build());
+                memberRepository.save(Member.builder().email(email)
+                        .nickName(name).roles(Role.MEMBER).build());
                 return new SignInResponse(tokenInfo, true);
             }
 
@@ -156,12 +156,12 @@ public class AuthService {
 
     @Transactional
     public void withdrawalUser(String userPk) {
-        User user = findByUserEmail(userPk);
-        List<Seed> seedList = seedRepository.findByUserId(user.getId());
+        Member member = findByUserEmail(userPk);
+        List<Seed> seedList = seedRepository.findByMemberId(member.getId());
         for (Seed seed : seedList) {
             seedService.deleteSeed(seed.getId());
         }
-        userRepository.deleteById(user.getId());
+        memberRepository.deleteById(member.getId());
     }
 
     public static String getClientIP(HttpServletRequest request) {

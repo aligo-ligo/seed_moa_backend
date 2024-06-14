@@ -1,4 +1,4 @@
-package com.intouch.aligooligo.domain.user.entity;
+package com.intouch.aligooligo.domain.member.entity;
 
 
 import jakarta.persistence.*;
@@ -8,15 +8,15 @@ import lombok.*;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "user")
+@Table(name = "member")
 @Builder
-public class User {
+public class Member {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "user_email", length = 50, nullable = false, unique = true)
+    @Column(name = "member_email", length = 50, nullable = false, unique = true)
     private String email;
 
     @Column(name = "nickname", length = 10, nullable = false)
@@ -27,12 +27,12 @@ public class User {
     @Column(name = "roles")
     private Role roles;
 
-    public User(String email, Role roles) {
+    public Member(String email, Role roles) {
         this.email = email;
         this.roles = roles;
     }
 
-    public User(String email, String nickName, Role roles){
+    public Member(String email, String nickName, Role roles){
         this.email = email;
         this.nickName = nickName;
         this.roles = roles;

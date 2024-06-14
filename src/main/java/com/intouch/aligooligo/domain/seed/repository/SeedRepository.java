@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface SeedRepository extends JpaRepository<Seed, Long> {
-    Page<Seed> findByUserIdOrderByIdDesc(Long userId, Pageable pageable);
-    List<Seed> findByUserId(Long userId);
+    Page<Seed> findByMemberIdOrderByIdDesc(Long memberId, Pageable pageable);
+    List<Seed> findByMemberId(Long memberId);
     boolean existsById(Integer targetId);
 }
