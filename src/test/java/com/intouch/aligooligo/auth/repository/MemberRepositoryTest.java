@@ -14,7 +14,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.TestPropertySource;
 
 @DataJpaTest
-@TestPropertySource(locations = "classpath:application-test.properties")
+@TestPropertySource(locations = "classpath:application-dev.properties")
 public class MemberRepositoryTest {
 
     @Autowired
@@ -23,7 +23,7 @@ public class MemberRepositoryTest {
     @BeforeEach
     void setUp() {
         Member member = Member.builder()
-                .email("test@test.com")
+                .email("test3@test.com")
                 .nickName("test")
                 .roles(Role.MEMBER)
                 .build();
@@ -35,7 +35,7 @@ public class MemberRepositoryTest {
     void findByEmailTest() {
         //given
         //when
-        Optional<Member> result = memberRepository.findByEmail("test@test.com");
+        Optional<Member> result = memberRepository.findByEmail("test3@test.com");
         //then
         assertThat(result.isPresent()).isTrue();
     }
@@ -55,7 +55,7 @@ public class MemberRepositoryTest {
     void ExistsByEmailTest() {
         //given
         //when
-        Boolean result = memberRepository.existsByEmail("test@test.com");
+        Boolean result = memberRepository.existsByEmail("test3@test.com");
         //then
         assertThat(result).isTrue();
     }

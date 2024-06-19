@@ -3,10 +3,10 @@ package com.intouch.aligooligo;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-//@SpringBootTest
+@SpringBootTest
 class AligooligoApplicationTests {
 
-	//@Test
+	@Test
 	void contextLoads() {
 	}
 
