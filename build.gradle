@@ -35,6 +35,9 @@ dependencies {
 	/* redis */
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+	testImplementation 'org.testcontainers:testcontainers:1.19.8'
+	testImplementation 'org.testcontainers:junit-jupiter:1.19.8'
+	testRuntimeOnly 'com.h2database:h2'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
