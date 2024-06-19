@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @AllArgsConstructor
-@RequestMapping(value="/users")
+@RequestMapping(value="/members")
 @RestController
 public class MemberController {
     private final MemberRepository memberRepository;
